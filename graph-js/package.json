@@ -1,0 +1,57 @@
+{
+  "name": "@guinetik/graph-js",
+  "version": "1.0.0",
+  "description": "Graph and Network Analysis for NodeJS and the Browser.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./types/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./types/index.d.ts"
+    },
+    "./worker": "./dist/network-worker.js",
+    "./worker-url": "./dist/worker-url.js"
+  },
+  "files": [
+    "dist",
+    "types",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "build:watch": "vite build --watch",
+    "prepublishOnly": "npm run build",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/guinetik/graph-js.git"
+  },
+  "keywords": [
+    "network-analysis",
+    "graph-theory",
+    "eigenvector-centrality",
+    "betweenness-centrality",
+    "modularity",
+    "community-detection",
+    "louvain-algorithm"
+  ],
+  "author": "guinetik",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/guinetik/graph-js/issues"
+  },
+  "homepage": "https://github.com/guinetik/graph-js#readme",
+  "dependencies": {
+    "@guinetik/logger": "^1.0.0"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^0.34.6",
+    "vite": "^7.1.12",
+    "vitest": "^0.34.6"
+  }
+}
