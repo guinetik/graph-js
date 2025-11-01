@@ -62,11 +62,12 @@
           </button>
 
           <button
-            @click="handleAddToAlice"
+            @click="handleAddToSelected"
             class="btn-secondary text-sm px-2 py-2 whitespace-nowrap"
-            title="Add a node connected to Alice"
+            :disabled="!getSelectedNode()"
+            :title="getSelectedNode() ? `Add a node connected to ${getSelectedNode().id}` : 'Select a node first'"
           >
-            🔗 To Alice
+            🔗 To Selected
           </button>
 
           <button
@@ -109,121 +110,62 @@
 
       <!-- Network Analysis Section -->
       <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
-        <h2 class="demo-controls-section-title">Network Analysis</h2>
+        <h2 class="demo-controls-section-title">⚡ Network Analysis (Node Sizes)</h2>
 
-        <button
-          @click="handleAnalyzeGraph"
-          :disabled="loading"
-          class="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-4 py-3 rounded-md font-semibold transition-colors"
-        >
-          <span v-if="!loading">🧮 Analyze Network (Web Workers)</span>
-          <span v-else>⏳ Analyzing...</span>
-        </button>
-
-        <div v-if="loading && analysisProgress > 0" class="mt-2">
-          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-            <div
-              class="bg-green-600 h-2 rounded-full transition-all duration-300"
-              :style="{ width: `${analysisProgress * 100}%` }"
-            ></div>
-          </div>
-          <p class="text-xs text-secondary mt-1 text-center">
-            {{ Math.round(analysisProgress * 100) }}%
-          </p>
-        </div>
+        <NetworkAnalysis
+          v-model:selected-metrics="selectedFeatures"
+          v-model:size-metric="selectedSizeMetric"
+          :analyzing="loading"
+          :progress="analysisProgress"
+          @analyze="handleAnalyzeGraph"
+        />
 
         <div class="info-box-green mt-3">
           <p class="text-xs text-green-800 dark:text-green-200">
-            <strong>Uses @guinetik/graph-js:</strong> Computes degree, eigenvector centrality,
-            and betweenness in web workers for optimal performance.
+            <strong>Uses @guinetik/graph-js:</strong> Computes centrality metrics
+            in web workers for optimal performance.
           </p>
         </div>
       </div>
-
       <!-- Layout Algorithm Section -->
       <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
         <h2 class="demo-controls-section-title">Layout Algorithm</h2>
 
-        <div class="space-y-2">
-          <label class="block text-sm font-medium text-secondary">
-            Choose Layout:
-          </label>
-          <select
-            v-model="selectedLayout"
-            class="w-full bg-secondary text-primary border border-color px-3 py-2 rounded-md"
-          >
-            <option
-              v-for="layout in availableLayouts"
-              :key="layout.id"
-              :value="layout.id"
-            >
-              {{ layout.name }}
-            </option>
-          </select>
-        </div>
-
-        <button
-          @click="handleApplyLayout"
-          :disabled="loading"
-          class="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white px-4 py-3 rounded-md font-semibold transition-colors mt-3"
-        >
-          <span v-if="!loading">🎯 Apply Layout</span>
-          <span v-else>⏳ Applying...</span>
-        </button>
-
-        <div v-if="selectedLayout !== 'none'" class="info-box-yellow mt-3">
-          <p class="text-xs text-yellow-800 dark:text-yellow-200">
-            <strong>{{ availableLayouts.find(l => l.id === selectedLayout)?.name }}:</strong>
-            {{ availableLayouts.find(l => l.id === selectedLayout)?.description }}
-          </p>
-        </div>
+        <LayoutPicker
+          v-model="selectedLayout"
+          :available-layouts="availableLayouts"
+          :loading="loading"
+          @apply="handleApplyLayout"
+        />
       </div>
 
       <!-- Community Detection Section -->
       <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
         <h2 class="demo-controls-section-title">🎨 Community Detection</h2>
 
-        <div class="space-y-2">
-          <label class="block text-sm font-medium text-secondary">
-            Choose Algorithm:
-          </label>
-          <select
-            v-model="selectedCommunityAlgorithm"
-            class="w-full bg-secondary text-primary border border-color px-3 py-2 rounded-md"
-          >
-            <option
-              v-for="algo in availableCommunityAlgorithms"
-              :key="algo.id"
-              :value="algo.id"
-            >
-              {{ algo.name }}
-            </option>
-          </select>
-        </div>
-
-        <button
-          @click="handleDetectCommunities"
-          :disabled="loading"
-          class="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 text-white px-4 py-3 rounded-md font-semibold transition-colors mt-3"
+        <CommunityPicker
+          v-model="selectedCommunityAlgorithm"
+          :available-algorithms="availableCommunityAlgorithms"
+          :detecting="loading"
+          @detect="handleDetectCommunities"
         >
-          <span v-if="!loading">🎨 Detect Communities</span>
-          <span v-else>⏳ Detecting...</span>
-        </button>
+          <template #results>
+            <div v-if="communityResult" class="info-box-green mt-3">
+              <p class="text-sm text-green-800 dark:text-green-200 space-y-1">
+                <div><strong>Communities Found:</strong> {{ communityResult.numCommunities }}</div>
+                <div><strong>Modularity:</strong> {{ communityResult.modularity.toFixed(3) }}</div>
+                <div class="text-xs mt-2">Node colors represent community assignments</div>
+              </p>
+            </div>
 
-        <div v-if="communityResult" class="info-box-green mt-3">
-          <p class="text-sm text-green-800 dark:text-green-200 space-y-1">
-            <div><strong>Communities Found:</strong> {{ communityResult.numCommunities }}</div>
-            <div><strong>Modularity:</strong> {{ communityResult.modularity.toFixed(3) }}</div>
-            <div class="text-xs mt-2">Node colors represent community assignments</div>
-          </p>
-        </div>
-
-        <div v-if="availableCommunityAlgorithms.length > 0 && !communityResult" class="info-box-yellow mt-3">
-          <p class="text-xs text-yellow-800 dark:text-yellow-200">
-            <strong>{{ availableCommunityAlgorithms.find(a => a.id === selectedCommunityAlgorithm)?.name }}:</strong>
-            {{ availableCommunityAlgorithms.find(a => a.id === selectedCommunityAlgorithm)?.description }}
-          </p>
-        </div>
+            <div v-if="availableCommunityAlgorithms.length > 0 && !communityResult" class="info-box-yellow mt-3">
+              <p class="text-xs text-yellow-800 dark:text-yellow-200">
+                <strong>{{ availableCommunityAlgorithms.find(a => a.id === selectedCommunityAlgorithm)?.name }}:</strong>
+                {{ availableCommunityAlgorithms.find(a => a.id === selectedCommunityAlgorithm)?.description }}
+              </p>
+            </div>
+          </template>
+        </CommunityPicker>
       </div>
 
       <!-- Instructions Box -->
@@ -239,19 +181,6 @@
           <li>📊 <strong>Node size</strong> = centrality</li>
           <li>🎨 <strong>Color</strong> = group/community</li>
         </ul>
-      </div>
-
-      <!-- Metrics Explanation -->
-      <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
-        <h3 class="text-sm font-semibold text-primary mb-2">
-          📈 About Network Analysis
-        </h3>
-        <p class="text-sm text-secondary mb-2">
-          Network centrality measures how important a node is within the network structure.
-        </p>
-        <p class="text-sm text-secondary">
-          More central nodes have more connections or connections to other important nodes.
-        </p>
       </div>
     </template>
 
@@ -276,6 +205,9 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import DemoLayout from '../components/DemoLayout.vue';
+import LayoutPicker from '../components/LayoutPicker.vue';
+import CommunityPicker from '../components/CommunityPicker.vue';
+import NetworkAnalysis from '../components/NetworkAnalysis.vue';
 import { useNetworkGraph } from '../composables/useNetworkGraph';
 import { ShowcaseController } from '../lib/ShowcaseController';
 
@@ -295,7 +227,9 @@ const {
   applyLayout,
   getAvailableLayouts,
   detectCommunities,
-  getAvailableCommunityAlgorithms
+  getAvailableCommunityAlgorithms,
+  getSelectedNode,
+  unlockPositions
 } = graphComposable;
 
 // Local state (Vue-specific reactive data)
@@ -305,6 +239,8 @@ const availableLayouts = ref([]);
 const selectedCommunityAlgorithm = ref('louvain');
 const availableCommunityAlgorithms = ref([]);
 const communityResult = ref(null);
+const selectedFeatures = ref(['degree', 'eigenvector', 'betweenness']);
+const selectedSizeMetric = ref('');
 const statusMessage = ref('');
 const statusType = ref('info');
 const loadingMessage = ref('Loading graph...');
@@ -341,7 +277,9 @@ const initializeShowcase = () => {
     applyLayout,
     getAvailableLayouts,
     detectCommunities,
-    getAvailableCommunityAlgorithms
+    getAvailableCommunityAlgorithms,
+    getSelectedNode,
+    unlockPositions
   };
 
   controller = new ShowcaseController({
@@ -373,11 +311,11 @@ const handleAddRandomNode = () => {
 };
 
 /**
- * Add a node connected to "Alice"
+ * Add a node connected to the selected node
  */
-const handleAddToAlice = () => {
+const handleAddToSelected = () => {
   if (!controller) return;
-  controller.addNodeConnectedTo('Alice');
+  controller.addNodeToSelected();
 };
 
 /**
@@ -395,17 +333,17 @@ const handleLoadDataset = async () => {
   if (!controller) return;
 
   try {
-    loading.value = true;
+    loadingMessage.value = `Loading ${selectedDataset.value} dataset...`;
     const result = await controller.loadDataset(selectedDataset.value);
-    
+
     if (result.success) {
       loadingMessage.value = `Loading ${result.name} dataset...`;
     }
   } catch (err) {
     console.error('Failed to load dataset:', err);
-  } finally {
-    loading.value = false;
+    loading.value = false; // Only clear on error
   }
+  // Don't clear loading here - let the composable's loadData handle it via the 'ready' event
 };
 
 /**
@@ -416,7 +354,7 @@ const handleAnalyzeGraph = async () => {
 
   try {
     loadingMessage.value = 'Analyzing network using workers...';
-    await controller.analyzeGraph(['degree', 'eigenvector', 'betweenness']);
+    await controller.analyzeGraph(selectedFeatures.value);
   } catch (err) {
     console.error('Analysis error:', err);
   }

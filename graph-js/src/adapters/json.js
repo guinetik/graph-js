@@ -48,15 +48,15 @@ export class JSONAdapter extends Adapter {
     }
 
     const nodes = d3Data.nodes.map(node => ({
-      id: String(node.id),
-      ...node
+      ...node,
+      id: String(node.id)  // Spread first, then override with stringified id
     }));
 
     const edges = (d3Data.links || []).map(link => ({
-      source: String(link.source?.id || link.source),
+      ...link,
+      source: String(link.source?.id || link.source),  // Spread first, then override
       target: String(link.target?.id || link.target),
-      weight: link.weight || link.value || 1,
-      ...link
+      weight: link.weight || link.value || 1
     }));
 
     const graphData = { nodes, edges };

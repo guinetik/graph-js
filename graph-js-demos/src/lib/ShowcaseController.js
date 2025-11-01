@@ -104,19 +104,9 @@ export class ShowcaseController {
    */
   async _loadDefaultDataset() {
     const initialData = this.getInitialDataset();
-    
-    // Convert to GraphData format
-    const graphData = {
-      nodes: initialData.nodes,
-      edges: initialData.links.map(l => ({
-        source: l.source,
-        target: l.target,
-        weight: l.weight || 1
-      }))
-    };
 
-    // Convert to D3 format
-    return JSONAdapter.toD3(graphData);
+    // Already in D3 format (has links), just return it
+    return initialData;
   }
 
   /**
@@ -134,7 +124,10 @@ export class ShowcaseController {
       group: n.club === 'Mr. Hi' ? 1 : 2
     }));
 
-    return JSONAdapter.toD3(graphData);
+    return {
+      nodes: graphData.nodes,
+      links: graphData.edges
+    };
   }
 
   /**
@@ -152,7 +145,10 @@ export class ShowcaseController {
       group: n.group || 1
     }));
 
-    return JSONAdapter.toD3(graphData);
+    return {
+      nodes: graphData.nodes,
+      links: graphData.edges
+    };
   }
 
   /**
@@ -224,13 +220,13 @@ export class ShowcaseController {
 
     // Pick a random existing node to connect to
     const randomNode = nodeIds[Math.floor(Math.random() * nodeIds.length)];
-    const newNode = this.graphManager.addNode([randomNode]);
+    const newNode = this.graphManager.addNode([randomNode], null, null, true); // incremental = true
 
     if (newNode) {
       const message = `✅ Added node "${newNode.id}" connected to "${randomNode}"`;
       this.log.debug('Added random node', { nodeId: newNode.id, connectedTo: randomNode });
       this._updateStatus(message, 'success');
-      
+
       return {
         success: true,
         node: newNode,
@@ -243,34 +239,37 @@ export class ShowcaseController {
   }
 
   /**
-   * Adds a node connected to a specific target node
-   * 
-   * @param {string} targetNodeId - ID of the node to connect to
+   * Adds a node connected to the currently selected node
+   *
    * @returns {Object} Result object with success status and node info
    */
-  addNodeConnectedTo(targetNodeId) {
+  addNodeToSelected() {
     if (!this.graphManager.graphInstance.value) {
       return { success: false, error: 'Graph not initialized' };
     }
 
-    if (!this.graphManager.hasNode(targetNodeId)) {
-      const message = `❌ Node "${targetNodeId}" not found in graph`;
-      this.log.warn('Target node not found', { targetNodeId });
+    // Get the currently selected node
+    const selectedNode = this.graphManager.getSelectedNode();
+
+    if (!selectedNode) {
+      const message = '❌ No node selected. Click on a node to select it first.';
+      this.log.warn('No node selected');
       this._updateStatus(message, 'error');
-      
+
       return {
         success: false,
-        error: `Node "${targetNodeId}" not found`
+        error: 'No node selected'
       };
     }
 
-    const newNode = this.graphManager.addNode([targetNodeId]);
-    
+    const targetNodeId = selectedNode.id;
+    const newNode = this.graphManager.addNode([targetNodeId], null, null, true); // incremental = true
+
     if (newNode) {
       const message = `✅ Added node "${newNode.id}" connected to "${targetNodeId}"`;
-      this.log.debug('Added node connected to target', { nodeId: newNode.id, targetNodeId });
+      this.log.debug('Added node connected to selected', { nodeId: newNode.id, targetNodeId });
       this._updateStatus(message, 'success');
-      
+
       return {
         success: true,
         node: newNode,
@@ -278,13 +277,13 @@ export class ShowcaseController {
       };
     }
 
-    this.log.warn('Failed to add node connected to target', { targetNodeId });
+    this.log.warn('Failed to add node connected to selected', { targetNodeId });
     return { success: false, error: 'Failed to add node' };
   }
 
   /**
    * Removes a random node from the graph
-   * 
+   *
    * @returns {Object} Result object with success status and removed node ID
    */
   removeRandomNode() {
@@ -296,18 +295,18 @@ export class ShowcaseController {
     if (nodeIds.length === 0) {
       const message = '❌ No nodes to remove';
       this._updateStatus(message, 'error');
-      
+
       return { success: false, error: 'No nodes to remove' };
     }
 
     const randomId = nodeIds[Math.floor(Math.random() * nodeIds.length)];
-    const success = this.graphManager.removeNode(randomId);
+    const success = this.graphManager.removeNode(randomId, true); // incremental = true
 
     if (success) {
       const message = `🗑️ Removed node "${randomId}"`;
       this.log.debug('Removed random node', { nodeId: randomId });
       this._updateStatus(message, 'info');
-      
+
       return {
         success: true,
         removedNodeId: randomId
@@ -372,7 +371,10 @@ export class ShowcaseController {
       const message = 'ℹ️ Using D3 physics simulation (no layout algorithm)';
       this.log.debug('Using default D3 physics simulation');
       this._updateStatus(message, 'info');
-      
+
+      // Unlock all fixed positions to allow D3 physics to take over
+      this.graphManager.unlockPositions();
+
       return {
         success: true,
         layoutId: 'none',
@@ -500,6 +502,15 @@ export class ShowcaseController {
       this._updateStatus(`Error: ${error.message}`, 'error');
       return null;
     }
+  }
+
+  /**
+   * Gets the currently selected node
+   *
+   * @returns {Object|null} Selected node or null
+   */
+  getSelectedNode() {
+    return this.graphManager.getSelectedNode();
   }
 }
 

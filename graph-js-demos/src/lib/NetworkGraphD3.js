@@ -189,6 +189,9 @@ export class NetworkGraphD3 {
     this.isReady = false;
     this.isRendering = false; // Track if we're currently rendering
 
+    // Selection state
+    this.selectedNode = null;
+
     // Scales (will be computed based on data)
     this.sizeScale = null;
     this.colorScale = null;
@@ -272,6 +275,14 @@ export class NetworkGraphD3 {
     this.svg.call(this.zoomBehavior);
     this.currentZoom = 1;
 
+    // Add click handler to SVG background to deselect nodes
+    this.svg.on('click', (event) => {
+      // Only deselect if clicking on the SVG background (not on a node)
+      if (event.target === this.svg.node()) {
+        this.deselectNode();
+      }
+    });
+
     // Initialize force simulation with dynamic collision radius
     this.simulation = d3.forceSimulation()
       .force('link', d3.forceLink()
@@ -342,6 +353,9 @@ export class NetworkGraphD3 {
 
     // Clear link key cache
     this.linkKeyCache.clear();
+
+    // Clear selection when loading new dataset
+    this.selectedNode = null;
 
     // Compute scales based on data
     this.computeScales();
@@ -525,7 +539,7 @@ export class NetworkGraphD3 {
     this.stableTickCount = 0;
     this.lastAlpha = 1;
 
-    // Hide SVG until ready
+    // Hide SVG until ready (saves CPU by not rendering during load)
     if (this.svg) {
       this.svg
         .style('opacity', 0)
@@ -568,18 +582,25 @@ export class NetworkGraphD3 {
       .call(this.createDragBehavior())
       .on('mouseover', (event, d) => this.onNodeMouseOver(event, d))
       .on('mouseout', (event, d) => this.onNodeMouseOut(event, d))
-      .on('click', (event, d) => this.emit('nodeClick', d))
+      .on('click', (event, d) => {
+        event.stopPropagation(); // Prevent SVG background click
+        this.toggleNodeSelection(d);
+        this.emit('nodeClick', d);
+      })
       .on('keydown', (event, d) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
+          this.toggleNodeSelection(d);
           this.emit('nodeClick', d);
         }
       });
 
-    // Update existing nodes (size and color may have changed)
+    // Update existing nodes (size, color, and selection state may have changed)
     this.node = nodeEnter.merge(this.node)
       .attr('r', d => this.getNodeRadius(d))
-      .attr('fill', d => this.getNodeColor(d));
+      .attr('fill', d => this.getNodeColor(d))
+      .attr('stroke', d => this.getNodeStrokeColor(d))
+      .attr('stroke-width', d => this.getNodeStrokeWidth(d));
 
     // Update collision detection with dynamic radius
     this.simulation.force('collision')
@@ -597,15 +618,19 @@ export class NetworkGraphD3 {
         .append('text')
         .text(d => d.id)
         .attr('font-size', '12px')
-        .attr('dx', 12)
-        .attr('dy', 4)
+        .attr('text-anchor', 'middle')
+        .attr('dx', 0)
+        .attr('dy', d => this.getNodeRadius(d) + 15)
         .attr('fill', 'var(--color-text-primary)')
         .style('pointer-events', 'none')
         .style('user-select', 'none')
         .attr('aria-hidden', 'true');
 
       this.label = labelEnter.merge(this.label);
-      
+
+      // Update dy for all labels (in case node sizes changed)
+      this.label.attr('dy', d => this.getNodeRadius(d) + 15);
+
       // Update label visibility based on current zoom
       this.updateLabelVisibility();
     }
@@ -1110,10 +1135,10 @@ export class NetworkGraphD3 {
    * Handle node mouse out
    */
   onNodeMouseOut(event, node) {
-    // Reset node
+    // Reset node to its proper state (respecting selection)
     d3.select(event.currentTarget)
-      .attr('stroke-width', 2)
-      .attr('stroke', '#fff');
+      .attr('stroke-width', this.getNodeStrokeWidth(node))
+      .attr('stroke', this.getNodeStrokeColor(node));
 
     // Hide tooltip
     this.hideTooltip();
@@ -1173,6 +1198,110 @@ export class NetworkGraphD3 {
       '#f97316'  // orange
     ];
     return colors[(group - 1) % colors.length];
+  }
+
+  /**
+   * Get stroke (border) color for node based on selection state
+   * @param {Object} node - Node object
+   * @returns {string} Stroke color
+   */
+  getNodeStrokeColor(node) {
+    if (this.selectedNode && this.selectedNode.id === node.id) {
+      return '#fb923c'; // Light orange for selected node
+    }
+    return '#fff'; // White for non-selected nodes
+  }
+
+  /**
+   * Get stroke width for node based on selection state
+   * @param {Object} node - Node object
+   * @returns {number} Stroke width
+   */
+  getNodeStrokeWidth(node) {
+    if (this.selectedNode && this.selectedNode.id === node.id) {
+      return 3; // Thicker border for selected node
+    }
+    return 2; // Normal border width
+  }
+
+  /**
+   * Toggle node selection
+   * @param {Object} node - Node to toggle selection
+   */
+  toggleNodeSelection(node) {
+    if (this.selectedNode && this.selectedNode.id === node.id) {
+      // Clicking on already selected node - deselect it
+      this.deselectNode();
+    } else {
+      // Select new node
+      this.selectNode(node);
+    }
+  }
+
+  /**
+   * Select a node
+   * @param {Object} node - Node to select
+   */
+  selectNode(node) {
+    if (!node) return;
+
+    const previousSelection = this.selectedNode;
+
+    // Unfreeze the previously selected node (if any)
+    if (previousSelection) {
+      previousSelection.fx = null;
+      previousSelection.fy = null;
+    }
+
+    this.selectedNode = node;
+
+    // Update visual styling for all nodes
+    if (this.node) {
+      this.node
+        .attr('stroke', d => this.getNodeStrokeColor(d))
+        .attr('stroke-width', d => this.getNodeStrokeWidth(d));
+    }
+
+    this.log.debug('Node selected', { nodeId: node.id });
+    this.emit('nodeSelected', { node, previousSelection });
+  }
+
+  /**
+   * Deselect the currently selected node
+   */
+  deselectNode() {
+    if (!this.selectedNode) return;
+
+    const previousSelection = this.selectedNode;
+
+    // Unfreeze the deselected node so it can move freely with physics
+    previousSelection.fx = null;
+    previousSelection.fy = null;
+
+    this.selectedNode = null;
+
+    // Update visual styling for all nodes
+    if (this.node) {
+      this.node
+        .attr('stroke', d => this.getNodeStrokeColor(d))
+        .attr('stroke-width', d => this.getNodeStrokeWidth(d));
+    }
+
+    // Restart simulation with low alpha to let the unfrozen node settle
+    if (this.simulation) {
+      this.simulation.alpha(0.3).restart();
+    }
+
+    this.log.debug('Node deselected', { nodeId: previousSelection.id });
+    this.emit('nodeDeselected', { previousSelection });
+  }
+
+  /**
+   * Get the currently selected node
+   * @returns {Object|null} Selected node or null
+   */
+  getSelectedNode() {
+    return this.selectedNode;
   }
 
   /**
@@ -1331,19 +1460,26 @@ export class NetworkGraphD3 {
         .call(this.createDragBehavior())
         .on('mouseover', (event, d) => this.onNodeMouseOver(event, d))
         .on('mouseout', (event, d) => this.onNodeMouseOut(event, d))
-        .on('click', (event, d) => this.emit('nodeClick', d))
+        .on('click', (event, d) => {
+          event.stopPropagation(); // Prevent SVG background click
+          this.toggleNodeSelection(d);
+          this.emit('nodeClick', d);
+        })
         .on('keydown', (event, d) => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
+            this.toggleNodeSelection(d);
             this.emit('nodeClick', d);
           }
         });
 
-      // Merge and update all nodes (in case colors changed)
+      // Merge and update all nodes (in case colors or selection changed)
       this.node = nodeEnter.merge(this.node);
       this.node
         .attr('r', d => this.getNodeRadius(d))
-        .attr('fill', d => this.getNodeColor(d));
+        .attr('fill', d => this.getNodeColor(d))
+        .attr('stroke', d => this.getNodeStrokeColor(d))
+        .attr('stroke-width', d => this.getNodeStrokeWidth(d));
     }
 
     // Add new links
@@ -1395,8 +1531,9 @@ export class NetworkGraphD3 {
         .append('text')
         .text(d => d.id)
         .attr('font-size', '12px')
-        .attr('dx', 12)
-        .attr('dy', 4)
+        .attr('text-anchor', 'middle')
+        .attr('dx', 0)
+        .attr('dy', d => this.getNodeRadius(d) + 15)
         .attr('fill', 'var(--color-text-primary)')
         .attr('x', d => d.x)
         .attr('y', d => d.y)
@@ -1406,7 +1543,10 @@ export class NetworkGraphD3 {
 
       // Merge
       this.label = labelEnter.merge(this.label);
-      
+
+      // Update dy for all labels (in case node sizes changed)
+      this.label.attr('dy', d => this.getNodeRadius(d) + 15);
+
       this.updateLabelVisibility();
     }
 
@@ -1550,6 +1690,98 @@ export class NetworkGraphD3 {
 
     // Update graph
     this.updateGraph();
+
+    this.emit('nodeRemoved', nodeId);
+    return true;
+  }
+
+  /**
+   * Remove a node from the graph incrementally (without resetting ready state)
+   * Use this for interactive removals where you don't want the graph to disappear
+   * @param {String} nodeId - ID of the node to remove
+   * @returns {Boolean} True if node was removed
+   */
+  removeNodeIncremental(nodeId) {
+    if (!nodeId) {
+      // Remove random node if no ID specified
+      if (this.data.nodes.length > 0) {
+        nodeId = this.data.nodes[Math.floor(Math.random() * this.data.nodes.length)].id;
+      } else {
+        return false;
+      }
+    }
+
+    const nodeIndex = this.data.nodes.findIndex(n => n.id === nodeId);
+    if (nodeIndex === -1) return false;
+
+    // Remove node from data
+    this.data.nodes.splice(nodeIndex, 1);
+
+    // Remove all links connected to this node using normalized IDs
+    this.data.links = this.data.links.filter(l => {
+      const sourceId = normalizeLinkId(l.source);
+      const targetId = normalizeLinkId(l.target);
+      return sourceId !== nodeId && targetId !== nodeId;
+    });
+
+    // Clear link key cache
+    this.linkKeyCache.clear();
+
+    // Update scales if needed (for color/size)
+    this.computeScales();
+
+    // Remove node from visualization without resetting ready state
+    if (this.nodeGroup) {
+      // Update node selection
+      this.node = this.nodeGroup
+        .selectAll('circle')
+        .data(this.data.nodes, d => d.id);
+
+      // Remove old nodes
+      this.node.exit().remove();
+    }
+
+    // Remove disconnected links from visualization
+    if (this.linkGroup) {
+      // Update link selection
+      this.link = this.linkGroup
+        .selectAll('line')
+        .data(this.data.links, d => getLinkKey(d));
+
+      // Remove old links
+      this.link.exit().remove();
+    }
+
+    // Remove labels if enabled
+    if (this.options.showLabels && this.labelGroup) {
+      // Update label selection
+      this.label = this.labelGroup
+        .selectAll('text')
+        .data(this.data.nodes, d => d.id);
+
+      // Remove old labels
+      this.label.exit().remove();
+    }
+
+    // Update simulation with remaining nodes
+    this.simulation.nodes(this.data.nodes);
+    this.simulation.force('link').links(this.data.links);
+
+    // Update collision detection
+    this.simulation.force('collision')
+      .radius(d => this.getNodeRadius(d) + DEFAULTS.COLLISION_PADDING);
+
+    // Restart simulation gently (don't reset ready state)
+    if (this.isReady) {
+      // Keep graph visible, just restart simulation with low alpha
+      this.simulation.alpha(0.3).restart();
+    } else {
+      // If not ready yet, enable rendering
+      this.isRendering = true;
+      requestAnimationFrame(() => {
+        this.simulation.alpha(DEFAULTS.SIMULATION_ALPHA).restart();
+      });
+    }
 
     this.emit('nodeRemoved', nodeId);
     return true;

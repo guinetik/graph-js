@@ -104,13 +104,13 @@ export function useNetworkGraph(options = {}) {
     try {
       loading.value = true;
       log.debug('Loading data into graph', { nodeCount: nodes.length, linkCount: links.length });
-      
+
       // Listen for ready event - this will hide spinner and zoom to fit
       const readyHandler = () => {
         loading.value = false;
         graphInstance.value.off('ready', readyHandler);
         log.info('Graph ready and fitted to view');
-        
+
         // Auto-compute eigenvector centrality after data is loaded
         // This happens automatically when loading from localStorage or initial data
         if (autoComputeCentrality && graphInstance.value?.data?.nodes?.length >= 2) {
@@ -120,10 +120,10 @@ export function useNetworkGraph(options = {}) {
           });
         }
       };
-      
+
       graphInstance.value.on('ready', readyHandler);
       graphInstance.value.setData(nodes, links);
-      
+
       // If ready event doesn't fire (shouldn't happen), set timeout as fallback
       // But user said no setTimeout... so we rely on the event
     } catch (err) {
@@ -213,17 +213,33 @@ export function useNetworkGraph(options = {}) {
   /**
    * Remove a node from the graph
    * @param {String} nodeId - ID of node to remove (optional, removes random if not provided)
+   * @param {Boolean} incremental - If true, removes node without resetting ready state (default: false)
    * @returns {Boolean} True if node was removed
    */
-  const removeNode = (nodeId = null) => {
+  const removeNode = (nodeId = null, incremental = false) => {
     if (!graphInstance.value) {
       log.warn('Graph not initialized yet');
       return false;
     }
 
     try {
-      log.debug('Removing node', { nodeId });
-      return graphInstance.value.removeNode(nodeId);
+      log.debug('Removing node', { nodeId, incremental });
+      let removed;
+      if (incremental && graphInstance.value.removeNodeIncremental) {
+        removed = graphInstance.value.removeNodeIncremental(nodeId);
+      } else {
+        removed = graphInstance.value.removeNode(nodeId);
+      }
+
+      // Auto-compute eigenvector centrality after removing node
+      if (removed && autoComputeCentrality) {
+        // Use requestAnimationFrame to defer computation and avoid blocking UI
+        requestAnimationFrame(() => {
+          autoComputeEigenvector();
+        });
+      }
+
+      return removed;
     } catch (err) {
       log.error('Failed to remove node', { error: err.message, stack: err.stack });
       error.value = err.message;
@@ -554,6 +570,18 @@ export function useNetworkGraph(options = {}) {
   };
 
   /**
+   * Get the currently selected node
+   * @returns {Object|null} Selected node or null
+   */
+  const getSelectedNode = () => {
+    if (!graphInstance.value) {
+      log.warn('Graph not initialized yet');
+      return null;
+    }
+    return graphInstance.value.getSelectedNode();
+  };
+
+  /**
    * Destroy the graph and cleanup
    */
   const destroyGraph = async () => {
@@ -615,7 +643,8 @@ export function useNetworkGraph(options = {}) {
     updateVisualEncoding,
     lockPositions,
     unlockPositions,
-    saveAsPNG
+    saveAsPNG,
+    getSelectedNode
   };
 }
 

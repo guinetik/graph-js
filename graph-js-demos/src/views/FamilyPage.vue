@@ -179,68 +179,13 @@
       <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
         <h2 class="demo-controls-section-title">⚡ Network Analysis (Node Sizes)</h2>
 
-        <div class="bg-[var(--color-bg-secondary)] rounded-md p-4 space-y-2 mb-3">
-          <h3 class="text-sm font-semibold text-primary">
-            Metrics to Calculate
-          </h3>
-          <div class="space-y-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" v-model="selectedFeatures" value="degree" class="rounded">
-              <span class="text-secondary">Degree Centrality</span>
-            </label>
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" v-model="selectedFeatures" value="betweenness" class="rounded">
-              <span class="text-secondary">Betweenness Centrality</span>
-            </label>
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" v-model="selectedFeatures" value="clustering" class="rounded">
-              <span class="text-secondary">Clustering Coefficient</span>
-            </label>
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" v-model="selectedFeatures" value="eigenvector" class="rounded">
-              <span class="text-secondary">Eigenvector Centrality</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="space-y-2 mb-3">
-          <label class="block text-sm font-medium text-secondary">
-            Node Size Based On:
-          </label>
-          <select
-            v-model="selectedSizeMetric"
-            :disabled="selectedFeatures.length === 0"
-            class="w-full bg-secondary text-primary border border-color px-3 py-2 rounded-md disabled:opacity-50"
-          >
-            <option value="">-- Select a metric --</option>
-            <option v-if="selectedFeatures.includes('degree')" value="degree">Degree</option>
-            <option v-if="selectedFeatures.includes('betweenness')" value="betweenness">Betweenness</option>
-            <option v-if="selectedFeatures.includes('clustering')" value="clustering">Clustering</option>
-            <option v-if="selectedFeatures.includes('eigenvector')" value="eigenvector">Eigenvector</option>
-          </select>
-        </div>
-
-        <button
-          @click="handleAnalyzeGraph"
-          :disabled="analyzing || selectedFeatures.length === 0"
-          class="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white px-4 py-3 rounded-md font-semibold transition-colors"
-        >
-          <span v-if="!analyzing">⚡ Analyze Network</span>
-          <span v-else>⏳ Analyzing...</span>
-        </button>
-
-        <!-- Progress Bar -->
-        <div v-if="analyzing" class="mt-2">
-          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-            <div
-              class="bg-purple-600 h-2 rounded-full transition-all duration-300"
-              :style="{ width: `${analysisProgress * 100}%` }"
-            ></div>
-          </div>
-          <p class="text-xs text-secondary mt-1 text-center">
-            {{ Math.round(analysisProgress * 100) }}%
-          </p>
-        </div>
+        <NetworkAnalysis
+          v-model:selected-metrics="selectedFeatures"
+          v-model:size-metric="selectedSizeMetric"
+          :analyzing="analyzing"
+          :progress="analysisProgress"
+          @analyze="handleAnalyzeGraph"
+        />
       </div>
 
       <!-- Legend -->
@@ -292,33 +237,12 @@
       <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
         <h2 class="demo-controls-section-title">🎯 Layout Algorithm</h2>
 
-        <div class="space-y-2 mb-3">
-          <label class="block text-sm font-medium text-secondary">
-            Choose Layout:
-          </label>
-          <select
-            v-model="selectedLayout"
-            class="w-full bg-secondary text-primary border border-color px-3 py-2 rounded-md"
-          >
-            <option value="none">Default (D3 Force Simulation)</option>
-            <option
-              v-for="layout in availableLayouts"
-              :key="layout.id"
-              :value="layout.id"
-            >
-              {{ layout.name }}
-            </option>
-          </select>
-        </div>
-
-        <button
-          @click="handleApplyLayout"
-          :disabled="loading || applyingLayout"
-          class="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg font-semibold transition-colors shadow-sm"
-        >
-          <span v-if="!applyingLayout">🎯 Apply Layout</span>
-          <span v-else>⏳ Applying...</span>
-        </button>
+        <LayoutPicker
+          v-model="selectedLayout"
+          :available-layouts="availableLayouts"
+          :loading="loading || applyingLayout"
+          @apply="handleApplyLayout"
+        />
 
         <div class="info-box-yellow mt-3">
           <p class="text-xs text-yellow-800 dark:text-yellow-200">
@@ -384,6 +308,8 @@
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import DemoLayout from '../components/DemoLayout.vue';
 import DialogForm from '../components/DialogForm.vue';
+import LayoutPicker from '../components/LayoutPicker.vue';
+import NetworkAnalysis from '../components/NetworkAnalysis.vue';
 import { useNetworkGraph } from '../composables/useNetworkGraph';
 import { FamilyController, FAMILY_GROUPS, GROUP_COLORS, DIALOG_ACTIONS } from '../lib/FamilyController';
 

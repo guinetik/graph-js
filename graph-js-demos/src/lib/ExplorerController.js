@@ -341,7 +341,10 @@ export class ExplorerController {
       const message = 'ℹ️ Using D3 physics simulation (no layout algorithm)';
       this.log.debug('Using default D3 physics simulation');
       this._updateStatus(message, 'info');
-      
+
+      // Unlock all fixed positions to allow D3 physics to take over
+      this.graphManager.unlockPositions();
+
       return {
         success: true,
         layoutId: 'none',

@@ -288,6 +288,11 @@ export class FamilyController {
       this.log.debug('Using default D3 physics simulation');
       this.showStatus(message, 'info');
 
+      // Unlock all fixed positions to allow D3 physics to take over
+      if (this.graphManager?.unlockPositions) {
+        this.graphManager.unlockPositions();
+      }
+
       return {
         success: true,
         layoutId: 'none',
