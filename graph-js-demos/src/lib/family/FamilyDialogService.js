@@ -6,7 +6,19 @@
  * @class
  */
 
-import { FAMILY_GROUPS } from './FamilyConstants.js';
+import { FAMILY_GROUPS, GENDER, GENDER_EMOJI } from './FamilyConstants.js';
+
+/**
+ * Get gender field options for radio buttons
+ * @returns {Array} Gender options with emoji and text
+ */
+function getGenderOptions() {
+  return [
+    { value: GENDER.MALE, emoji: GENDER_EMOJI[GENDER.MALE], text: 'Male' },
+    { value: GENDER.FEMALE, emoji: GENDER_EMOJI[GENDER.FEMALE], text: 'Female' },
+    { value: GENDER.OTHER, emoji: GENDER_EMOJI[GENDER.OTHER], text: 'Other' }
+  ];
+}
 
 /**
  * Dialog action types enum
@@ -55,8 +67,10 @@ export class FamilyDialogService {
     return {
       title: 'Add Parents',
       fields: [
-        { label: 'Parent 1 Name', type: 'text', required: true },
-        { label: 'Parent 2 Name', type: 'text', required: false }
+        { label: 'Mother Name', type: 'text', required: false },
+        { label: 'Mother Avatar (optional)', type: 'emoji', required: false, placeholder: '👩 Type an emoji' },
+        { label: 'Father Name', type: 'text', required: false },
+        { label: 'Father Avatar (optional)', type: 'emoji', required: false, placeholder: '👨 Type an emoji' }
       ],
       action: DIALOG_ACTIONS.ADD_PARENTS
     };
@@ -71,7 +85,9 @@ export class FamilyDialogService {
     return {
       title: 'Add Sibling',
       fields: [
-        { label: 'Sibling Name', type: 'text', required: true }
+        { label: 'Sibling Name', type: 'text', required: true },
+        { label: 'Gender', type: 'radio', options: getGenderOptions(), required: true },
+        { label: 'Avatar (optional)', type: 'emoji', required: false, placeholder: '👤 Type an emoji' }
       ],
       action: DIALOG_ACTIONS.ADD_SIBLING
     };
@@ -99,8 +115,10 @@ export class FamilyDialogService {
       title: 'Add Grandparents',
       fields: [
         { label: "Parent's Side", type: 'select', options: parentOptions, required: true },
-        { label: 'Grandparent 1 Name', type: 'text', required: true },
-        { label: 'Grandparent 2 Name', type: 'text', required: false }
+        { label: 'Grandmother Name', type: 'text', required: false },
+        { label: 'Grandmother Avatar (optional)', type: 'emoji', required: false, placeholder: '👵 Type an emoji' },
+        { label: 'Grandfather Name', type: 'text', required: false },
+        { label: 'Grandfather Avatar (optional)', type: 'emoji', required: false, placeholder: '👴 Type an emoji' }
       ],
       action: DIALOG_ACTIONS.ADD_GRANDPARENTS
     };
@@ -128,7 +146,9 @@ export class FamilyDialogService {
       title: 'Add Uncle/Aunt',
       fields: [
         { label: "Parent's Side", type: 'select', options: parentOptions, required: true },
-        { label: 'Uncle/Aunt Name', type: 'text', required: true }
+        { label: 'Name', type: 'text', required: true },
+        { label: 'Gender', type: 'radio', options: getGenderOptions(), required: true },
+        { label: 'Avatar (optional)', type: 'emoji', required: false, placeholder: '👤 Type an emoji' }
       ],
       action: DIALOG_ACTIONS.ADD_UNCLE_AUNT
     };
@@ -156,7 +176,9 @@ export class FamilyDialogService {
       title: 'Add Cousin',
       fields: [
         { label: 'Uncle/Aunt', type: 'select', options: uncleAuntOptions, required: true },
-        { label: 'Cousin Name', type: 'text', required: true }
+        { label: 'Name', type: 'text', required: true },
+        { label: 'Gender', type: 'radio', options: getGenderOptions(), required: true },
+        { label: 'Avatar (optional)', type: 'emoji', required: false, placeholder: '👤 Type an emoji' }
       ],
       action: DIALOG_ACTIONS.ADD_COUSIN
     };
@@ -204,7 +226,9 @@ export class FamilyDialogService {
       title: 'Add Child',
       fields: [
         { label: 'Parent', type: 'select', options: parentOptions, required: true },
-        { label: 'Child Name', type: 'text', required: true }
+        { label: 'Name', type: 'text', required: true },
+        { label: 'Gender', type: 'radio', options: getGenderOptions(), required: true },
+        { label: 'Avatar (optional)', type: 'emoji', required: false, placeholder: '👤 Type an emoji' }
       ],
       action: DIALOG_ACTIONS.ADD_CHILD
     };
@@ -232,7 +256,9 @@ export class FamilyDialogService {
       title: 'Add Niece/Nephew',
       fields: [
         { label: 'Sibling', type: 'select', options: siblingOptions, required: true },
-        { label: 'Niece/Nephew Name', type: 'text', required: true }
+        { label: 'Name', type: 'text', required: true },
+        { label: 'Gender', type: 'radio', options: getGenderOptions(), required: true },
+        { label: 'Avatar (optional)', type: 'emoji', required: false, placeholder: '👤 Type an emoji' }
       ],
       action: DIALOG_ACTIONS.ADD_NIECE_NEPHEW
     };
@@ -280,7 +306,9 @@ export class FamilyDialogService {
       title: 'Add Partner/Spouse',
       fields: [
         { label: 'Partner Of', type: 'select', options: partnerOptions, required: true },
-        { label: 'Partner Name', type: 'text', required: true }
+        { label: 'Name', type: 'text', required: true },
+        { label: 'Gender', type: 'radio', options: getGenderOptions(), required: true },
+        { label: 'Avatar (optional)', type: 'emoji', required: false, placeholder: '👤 Type an emoji' }
       ],
       action: DIALOG_ACTIONS.ADD_PARTNER
     };
@@ -339,21 +367,29 @@ export class FamilyDialogService {
   executeAction(action, values, operations) {
     switch (action) {
       case DIALOG_ACTIONS.ADD_PARENTS:
-        return operations.addParents(values[0], values[1]);
+        // values: [motherName, motherAvatar, fatherName, fatherAvatar]
+        return operations.addParents(values[0], values[2], values[1], values[3]);
       case DIALOG_ACTIONS.ADD_SIBLING:
-        return operations.addSibling(values[0]);
+        // values: [name, gender, avatar]
+        return operations.addSibling(values[0], values[1], values[2]);
       case DIALOG_ACTIONS.ADD_GRANDPARENTS:
-        return operations.addGrandparents(values[0], values[1], values[2]);
+        // values: [parentSide, grandmotherName, grandmotherAvatar, grandfatherName, grandfatherAvatar]
+        return operations.addGrandparents(values[0], values[1], values[3], values[2], values[4]);
       case DIALOG_ACTIONS.ADD_UNCLE_AUNT:
-        return operations.addUncleAunt(values[0], values[1]);
+        // values: [parentSide, name, gender, avatar]
+        return operations.addUncleAunt(values[0], values[1], values[2], values[3]);
       case DIALOG_ACTIONS.ADD_COUSIN:
-        return operations.addCousin(values[0], values[1]);
+        // values: [uncleAuntId, name, gender, avatar]
+        return operations.addCousin(values[0], values[1], values[2], values[3]);
       case DIALOG_ACTIONS.ADD_CHILD:
-        return operations.addChild(values[0], values[1]);
+        // values: [parentId, name, gender, avatar]
+        return operations.addChild(values[0], values[1], values[2], values[3]);
       case DIALOG_ACTIONS.ADD_NIECE_NEPHEW:
-        return operations.addNieceNephew(values[0], values[1]);
+        // values: [siblingId, name, gender, avatar]
+        return operations.addNieceNephew(values[0], values[1], values[2], values[3]);
       case DIALOG_ACTIONS.ADD_PARTNER:
-        return operations.addPartner(values[0], values[1]);
+        // values: [personId, name, gender, avatar]
+        return operations.addPartner(values[0], values[1], values[2], values[3]);
       default:
         return { success: false, message: `Unknown action: ${action}` };
     }

@@ -14,6 +14,24 @@ export const FAMILY_GROUPS = {
 };
 
 /**
+ * Gender constants
+ */
+export const GENDER = {
+  MALE: 'male',
+  FEMALE: 'female',
+  OTHER: 'other'
+};
+
+/**
+ * Gender emoji mapping
+ */
+export const GENDER_EMOJI = {
+  [GENDER.MALE]: '🧔‍♂️',
+  [GENDER.FEMALE]: '👱‍♀️',
+  [GENDER.OTHER]: '🏳️‍⚧️'
+};
+
+/**
  * Group color mapping
  */
 export const GROUP_COLORS = {
@@ -31,29 +49,33 @@ export const GROUP_COLORS = {
 /**
  * Get relationship label for a group
  * @param {number} group - Family group constant
- * @param {string} [genderHint] - Optional hint for gender-specific terms (e.g., 'father' vs 'mother')
+ * @param {string} [genderHint] - Optional hint for gender-specific terms (GENDER.MALE, GENDER.FEMALE, GENDER.OTHER)
  * @returns {string} Human-readable relationship label
  */
 export function getRelationshipLabel(group, genderHint = null) {
+  // For 'other' gender, use masculine form as default (per user request)
+  const isFemale = genderHint === GENDER.FEMALE;
+  const isMale = genderHint === GENDER.MALE || genderHint === GENDER.OTHER;
+
   switch (group) {
     case FAMILY_GROUPS.YOU:
       return 'You';
     case FAMILY_GROUPS.PARENT:
-      return genderHint === 'male' ? 'Father' : genderHint === 'female' ? 'Mother' : 'Parent';
+      return isFemale ? 'Mother' : isMale ? 'Father' : 'Parent';
     case FAMILY_GROUPS.SIBLING:
-      return genderHint === 'male' ? 'Brother' : genderHint === 'female' ? 'Sister' : 'Sibling';
+      return isFemale ? 'Sister' : isMale ? 'Brother' : 'Sibling';
     case FAMILY_GROUPS.UNCLE_AUNT:
-      return genderHint === 'male' ? 'Uncle' : genderHint === 'female' ? 'Aunt' : 'Uncle/Aunt';
+      return isFemale ? 'Aunt' : isMale ? 'Uncle' : 'Uncle/Aunt';
     case FAMILY_GROUPS.COUSIN:
       return 'Cousin';
     case FAMILY_GROUPS.GRANDPARENT:
-      return genderHint === 'male' ? 'Grandfather' : genderHint === 'female' ? 'Grandmother' : 'Grandparent';
+      return isFemale ? 'Grandmother' : isMale ? 'Grandfather' : 'Grandparent';
     case FAMILY_GROUPS.NIECE_NEPHEW:
-      return genderHint === 'male' ? 'Nephew' : genderHint === 'female' ? 'Niece' : 'Niece/Nephew';
+      return isFemale ? 'Niece' : isMale ? 'Nephew' : 'Niece/Nephew';
     case FAMILY_GROUPS.CHILD:
-      return genderHint === 'male' ? 'Son' : genderHint === 'female' ? 'Daughter' : 'Child';
+      return isFemale ? 'Daughter' : isMale ? 'Son' : 'Child';
     case FAMILY_GROUPS.PARTNER:
-      return genderHint === 'male' ? 'Husband' : genderHint === 'female' ? 'Wife' : 'Partner/Spouse';
+      return isFemale ? 'Wife' : isMale ? 'Husband' : 'Partner/Spouse';
     default:
       return 'Relative';
   }

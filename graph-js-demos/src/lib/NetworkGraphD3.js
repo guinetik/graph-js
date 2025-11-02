@@ -172,6 +172,7 @@ export class NetworkGraphD3 {
       colorScheme: options.colorScheme || 'categorical',
       showLabels: options.showLabels !== false, // Default to true
       tooltipBuilder: options.tooltipBuilder || null,
+      renderMode: options.renderMode || 'colors', // 'colors' or 'avatars'
       ...options
     };
 
@@ -461,6 +462,36 @@ export class NetworkGraphD3 {
   }
 
   /**
+   * Set render mode ('colors' or 'avatars')
+   * @param {string} mode - 'colors' or 'avatars'
+   */
+  setRenderMode(mode) {
+    if (mode !== 'colors' && mode !== 'avatars') {
+      this.log.warn(`Invalid render mode: ${mode}. Must be 'colors' or 'avatars'`);
+      return;
+    }
+
+    this.options.renderMode = mode;
+    this.log.debug(`Render mode changed to: ${mode}`);
+
+    // Remove ALL existing node elements (both circles and text)
+    if (this.nodeGroup) {
+      this.nodeGroup.selectAll('circle').remove();
+      this.nodeGroup.selectAll('text').remove();
+      this.node = null;
+    }
+
+    // Also remove labels if they exist (will be recreated if needed)
+    if (this.labelGroup) {
+      this.labelGroup.selectAll('text').remove();
+      this.label = null;
+    }
+
+    // Re-render nodes with new mode
+    this.updateGraph();
+  }
+
+  /**
    * Update node statistics (e.g., eigenvector centrality) and refresh visualization
    * This method updates node properties in-place and refreshes node sizes/colors
    * 
@@ -562,45 +593,93 @@ export class NetworkGraphD3 {
 
     this.link = linkEnter.merge(this.link);
 
-    // Update nodes
+    // Update nodes - render based on mode
+    const elementType = this.options.renderMode === 'avatars' ? 'text' : 'circle';
     this.node = this.nodeGroup
-      .selectAll('circle')
+      .selectAll(elementType)
       .data(this.data.nodes, d => d.id);
 
     this.node.exit().remove();
 
     const nodeEnter = this.node.enter()
-      .append('circle')
-      .attr('r', d => this.getNodeRadius(d))
-      .attr('fill', d => this.getNodeColor(d))
-      .attr('stroke', '#fff')
-      .attr('stroke-width', 2)
-      .attr('cursor', 'pointer')
-      .attr('role', 'button')
-      .attr('tabindex', 0)
-      .attr('aria-label', d => `Node ${d.id}`)
-      .call(this.createDragBehavior())
-      .on('mouseover', (event, d) => this.onNodeMouseOver(event, d))
-      .on('mouseout', (event, d) => this.onNodeMouseOut(event, d))
-      .on('click', (event, d) => {
-        event.stopPropagation(); // Prevent SVG background click
-        this.toggleNodeSelection(d);
-        this.emit('nodeClick', d);
-      })
-      .on('keydown', (event, d) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
+      .append(elementType);
+
+    // Configure node based on render mode
+    if (this.options.renderMode === 'avatars') {
+      // Avatar mode - render as text with emoji
+      nodeEnter
+        .attr('text-anchor', 'middle')
+        .attr('dominant-baseline', 'central')
+        .attr('font-size', d => `${this.getNodeRadius(d) * 2}px`)
+        .attr('cursor', 'pointer')
+        .attr('role', 'button')
+        .attr('tabindex', 0)
+        .attr('aria-label', d => `Node ${d.id}`)
+        .text(d => d.avatar || '👤') // Use avatar or default emoji
+        .attr('stroke', d => this.getNodeStrokeColor(d))
+        .attr('stroke-width', d => this.getNodeStrokeWidth(d) * 0.5)
+        .attr('paint-order', 'stroke')
+        .call(this.createDragBehavior())
+        .on('mouseover', (event, d) => this.onNodeMouseOver(event, d))
+        .on('mouseout', (event, d) => this.onNodeMouseOut(event, d))
+        .on('click', (event, d) => {
+          event.stopPropagation();
           this.toggleNodeSelection(d);
           this.emit('nodeClick', d);
-        }
-      });
+        })
+        .on('keydown', (event, d) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            this.toggleNodeSelection(d);
+            this.emit('nodeClick', d);
+          }
+        });
+    } else {
+      // Colors mode - render as colored circles
+      nodeEnter
+        .attr('r', d => this.getNodeRadius(d))
+        .attr('fill', d => this.getNodeColor(d))
+        .attr('stroke', '#fff')
+        .attr('stroke-width', 2)
+        .attr('cursor', 'pointer')
+        .attr('role', 'button')
+        .attr('tabindex', 0)
+        .attr('aria-label', d => `Node ${d.id}`)
+        .call(this.createDragBehavior())
+        .on('mouseover', (event, d) => this.onNodeMouseOver(event, d))
+        .on('mouseout', (event, d) => this.onNodeMouseOut(event, d))
+        .on('click', (event, d) => {
+          event.stopPropagation();
+          this.toggleNodeSelection(d);
+          this.emit('nodeClick', d);
+        })
+        .on('keydown', (event, d) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            this.toggleNodeSelection(d);
+            this.emit('nodeClick', d);
+          }
+        });
+    }
 
     // Update existing nodes (size, color, and selection state may have changed)
-    this.node = nodeEnter.merge(this.node)
-      .attr('r', d => this.getNodeRadius(d))
-      .attr('fill', d => this.getNodeColor(d))
-      .attr('stroke', d => this.getNodeStrokeColor(d))
-      .attr('stroke-width', d => this.getNodeStrokeWidth(d));
+    this.node = nodeEnter.merge(this.node);
+
+    if (this.options.renderMode === 'avatars') {
+      // Update text nodes
+      this.node
+        .attr('font-size', d => `${this.getNodeRadius(d) * 2}px`)
+        .text(d => d.avatar || '👤')
+        .attr('stroke', d => this.getNodeStrokeColor(d))
+        .attr('stroke-width', d => this.getNodeStrokeWidth(d) * 0.5);
+    } else {
+      // Update circle nodes
+      this.node
+        .attr('r', d => this.getNodeRadius(d))
+        .attr('fill', d => this.getNodeColor(d))
+        .attr('stroke', d => this.getNodeStrokeColor(d))
+        .attr('stroke-width', d => this.getNodeStrokeWidth(d));
+    }
 
     // Update collision detection with dynamic radius
     this.simulation.force('collision')
@@ -666,11 +745,17 @@ export class NetworkGraphD3 {
         .attr('y2', d => d.target.y);
     }
 
-    // Update node positions
+    // Update node positions (different attributes for circles vs text)
     if (this.node) {
-      this.node
-        .attr('cx', d => d.x)
-        .attr('cy', d => d.y);
+      if (this.options.renderMode === 'avatars') {
+        this.node
+          .attr('x', d => d.x)
+          .attr('y', d => d.y);
+      } else {
+        this.node
+          .attr('cx', d => d.x)
+          .attr('cy', d => d.y);
+      }
     }
 
     // Update label positions
@@ -999,6 +1084,8 @@ export class NetworkGraphD3 {
     // Priority properties (shown first, before others)
     const priorityProps = [
       'relationship',  // Family relationship
+      'gender',        // Gender (for family tree)
+      'avatar',        // Avatar emoji (for family tree)
       'group',         // Group number
       'community'      // Community detection
     ];
@@ -1022,6 +1109,18 @@ export class NetworkGraphD3 {
         // Special formatting for specific properties
         if (prop === 'relationship') {
           parts.push(`<div style="margin-bottom: 3px;"><strong>👤 Relationship:</strong> ${this.escapeHtml(value)}</div>`);
+        } else if (prop === 'gender') {
+          // Map gender value to emoji + text
+          const genderMap = {
+            'male': { emoji: '🧔‍♂️', text: 'Male' },
+            'female': { emoji: '👱‍♀️', text: 'Female' },
+            'other': { emoji: '🏳️‍⚧️', text: 'Other' }
+          };
+          const genderInfo = genderMap[value] || { emoji: '', text: value };
+          parts.push(`<div style="margin-bottom: 3px;"><strong>Gender:</strong> ${genderInfo.emoji} ${genderInfo.text}</div>`);
+        } else if (prop === 'avatar') {
+          // Display avatar emoji with label
+          parts.push(`<div style="margin-bottom: 3px;"><strong>Avatar:</strong> ${value}</div>`);
         } else if (prop === 'group') {
           parts.push(`<div style="margin-bottom: 3px;"><strong>Group:</strong> ${value}</div>`);
         } else if (prop === 'community') {
@@ -1438,48 +1537,94 @@ export class NetworkGraphD3 {
 
     // Add new node to visualization without resetting ready state
     if (this.nodeGroup) {
+      const elementType = this.options.renderMode === 'avatars' ? 'text' : 'circle';
+
       // Update node selection with all nodes including the new one
       this.node = this.nodeGroup
-        .selectAll('circle')
+        .selectAll(elementType)
         .data(this.data.nodes, d => d.id);
 
       // Add new node
       const nodeEnter = this.node
         .enter()
-        .append('circle')
-        .attr('r', d => this.getNodeRadius(d))
-        .attr('fill', d => this.getNodeColor(d))
-        .attr('stroke', '#fff')
-        .attr('stroke-width', 2)
-        .attr('cursor', 'pointer')
-        .attr('role', 'button')
-        .attr('tabindex', 0)
-        .attr('aria-label', d => `Node ${d.id}`)
-        .attr('cx', d => d.x)
-        .attr('cy', d => d.y)
-        .call(this.createDragBehavior())
-        .on('mouseover', (event, d) => this.onNodeMouseOver(event, d))
-        .on('mouseout', (event, d) => this.onNodeMouseOut(event, d))
-        .on('click', (event, d) => {
-          event.stopPropagation(); // Prevent SVG background click
-          this.toggleNodeSelection(d);
-          this.emit('nodeClick', d);
-        })
-        .on('keydown', (event, d) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
+        .append(elementType);
+
+      // Configure based on render mode
+      if (this.options.renderMode === 'avatars') {
+        nodeEnter
+          .attr('text-anchor', 'middle')
+          .attr('dominant-baseline', 'central')
+          .attr('font-size', d => `${this.getNodeRadius(d) * 2}px`)
+          .attr('cursor', 'pointer')
+          .attr('role', 'button')
+          .attr('tabindex', 0)
+          .attr('aria-label', d => `Node ${d.id}`)
+          .attr('x', d => d.x)
+          .attr('y', d => d.y)
+          .text(d => d.avatar || '👤')
+          .attr('stroke', d => this.getNodeStrokeColor(d))
+          .attr('stroke-width', d => this.getNodeStrokeWidth(d) * 0.5)
+          .attr('paint-order', 'stroke')
+          .call(this.createDragBehavior())
+          .on('mouseover', (event, d) => this.onNodeMouseOver(event, d))
+          .on('mouseout', (event, d) => this.onNodeMouseOut(event, d))
+          .on('click', (event, d) => {
+            event.stopPropagation();
             this.toggleNodeSelection(d);
             this.emit('nodeClick', d);
-          }
-        });
+          })
+          .on('keydown', (event, d) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              this.toggleNodeSelection(d);
+              this.emit('nodeClick', d);
+            }
+          });
+      } else {
+        nodeEnter
+          .attr('r', d => this.getNodeRadius(d))
+          .attr('fill', d => this.getNodeColor(d))
+          .attr('stroke', '#fff')
+          .attr('stroke-width', 2)
+          .attr('cursor', 'pointer')
+          .attr('role', 'button')
+          .attr('tabindex', 0)
+          .attr('aria-label', d => `Node ${d.id}`)
+          .attr('cx', d => d.x)
+          .attr('cy', d => d.y)
+          .call(this.createDragBehavior())
+          .on('mouseover', (event, d) => this.onNodeMouseOver(event, d))
+          .on('mouseout', (event, d) => this.onNodeMouseOut(event, d))
+          .on('click', (event, d) => {
+            event.stopPropagation();
+            this.toggleNodeSelection(d);
+            this.emit('nodeClick', d);
+          })
+          .on('keydown', (event, d) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              this.toggleNodeSelection(d);
+              this.emit('nodeClick', d);
+            }
+          });
+      }
 
       // Merge and update all nodes (in case colors or selection changed)
       this.node = nodeEnter.merge(this.node);
-      this.node
-        .attr('r', d => this.getNodeRadius(d))
-        .attr('fill', d => this.getNodeColor(d))
-        .attr('stroke', d => this.getNodeStrokeColor(d))
-        .attr('stroke-width', d => this.getNodeStrokeWidth(d));
+
+      if (this.options.renderMode === 'avatars') {
+        this.node
+          .attr('font-size', d => `${this.getNodeRadius(d) * 2}px`)
+          .text(d => d.avatar || '👤')
+          .attr('stroke', d => this.getNodeStrokeColor(d))
+          .attr('stroke-width', d => this.getNodeStrokeWidth(d) * 0.5);
+      } else {
+        this.node
+          .attr('r', d => this.getNodeRadius(d))
+          .attr('fill', d => this.getNodeColor(d))
+          .attr('stroke', d => this.getNodeStrokeColor(d))
+          .attr('stroke-width', d => this.getNodeStrokeWidth(d));
+      }
     }
 
     // Add new links

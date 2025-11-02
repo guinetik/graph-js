@@ -175,6 +175,56 @@
         </div>
       </div>
 
+      <!-- Render Mode Section -->
+      <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
+        <h2 class="demo-controls-section-title">🎨 Render Nodes</h2>
+
+        <div class="flex flex-wrap gap-2 mb-3">
+          <label
+            class="flex items-center gap-2 cursor-pointer px-3 py-2 border-2 rounded-lg transition-all flex-1 min-w-[120px]"
+            :class="{
+              'border-green-500 bg-green-50 dark:bg-green-900/20': renderMode === 'colors',
+              'border-gray-300 dark:border-gray-600 hover:border-green-300': renderMode !== 'colors'
+            }"
+          >
+            <input
+              type="radio"
+              name="renderMode"
+              value="colors"
+              v-model="renderMode"
+              class="text-green-600 focus:ring-green-500"
+            />
+            <span class="text-xl">🎨</span>
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Colors</span>
+          </label>
+
+          <label
+            class="flex items-center gap-2 cursor-pointer px-3 py-2 border-2 rounded-lg transition-all flex-1 min-w-[120px]"
+            :class="{
+              'border-green-500 bg-green-50 dark:bg-green-900/20': renderMode === 'avatars',
+              'border-gray-300 dark:border-gray-600 hover:border-green-300': renderMode !== 'avatars'
+            }"
+          >
+            <input
+              type="radio"
+              name="renderMode"
+              value="avatars"
+              v-model="renderMode"
+              class="text-green-600 focus:ring-green-500"
+            />
+            <span class="text-xl">👤</span>
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Avatars</span>
+          </label>
+        </div>
+
+        <div class="info-box-blue">
+          <p class="text-xs text-blue-800 dark:text-blue-200">
+            <strong>Colors:</strong> Nodes colored by relationship type.<br>
+            <strong>Avatars:</strong> Nodes shown as emoji avatars (if set).
+          </p>
+        </div>
+      </div>
+
       <!-- Network Analysis Section -->
       <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
         <h2 class="demo-controls-section-title">⚡ Network Analysis (Node Sizes)</h2>
@@ -278,12 +328,12 @@
     <template #graph>
       <!-- Loading Overlay -->
       <div
-        v-if="loading"
+        v-if="loading || switchingRenderMode"
         class="absolute inset-0 flex items-center justify-center bg-white/90 dark:bg-gray-900/90 z-10"
       >
         <div class="text-center">
           <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent mb-4"></div>
-          <p class="text-secondary">{{ loadingMessage }}</p>
+          <p class="text-secondary">{{ switchingRenderMode ? 'Switching render mode...' : loadingMessage }}</p>
         </div>
       </div>
 
@@ -358,6 +408,8 @@ const canRedo = ref(false);
 const selectedFeatures = ref(['eigenvector']); // Default to eigenvector
 const selectedSizeMetric = ref('eigenvector');
 const analyzing = ref(false);
+const renderMode = ref('colors'); // 'colors' or 'avatars'
+const switchingRenderMode = ref(false);
 
 // Controller instance
 let controller = null;
@@ -682,6 +734,22 @@ watch(graphInstance, (newInstance) => {
     updateUndoRedoStates();
   }
 }, { immediate: true });
+
+// Watch for render mode changes
+watch(renderMode, (newMode) => {
+  if (graphInstance.value) {
+    switchingRenderMode.value = true;
+
+    // Listen for the 'ready' event which fires when D3 has finished rendering
+    const onRenderComplete = () => {
+      switchingRenderMode.value = false;
+      graphInstance.value.off('ready', onRenderComplete);
+    };
+
+    graphInstance.value.on('ready', onRenderComplete);
+    graphInstance.value.setRenderMode(newMode);
+  }
+});
 
 // Add keyboard shortcuts on mount
 onMounted(() => {

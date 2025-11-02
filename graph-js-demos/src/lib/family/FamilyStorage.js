@@ -149,6 +149,11 @@ export class FamilyStorage {
         const cleanNode = { id, group };
         // Preserve relationship property
         if (relationship !== undefined) cleanNode.relationship = relationship;
+        // Preserve gender and avatar properties
+        if (rest.gender !== undefined) cleanNode.gender = rest.gender;
+        if (rest.avatar !== undefined) cleanNode.avatar = rest.avatar;
+        // Preserve partnerOf property (critical for finding partners when creating children/cousins)
+        if (rest.partnerOf !== undefined) cleanNode.partnerOf = rest.partnerOf;
         // Preserve other properties that might be useful (like centrality, community, etc.)
         if (rest.centrality !== undefined) cleanNode.centrality = rest.centrality;
         if (rest.community !== undefined) cleanNode.community = rest.community;
