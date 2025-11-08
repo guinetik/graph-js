@@ -82,7 +82,7 @@
 
           <!-- GitHub Link -->
           <a
-            href="https://github.com/guinetik/js-network-stats"
+            href="https://github.com/guinetik/graph-js"
             target="_blank"
             class="btn-icon"
             title="View on GitHub"
@@ -183,7 +183,7 @@
 
               <!-- GitHub Link -->
               <a
-                href="https://github.com/guinetik/js-network-stats"
+                href="https://github.com/guinetik/graph-js"
                 target="_blank"
                 class="flex items-center justify-between px-4 py-3 rounded-md bg-secondary hover:bg-[var(--color-bg-tertiary)] transition-colors"
               >

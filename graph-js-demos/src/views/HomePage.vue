@@ -17,7 +17,7 @@
           <router-link to="/showcase" class="btn-primary">
             🚀 {{ t('home.hero.cta') }}
           </router-link>
-          <a href="https://github.com/guinetik/js-network-stats" target="_blank" class="btn-secondary">
+          <a href="https://github.com/guinetik/graph-js" target="_blank" class="btn-secondary">
             📚 {{ t('home.hero.github') }}
           </a>
         </div>
@@ -51,7 +51,7 @@
               <div class="w-3 h-3 rounded-full bg-green-500"></div>
             </div>
           </div>
-          <pre class="p-6 overflow-x-auto bg-gray-900 text-gray-100"><code class="text-sm">{{ t('home.code.snippet') }}</code></pre>
+          <CodeBlock :code="codeExample" language="javascript" />
         </div>
       </div>
     </div>
@@ -60,6 +60,23 @@
 
 <script setup>
 import { useI18n } from '../composables/useI18n';
+import CodeBlock from '../components/CodeBlock.vue';
 
 const { t } = useI18n();
+
+const codeExample = `npm install @guinetik/graph-js
+
+import NetworkStats from '@guinetik/graph-js';
+
+const network = [
+  { source: 'Alice', target: 'Bob', weight: 1 },
+  { source: 'Bob', target: 'Carol', weight: 2 },
+  { source: 'Carol', target: 'Alice', weight: 1 }
+];
+
+const analyzer = new NetworkStats({ verbose: true });
+const results = await analyzer.analyze(network, ['degree', 'eigenvector']);
+
+console.log(results);
+// Analysis runs in workers for optimal performance!`;
 </script>

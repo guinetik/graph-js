@@ -25,6 +25,7 @@
     "@guinetik/logger": "^1.0.0",
     "@vitejs/plugin-vue": "^6.0.1",
     "d3": "^7.9.0",
+    "shiki": "^3.15.0",
     "vue": "^3.5.22",
     "vue-router": "^4.6.3"
   },

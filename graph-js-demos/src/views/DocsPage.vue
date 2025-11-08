@@ -53,25 +53,7 @@
         </div>
 
         <h3 class="text-xl font-bold text-accent mb-3">{{ t('docs.quickStart.basicUsage') }}</h3>
-        <div class="bg-gray-900 rounded-lg p-4">
-          <pre class="text-sm text-gray-200"><code>import NetworkStats from '@guinetik/graph-js';
-
-const network = [
-  { source: 'Alice', target: 'Bob' },
-  { source: 'Bob', target: 'Charlie' },
-  { source: 'Charlie', target: 'Alice' }
-];
-
-const analyzer = new NetworkStats({ verbose: false });
-const results = await analyzer.analyze(network, ['degree', 'eigenvector']);
-
-console.log(results);
-// [
-//   { id: 'Alice', degree: 2, eigenvector: 0.577 },
-//   { id: 'Bob', degree: 2, eigenvector: 0.577 },
-//   { id: 'Charlie', degree: 2, eigenvector: 0.577 }
-// ]</code></pre>
-        </div>
+        <CodeBlock :code="basicUsageCode" language="javascript" />
       </div>
     </section>
 
@@ -123,18 +105,7 @@ console.log(results);
           </div>
         </div>
 
-        <div class="bg-gray-900 rounded-lg p-4 mt-6">
-          <pre class="text-sm text-gray-200"><code>import { Graph } from '@guinetik/graph-js';
-
-const graph = new Graph();
-graph.addNodesFrom(['A', 'B', 'C']);
-graph.addEdge('A', 'B', 1);
-graph.addEdge('B', 'C', 2);
-
-console.log(graph.getNeighbors('B')); // ['A', 'C']
-console.log(graph.numberOfNodes());    // 3
-console.log(graph.numberOfEdges());    // 2</code></pre>
-        </div>
+        <CodeBlock :code="graphClassCode" language="javascript" />
       </div>
 
       <!-- NetworkStats Class -->
@@ -241,19 +212,7 @@ console.log(graph.numberOfEdges());    // 2</code></pre>
           </div>
         </div>
 
-        <div class="bg-gray-900 rounded-lg p-4">
-          <pre class="text-sm text-gray-200"><code>import { CSVAdapter } from '@guinetik/graph-js';
-
-// Load from URLs
-const graphData = await CSVAdapter.loadFromURL(
-  '../data/edges.csv',
-  '../data/nodes.csv'
-);
-
-// Export to CSV
-const edgesCSV = CSVAdapter.toEdgeList(graphData);
-const nodesCSV = CSVAdapter.toNodes(graphData);</code></pre>
-        </div>
+        <CodeBlock :code="csvAdapterCode" language="javascript" />
       </div>
 
       <!-- JSON Adapter -->
@@ -295,18 +254,7 @@ const nodesCSV = CSVAdapter.toNodes(graphData);</code></pre>
           </div>
         </div>
 
-        <div class="bg-gray-900 rounded-lg p-4">
-          <pre class="text-sm text-gray-200"><code>import { JSONAdapter } from '@guinetik/graph-js';
-
-// Convert D3 format to GraphData
-const graphData = JSONAdapter.fromD3(d3Data);
-
-// Convert to Cytoscape format
-const cytoData = JSONAdapter.toCytoscape(graphData);
-
-// Auto-detect format
-const data = JSONAdapter.fromFormat(unknownJSON);</code></pre>
-        </div>
+        <CodeBlock :code="jsonAdapterCode" language="javascript" />
       </div>
 
       <!-- NetworkX Adapter -->
@@ -338,18 +286,7 @@ const data = JSONAdapter.fromFormat(unknownJSON);</code></pre>
           </div>
         </div>
 
-        <div class="bg-gray-900 rounded-lg p-4">
-          <pre class="text-sm text-gray-200"><code>import { NetworkXAdapter } from '@guinetik/graph-js';
-
-// From Python: nx.node_link_data(G)
-const graphData = NetworkXAdapter.fromNodeLink(nxData);
-
-// To Python: G = nx.node_link_graph(nxData)
-const nxData = NetworkXAdapter.toNodeLink(graphData, {
-  directed: false,
-  multigraph: false
-});</code></pre>
-        </div>
+        <CodeBlock :code="networkxAdapterCode" language="javascript" />
       </div>
     </section>
 
@@ -382,21 +319,7 @@ const nxData = NetworkXAdapter.toNodeLink(graphData, {
           </ul>
         </div>
 
-        <div class="bg-gray-900 rounded-lg p-4">
-          <pre class="text-sm text-gray-200"><code>import { Graph, ForceDirectedLayout } from '@guinetik/graph-js';
-
-const graph = new Graph();
-graph.addNodesFrom(['A', 'B', 'C']);
-graph.addEdge('A', 'B');
-graph.addEdge('B', 'C');
-
-const layout = new ForceDirectedLayout(graph, {
-  iterations: 100,
-  scale: 200
-});
-const positions = await layout.getPositions();
-// { 'A': {x: 120, y: 45}, 'B': {x: -30, y: 90}, ... }</code></pre>
-        </div>
+        <CodeBlock :code="forceLayoutCode" language="javascript" />
       </div>
 
       <!-- Kamada-Kawai Layout -->
@@ -419,15 +342,7 @@ const positions = await layout.getPositions();
           </ul>
         </div>
 
-        <div class="bg-gray-900 rounded-lg p-4">
-          <pre class="text-sm text-gray-200"><code>import { KamadaKawaiLayout } from '@guinetik/graph-js';
-
-const layout = new KamadaKawaiLayout(graph, {
-  iterations: 100,
-  scale: 200
-});
-const positions = await layout.getPositions();</code></pre>
-        </div>
+        <CodeBlock :code="kamadaKawaiCode" language="javascript" />
       </div>
 
       <!-- Spectral Layout -->
@@ -438,17 +353,7 @@ const positions = await layout.getPositions();</code></pre>
         <p class="text-sm text-accent mb-2">{{ t('docs.layouts.spectral.bestFor') }}</p>
         <p class="text-sm text-red-600 dark:text-red-400 mb-4">⚠️ {{ t('docs.layouts.spectral.requires') }}</p>
 
-        <div class="bg-gray-900 rounded-lg p-4">
-          <pre class="text-sm text-gray-200"><code>import { NetworkStats, Graph, SpectralLayout } from '@guinetik/graph-js';
-
-// First compute eigenvector-laplacian
-const analyzer = new NetworkStats();
-await analyzer.analyze(edges, ['eigenvector-laplacian']);
-
-// Then apply layout
-const layout = new SpectralLayout(graph, { scale: 200 });
-const positions = await layout.getPositions();</code></pre>
-        </div>
+        <CodeBlock :code="spectralLayoutCode" language="javascript" />
       </div>
 
       <!-- Other Layouts Grid -->
@@ -507,13 +412,7 @@ const positions = await layout.getPositions();</code></pre>
       <div class="card p-6 mt-8 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
         <h4 class="text-lg font-bold mb-3">{{ t('docs.layouts.usage') }}</h4>
         <p class="text-sm text-secondary mb-3">{{ t('docs.layouts.usageDescription') }}</p>
-        <div class="bg-gray-900 rounded-lg p-4">
-          <pre class="text-sm text-gray-200"><code>// All layouts follow this pattern
-const layout = new SomeLayout(graph, options);
-const positions = await layout.getPositions({
-  onProgress: (progress) => console.log(`${progress * 100}%`)
-});</code></pre>
-        </div>
+        <CodeBlock :code="layoutUsageCode" language="javascript" />
       </div>
     </section>
 
@@ -583,24 +482,7 @@ const positions = await layout.getPositions({
           </ul>
         </div>
 
-        <div class="bg-gray-900 rounded-lg p-4">
-          <pre class="text-sm text-gray-200"><code>import { CommunityDetection, LouvainAlgorithm } from '@guinetik/graph-js';
-
-// Method 1: Direct detection from GraphData
-const result = await CommunityDetection.detect(graphData, 'louvain', {
-  resolution: 1.0,
-  onProgress: (p) => console.log(`${Math.round(p * 100)}%`)
-});
-
-// Method 2: Using algorithm instance
-const detector = new CommunityDetection(graph);
-const algorithm = new LouvainAlgorithm({ resolution: 1.0 });
-const result = await detector.detectCommunities(algorithm);
-
-console.log(result.communities);     // { 'A': 0, 'B': 0, 'C': 1 }
-console.log(result.modularity);      // 0.42
-console.log(result.numCommunities);  // 2</code></pre>
-        </div>
+        <CodeBlock :code="communityDetectionCode" language="javascript" />
       </div>
 
       <!-- CommunityResult -->
@@ -634,8 +516,166 @@ console.log(result.numCommunities);  // 2</code></pre>
         <h3 class="text-2xl font-bold text-accent mb-4">{{ t('docs.examples.basic.title') }}</h3>
         <p class="text-secondary mb-4">{{ t('docs.examples.basic.description') }}</p>
 
-        <div class="bg-gray-900 rounded-lg p-4">
-          <pre class="text-sm text-gray-200"><code>import NetworkStats from '@guinetik/graph-js';
+        <CodeBlock :code="basicAnalysisCode" language="javascript" />
+      </div>
+
+      <!-- CSV Loading -->
+      <div class="card p-8 mb-8">
+        <h3 class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4">{{ t('docs.examples.csv.title') }}</h3>
+        <p class="text-secondary mb-4">{{ t('docs.examples.csv.description') }}</p>
+
+        <CodeBlock :code="csvExampleCode" language="javascript" />
+      </div>
+
+      <!-- Complete Workflow -->
+      <div class="card p-8">
+        <h3 class="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-4">{{ t('docs.examples.complete.title') }}</h3>
+        <p class="text-secondary mb-4">{{ t('docs.examples.complete.description') }}</p>
+
+        <CodeBlock :code="completeWorkflowCode" language="javascript" />
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <div class="text-center pt-12 pb-6 border-t border-[var(--color-border)]">
+      <p class="text-secondary">
+        📚 For more details, check out the
+        <a href="https://github.com/guinetik/graph-js"
+           class="text-purple-600 dark:text-purple-400 hover:underline"
+           target="_blank">
+          GitHub repository
+        </a>
+      </p>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { useI18n } from '../composables/useI18n';
+import CodeBlock from '../components/CodeBlock.vue';
+
+const { t } = useI18n();
+
+// Code examples
+const basicUsageCode = `import NetworkStats from '@guinetik/graph-js';
+
+const network = [
+  { source: 'Alice', target: 'Bob' },
+  { source: 'Bob', target: 'Charlie' },
+  { source: 'Charlie', target: 'Alice' }
+];
+
+const analyzer = new NetworkStats({ verbose: false });
+const results = await analyzer.analyze(network, ['degree', 'eigenvector']);
+
+console.log(results);
+// [
+//   { id: 'Alice', degree: 2, eigenvector: 0.577 },
+//   { id: 'Bob', degree: 2, eigenvector: 0.577 },
+//   { id: 'Charlie', degree: 2, eigenvector: 0.577 }
+// ]`;
+
+const graphClassCode = `import { Graph } from '@guinetik/graph-js';
+
+const graph = new Graph();
+graph.addNodesFrom(['A', 'B', 'C']);
+graph.addEdge('A', 'B', 1);
+graph.addEdge('B', 'C', 2);
+
+console.log(graph.getNeighbors('B')); // ['A', 'C']
+console.log(graph.numberOfNodes());    // 3
+console.log(graph.numberOfEdges());    // 2`;
+
+const csvAdapterCode = `import { CSVAdapter } from '@guinetik/graph-js';
+
+// Load from URLs
+const graphData = await CSVAdapter.loadFromURL(
+  '../data/edges.csv',
+  '../data/nodes.csv'
+);
+
+// Export to CSV
+const edgesCSV = CSVAdapter.toEdgeList(graphData);
+const nodesCSV = CSVAdapter.toNodes(graphData);`;
+
+const jsonAdapterCode = `import { JSONAdapter } from '@guinetik/graph-js';
+
+// Convert D3 format to GraphData
+const graphData = JSONAdapter.fromD3(d3Data);
+
+// Convert to Cytoscape format
+const cytoData = JSONAdapter.toCytoscape(graphData);
+
+// Auto-detect format
+const data = JSONAdapter.fromFormat(unknownJSON);`;
+
+const networkxAdapterCode = `import { NetworkXAdapter } from '@guinetik/graph-js';
+
+// From Python: nx.node_link_data(G)
+const graphData = NetworkXAdapter.fromNodeLink(nxData);
+
+// To Python: G = nx.node_link_graph(nxData)
+const nxData = NetworkXAdapter.toNodeLink(graphData, {
+  directed: false,
+  multigraph: false
+});`;
+
+const forceLayoutCode = `import { Graph, ForceDirectedLayout } from '@guinetik/graph-js';
+
+const graph = new Graph();
+graph.addNodesFrom(['A', 'B', 'C']);
+graph.addEdge('A', 'B');
+graph.addEdge('B', 'C');
+
+const layout = new ForceDirectedLayout(graph, {
+  iterations: 100,
+  scale: 200
+});
+const positions = await layout.getPositions();
+// { 'A': {x: 120, y: 45}, 'B': {x: -30, y: 90}, ... }`;
+
+const kamadaKawaiCode = `import { KamadaKawaiLayout } from '@guinetik/graph-js';
+
+const layout = new KamadaKawaiLayout(graph, {
+  iterations: 100,
+  scale: 200
+});
+const positions = await layout.getPositions();`;
+
+const spectralLayoutCode = `import { NetworkStats, Graph, SpectralLayout } from '@guinetik/graph-js';
+
+// First compute eigenvector-laplacian
+const analyzer = new NetworkStats();
+await analyzer.analyze(edges, ['eigenvector-laplacian']);
+
+// Then apply layout
+const layout = new SpectralLayout(graph, { scale: 200 });
+const positions = await layout.getPositions();`;
+
+const layoutUsageCode = `// All layouts follow this pattern
+const layout = new SomeLayout(graph, options);
+const positions = await layout.getPositions({
+  onProgress: (progress) => console.log(\`\${progress * 100}%\`)
+});`;
+
+const communityDetectionCode = `import { CommunityDetection, LouvainAlgorithm } from '@guinetik/graph-js';
+
+// Method 1: Direct detection from GraphData
+const result = await CommunityDetection.detect(graphData, 'louvain', {
+  resolution: 1.0,
+  onProgress: (p) => console.log(\`\${Math.round(p * 100)}%\`)
+});
+
+// Method 2: Using algorithm instance
+const detector = new CommunityDetection(graph);
+const algorithm = new LouvainAlgorithm({ resolution: 1.0 });
+const result = await detector.detectCommunities(algorithm);
+
+console.log(result.communities);     // { 'A': 0, 'B': 0, 'C': 1 }
+console.log(result.modularity);      // 0.42
+console.log(result.numCommunities);  // 2`;
+
+const basicAnalysisCode = `import NetworkStats from '@guinetik/graph-js';
 
 const network = [
   { source: 'Alice', target: 'Bob', weight: 1 },
@@ -653,17 +693,9 @@ console.log(results);
 //   ...
 // ]
 
-await analyzer.dispose(); // Cleanup workers</code></pre>
-        </div>
-      </div>
+await analyzer.dispose(); // Cleanup workers`;
 
-      <!-- CSV Loading -->
-      <div class="card p-8 mb-8">
-        <h3 class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4">{{ t('docs.examples.csv.title') }}</h3>
-        <p class="text-secondary mb-4">{{ t('docs.examples.csv.description') }}</p>
-
-        <div class="bg-gray-900 rounded-lg p-4">
-          <pre class="text-sm text-gray-200"><code>import { CSVAdapter } from '@guinetik/graph-js';
+const csvExampleCode = `import { CSVAdapter } from '@guinetik/graph-js';
 import NetworkStats from '@guinetik/graph-js';
 
 // Load CSV data
@@ -678,17 +710,9 @@ const network = graphData.edges;
 // Analyze
 const analyzer = new NetworkStats();
 const results = await analyzer.analyze(network, ['degree', 'clustering']);
-await analyzer.dispose();</code></pre>
-        </div>
-      </div>
+await analyzer.dispose();`;
 
-      <!-- Complete Workflow -->
-      <div class="card p-8">
-        <h3 class="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-4">{{ t('docs.examples.complete.title') }}</h3>
-        <p class="text-secondary mb-4">{{ t('docs.examples.complete.description') }}</p>
-
-        <div class="bg-gray-900 rounded-lg p-4">
-          <pre class="text-sm text-gray-200"><code>import NetworkStats, {
+const completeWorkflowCode = `import NetworkStats, {
   CSVAdapter,
   Graph,
   KamadaKawaiLayout,
@@ -734,27 +758,5 @@ const finalData = nodeMetrics.map(node => ({
 console.log('Analysis complete!', finalData);
 console.log('Modularity:', communityResult.modularity);
 
-await analyzer.dispose();</code></pre>
-        </div>
-      </div>
-    </section>
-
-    <!-- Footer -->
-    <div class="text-center pt-12 pb-6 border-t border-[var(--color-border)]">
-      <p class="text-secondary">
-        📚 For more details, check out the
-        <a href="https://github.com/guinetik/js-network-stats"
-           class="text-purple-600 dark:text-purple-400 hover:underline"
-           target="_blank">
-          GitHub repository
-        </a>
-      </p>
-    </div>
-  </div>
-</template>
-
-<script setup>
-import { useI18n } from '../composables/useI18n';
-
-const { t } = useI18n();
+await analyzer.dispose();`;
 </script>
