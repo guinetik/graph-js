@@ -175,6 +175,7 @@ Compute node positions for visualization using various layout algorithms.
 
 ```javascript
 import {
+  Graph,
   CircularLayout,
   ForceDirectedLayout,
   KamadaKawaiLayout,
@@ -190,7 +191,7 @@ graph.addEdge('A', 'B');
 
 // Compute positions
 const layout = new KamadaKawaiLayout(graph);
-const positions = layout.getPositions();
+const positions = await layout.getPositions();
 
 console.log(positions);
 // { 'A': { x: 0, y: 0 }, 'B': { x: 100, y: 0 } }
@@ -251,11 +252,11 @@ NetworkStats  ──(task)──>  Worker 1
 
 ### Bundle Integration
 
-For Vite, Webpack, or Rollup, specify the worker script path:
+For Vite, Webpack, or Rollup, import the worker URL:
 
 ```javascript
-// Vite example
-import workerUrl from '@guinetik/graph-js/dist/network-worker.js?worker&url';
+import NetworkStats from '@guinetik/graph-js';
+import workerUrl from '@guinetik/graph-js/worker-url';
 
 const analyzer = new NetworkStats({
   workerScript: workerUrl
@@ -299,7 +300,7 @@ for (const edge of network) {
 
 // 3. Compute layout
 const layout = new KamadaKawaiLayout(graph);
-const positions = layout.getPositions();
+const positions = await layout.getPositions();
 
 // 4. Merge metrics and positions
 const visualizationData = nodeMetrics.map(node => ({

@@ -108,7 +108,7 @@ export class FamilyController {
    * Reset family tree to initial state
    */
   resetFamily() {
-    this.storage.resetFamily(this.graphManager.loadData);
+    this.storage.resetFamily(this.graphManager.loadData, this.graphManager.graphInstance);
   }
 
   /**

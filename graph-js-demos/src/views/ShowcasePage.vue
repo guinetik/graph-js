@@ -207,6 +207,12 @@ import NetworkAnalysis from '../components/NetworkAnalysis.vue';
 import { useNetworkGraph } from '../composables/useNetworkGraph';
 import { useI18n } from '../composables/useI18n';
 import { ShowcaseController } from '../lib/ShowcaseController';
+import { createLogger } from '@guinetik/logger';
+
+const log = createLogger({
+  prefix: 'ShowcasePage',
+  level: import.meta.env.DEV ? 'debug' : 'info'
+});
 
 /**
  * Use i18n for translations
@@ -252,14 +258,14 @@ let controller = null;
 
 /**
  * Status change callback for the controller
- * 
+ *
  * @param {string} message - Status message
  * @param {string} type - Status type
  */
 const handleStatusChange = (message, type) => {
   statusMessage.value = message;
   statusType.value = type;
-  setTimeout(() => { statusMessage.value = ''; }, type === 'error' ? 5000 : 3000);
+  // Status persists - user sees it until next action
 };
 
 
@@ -298,11 +304,11 @@ const initializeShowcase = () => {
   // Get available layouts and community algorithms
   availableLayouts.value = controller.getAvailableLayouts();
   availableCommunityAlgorithms.value = controller.getAvailableCommunityAlgorithms();
-  
-  console.log('Initial data loaded', { 
+
+  log.info('Initial data loaded', {
     layouts: availableLayouts.value.length,
     communityAlgorithms: availableCommunityAlgorithms.value.length,
-    nodes: initialData.nodes.length 
+    nodes: initialData.nodes.length
   });
 };
 
@@ -344,7 +350,7 @@ const handleLoadDataset = async () => {
       loadingMessage.value = t('showcase.messages.loadingDatasetName').replace('{name}', result.name);
     }
   } catch (err) {
-    console.error('Failed to load dataset:', err);
+    log.error('Failed to load dataset', { error: err.message, stack: err.stack });
     loading.value = false; // Only clear on error
   }
   // Don't clear loading here - let the composable's loadData handle it via the 'ready' event
@@ -360,7 +366,7 @@ const handleAnalyzeGraph = async () => {
     loadingMessage.value = t('showcase.messages.analyzing');
     await controller.analyzeGraph(selectedFeatures.value);
   } catch (err) {
-    console.error('Analysis error:', err);
+    log.error('Analysis error', { error: err.message, stack: err.stack });
   }
 };
 
@@ -374,7 +380,7 @@ const handleApplyLayout = async () => {
     loadingMessage.value = t('showcase.messages.applyingLayout').replace('{layout}', selectedLayout.value);
     await controller.applyLayout(selectedLayout.value);
   } catch (err) {
-    console.error('Layout error:', err);
+    log.error('Layout error', { error: err.message, stack: err.stack });
   }
 };
 
@@ -392,7 +398,7 @@ const handleDetectCommunities = async () => {
       communityResult.value = result;
     }
   } catch (err) {
-    console.error('Community detection error:', err);
+    log.error('Community detection error', { error: err.message, stack: err.stack });
   }
 };
 

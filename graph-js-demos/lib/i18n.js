@@ -3,6 +3,13 @@
  * Translation strings for English and Portuguese
  */
 
+import { createLogger } from '@guinetik/logger';
+
+const log = createLogger({
+  prefix: 'i18n',
+  level: import.meta.env.DEV ? 'debug' : 'info'
+});
+
 export const translations = {
   en: {
     // Navigation
@@ -33,59 +40,61 @@ export const translations = {
     // Home page
     home: {
       hero: {
-        title: 'Lorem Ipsum Network Analysis',
-        subtitle: 'Dolor sit amet consectetur adipiscing elit',
-        description: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam quis nostrud exercitation.',
+        title: 'Modern Network Analysis for JavaScript',
+        subtitle: 'Powerful graph theory and network analysis with worker-first architecture',
+        description: 'Analyze social networks, family trees, and complex graphs with ease. Fast parallel computation, comprehensive metrics, and beautiful visualizations - all in pure JavaScript.',
         cta: 'Get Started',
         github: 'View on GitHub'
       },
       features: [
         {
           icon: '📊',
-          title: 'Lorem Analytics',
-          description: 'Consectetur adipiscing elit sed do eiusmod tempor incididunt'
+          title: 'Network Analytics',
+          description: 'Compute centrality metrics, clustering coefficients, and graph-level statistics with comprehensive analysis tools'
         },
         {
           icon: '🔍',
-          title: 'Ipsum Explorer',
-          description: 'Ut labore et dolore magna aliqua enim ad minim veniam'
+          title: 'Interactive Explorer',
+          description: 'Explore networks with drag-and-drop, zoom, pan, and real-time analysis of nodes and communities'
         },
         {
           icon: '🎨',
-          title: 'Dolor Layouts',
-          description: 'Quis nostrud exercitation ullamco laboris nisi ut aliquip'
+          title: 'Multiple Layouts',
+          description: '11 layout algorithms including force-directed, Kamada-Kawai, spectral, and hierarchical layouts'
         },
         {
           icon: '⚡',
-          title: 'Amet Performance',
-          description: 'Ex ea commodo consequat duis aute irure dolor in reprehenderit'
+          title: 'Worker Performance',
+          description: 'Non-blocking UI with web workers for parallel computation on large graphs with thousands of nodes'
         },
         {
           icon: '🔗',
-          title: 'Sit Connections',
-          description: 'Voluptate velit esse cillum dolore eu fugiat nulla pariatur'
+          title: 'Community Detection',
+          description: 'Find clusters and groups in networks using Louvain algorithm with modularity optimization'
         },
         {
           icon: '📈',
-          title: 'Elit Statistics',
-          description: 'Excepteur sint occaecat cupidatat non proident sunt in culpa'
+          title: 'Rich Metrics',
+          description: 'Degree, betweenness, eigenvector, clustering, closeness, and more statistical features'
         }
       ],
       code: {
-        title: 'Lorem Ipsum Example',
-        snippet: `npm install lorem-ipsum
+        title: 'Quick Start Example',
+        snippet: `npm install @guinetik/graph-js
 
-import { Lorem } from 'lorem-ipsum';
+import NetworkStats from '@guinetik/graph-js';
 
 const network = [
-  { source: 'Dolor', target: 'Sit', weight: 1 },
-  { source: 'Amet', target: 'Elit', weight: 2 }
+  { source: 'Alice', target: 'Bob', weight: 1 },
+  { source: 'Bob', target: 'Carol', weight: 2 },
+  { source: 'Carol', target: 'Alice', weight: 1 }
 ];
 
-const analyzer = new Lorem();
-const results = analyzer.analyze(network);
+const analyzer = new NetworkStats({ verbose: true });
+const results = await analyzer.analyze(network, ['degree', 'eigenvector']);
 
-console.log(results);`
+console.log(results);
+// Analysis runs in workers for optimal performance!`
       }
     },
 
@@ -145,11 +154,13 @@ console.log(results);`
       },
       networkStats: {
         title: 'NetworkStats',
-        description: 'Main class for analyzing networks and calculating statistical metrics.',
+        description: 'Main class for analyzing networks and calculating statistical metrics. All computation happens in web workers for optimal performance.',
         constructor: 'Constructor',
         constructorParams: {
-          maxIter: 'Maximum iterations for algorithms (default: 100000)',
-          verbose: 'Enable logging (default: true)'
+          verbose: 'Enable detailed logging (default: true)',
+          maxWorkers: 'Maximum number of workers (default: auto-detect CPU cores)',
+          taskTimeout: 'Task timeout in milliseconds (default: 60000)',
+          workerScript: 'Custom worker script path for bundlers like Vite'
         },
         analyze: {
           title: 'analyze() Method',
@@ -159,71 +170,301 @@ console.log(results);`
           title: 'Available Features',
           degree: 'Number of connections per node',
           eigenvector: 'Influence based on connection quality (like PageRank)',
+          eigenvectorLaplacian: 'Laplacian eigenvector centrality (for spectral layouts)',
           betweenness: 'Bridge importance between groups',
           clustering: 'How densely connected neighbors are',
+          closeness: 'Average distance to all other nodes in the network',
           cliques: 'Number of complete subgraphs containing the node',
+          egoDensity: 'Density of the node\'s immediate neighborhood',
           modularity: 'Community assignment (Louvain algorithm)'
         }
       },
       adapters: {
-        description: 'Convert between various graph formats and the standard GraphData format.',
+        title: 'Data Adapters',
+        description: 'Convert between various graph formats and the standard GraphData format. All adapters use static methods.',
         csv: {
           title: 'CSVAdapter',
-          description: 'Load and convert CSV files to graph format'
+          description: 'Load and convert CSV files to graph format. Supports edge lists and node property files.',
+          methods: 'Methods',
+          methodsList: {
+            fromEdgeList: {
+              name: 'fromEdgeList(csvText, options)',
+              description: 'Parse CSV edge list. Options: header (default: true), delimiter (default: ","), weighted (default: true)',
+              returns: 'Returns GraphData with nodes and edges'
+            },
+            fromNodes: {
+              name: 'fromNodes(csvText, options)',
+              description: 'Parse CSV node properties',
+              returns: 'Returns array of NodeData objects'
+            },
+            loadFromURL: {
+              name: 'loadFromURL(edgeURL, nodeURL, options)',
+              description: 'Async method to fetch and parse CSV from URLs',
+              returns: 'Returns Promise<GraphData>'
+            },
+            toEdgeList: {
+              name: 'toEdgeList(graphData, options)',
+              description: 'Export edges to CSV string',
+              returns: 'Returns CSV string'
+            },
+            toNodes: {
+              name: 'toNodes(graphData, options)',
+              description: 'Export nodes to CSV string',
+              returns: 'Returns CSV string'
+            }
+          }
         },
         json: {
           title: 'JSONAdapter',
-          description: 'Support for D3.js, Cytoscape, and other JSON formats'
+          description: 'Support for D3.js, Cytoscape, and other JSON formats. Auto-detects format.',
+          methods: 'Methods',
+          methodsList: {
+            fromD3: {
+              name: 'fromD3(d3Data)',
+              description: 'Convert D3.js force-directed format (with "links") to GraphData',
+              returns: 'Returns GraphData'
+            },
+            fromCytoscape: {
+              name: 'fromCytoscape(cytoData)',
+              description: 'Convert Cytoscape.js format to GraphData',
+              returns: 'Returns GraphData'
+            },
+            fromFormat: {
+              name: 'fromFormat(jsonData)',
+              description: 'Auto-detect format (GraphData, D3, Cytoscape, NetworkX)',
+              returns: 'Returns GraphData'
+            },
+            toD3: {
+              name: 'toD3(graphData)',
+              description: 'Convert to D3.js format with "links" property',
+              returns: 'Returns D3GraphData'
+            },
+            toCytoscape: {
+              name: 'toCytoscape(graphData)',
+              description: 'Convert to Cytoscape.js format',
+              returns: 'Returns CytoscapeData'
+            },
+            loadFromURL: {
+              name: 'loadFromURL(url)',
+              description: 'Async method to fetch and parse JSON',
+              returns: 'Returns Promise<GraphData>'
+            }
+          }
         },
         networkx: {
           title: 'NetworkXAdapter',
-          description: 'Python NetworkX interoperability'
+          description: 'Python NetworkX interoperability. Supports node-link and adjacency formats.',
+          methods: 'Methods',
+          methodsList: {
+            fromNodeLink: {
+              name: 'fromNodeLink(nxData)',
+              description: 'Convert NetworkX node-link format (most common)',
+              returns: 'Returns GraphData'
+            },
+            fromAdjacency: {
+              name: 'fromAdjacency(nxData)',
+              description: 'Convert NetworkX adjacency format',
+              returns: 'Returns GraphData'
+            },
+            toNodeLink: {
+              name: 'toNodeLink(graphData, options)',
+              description: 'Convert to node-link format. Options: directed (default: false), multigraph (default: false)',
+              returns: 'Returns NetworkX node-link data'
+            },
+            toAdjacency: {
+              name: 'toAdjacency(graphData)',
+              description: 'Convert to adjacency format',
+              returns: 'Returns array of node objects with adjacency lists'
+            }
+          }
         }
       },
       layouts: {
-        description: 'Position nodes in 2D space using physics-based algorithms.',
+        title: 'Graph Layouts',
+        description: 'Position nodes in 2D space using various algorithms. All layouts use async computation in Web Workers for optimal performance.',
+        note: 'All layout methods are async and return Promise<Object> with node positions {nodeId: {x, y}}',
         forceDirected: {
           title: 'ForceDirectedLayout',
-          description: 'Spring-electrical model (Fruchterman-Reingold algorithm)',
+          description: 'Spring-electrical model using Fruchterman-Reingold algorithm. Good for general-purpose network visualization.',
+          complexity: 'Time Complexity: O(iterations × V²)',
+          bestFor: 'Best for: General networks, social graphs',
+          constructor: 'new ForceDirectedLayout(graph, options)',
           options: {
-            width: 'Layout area width (default: 1000)',
-            height: 'Layout area height (default: 1000)',
-            iterations: 'Number of simulation steps (default: 100)',
-            repulsion: 'Node repulsion strength (default: 50000)',
-            attraction: 'Edge attraction strength (default: 0.1)'
+            iterations: 'Number of simulation steps (default: 50)',
+            k: 'Optimal distance between nodes (default: auto-calculated)',
+            scale: 'Scale factor for positions (default: 1)',
+            center: 'Center point {x, y} (default: {x:0, y:0})',
+            initialPositions: 'Starting positions (default: random)',
+            threshold: 'Convergence threshold (default: 1e-4)'
+          }
+        },
+        kamadaKawai: {
+          title: 'KamadaKawaiLayout',
+          description: 'Energy minimization based on all-pairs shortest paths. Produces aesthetically pleasing layouts.',
+          complexity: 'Time Complexity: O(V³ + iterations × V²)',
+          bestFor: 'Best for: Small-medium graphs (<1000 nodes), trees, planar graphs',
+          constructor: 'new KamadaKawaiLayout(graph, options)',
+          options: {
+            iterations: 'Maximum iterations (default: 1000)',
+            scale: 'Scale factor (default: 1)',
+            center: 'Center point (default: {x:0, y:0})',
+            initialPositions: 'Starting positions (default: circular)',
+            threshold: 'Convergence threshold (default: 1e-4)',
+            K: 'Spring constant scaling (default: auto)'
+          }
+        },
+        spectral: {
+          title: 'SpectralLayout',
+          description: 'Uses Laplacian eigenvectors as coordinates. Excellent for visualizing community structure.',
+          complexity: 'Time Complexity: O(V) using pre-computed eigenvectors',
+          bestFor: 'Best for: Community visualization, graph topology',
+          requires: 'Requires: "eigenvector-laplacian" statistic must be pre-computed',
+          constructor: 'new SpectralLayout(graph, options)',
+          options: {
+            scale: 'Scale factor (default: 100)',
+            center: 'Center point (default: {x:0, y:0})'
           }
         },
         circular: {
           title: 'CircularLayout',
-          description: 'Distance-based circular positioning'
-        }
+          description: 'Positions nodes in a circle. Simple and clean for small networks.',
+          complexity: 'Time Complexity: O(V)',
+          bestFor: 'Best for: Small networks, cycle graphs',
+          constructor: 'new CircularLayout(graph, options)',
+          options: {
+            scale: 'Circle radius (default: 100)',
+            center: 'Center point (default: {x:0, y:0})',
+            sortBy: 'Optional sort function for node order'
+          }
+        },
+        shell: {
+          title: 'ShellLayout',
+          description: 'Concentric circles based on node degree. High-degree nodes in center.',
+          complexity: 'Time Complexity: O(V)',
+          bestFor: 'Best for: Hub-and-spoke networks, star graphs',
+          requires: 'Requires: "degree" statistic must be pre-computed',
+          constructor: 'new ShellLayout(graph, options)'
+        },
+        spiral: {
+          title: 'SpiralLayout',
+          description: 'Archimedean spiral pattern. Aesthetically pleasing for ordered data.',
+          complexity: 'Time Complexity: O(V)',
+          bestFor: 'Best for: Sequential or temporal networks',
+          constructor: 'new SpiralLayout(graph, options)'
+        },
+        bfs: {
+          title: 'BFSLayout',
+          description: 'Breadth-first search layers. Shows distance from root node.',
+          complexity: 'Time Complexity: O(V + E)',
+          bestFor: 'Best for: Trees, hierarchies, showing propagation',
+          constructor: 'new BFSLayout(graph, options)'
+        },
+        bipartite: {
+          title: 'BipartiteLayout',
+          description: 'Two-layer layout for bipartite graphs.',
+          complexity: 'Time Complexity: O(V)',
+          bestFor: 'Best for: Two-mode networks, actor-event data',
+          constructor: 'new BipartiteLayout(graph, options)'
+        },
+        random: {
+          title: 'RandomLayout',
+          description: 'Random positions. Useful as starting point for other layouts.',
+          complexity: 'Time Complexity: O(V)',
+          bestFor: 'Best for: Initial positions, testing',
+          constructor: 'new RandomLayout(graph, options)'
+        },
+        usage: 'Usage Pattern',
+        usageDescription: 'All layouts follow the same async pattern'
       },
       community: {
-        description: 'Detect communities (clusters) in networks using various algorithms.',
-        detector: {
-          description: 'Main orchestrator class using Strategy Pattern'
+        title: 'Community Detection',
+        description: 'Detect communities (clusters) in networks using various algorithms. All computation runs in Web Workers.',
+        mainClass: {
+          title: 'CommunityDetection',
+          description: 'Main class for detecting communities in graphs',
+          constructor: 'new CommunityDetection(graph)',
+          methods: {
+            detectCommunities: {
+              name: 'detectCommunities(algorithm, options)',
+              description: 'Detect communities using specified algorithm. Algorithm can be instance or string ("louvain")',
+              returns: 'Returns Promise<CommunityResult> with communities, modularity, numCommunities'
+            },
+            calculateModularity: {
+              name: 'calculateModularity(communities)',
+              description: 'Calculate modularity score for a partition',
+              returns: 'Returns number (-1 to 1, higher is better)'
+            }
+          },
+          staticMethods: {
+            detect: {
+              name: 'CommunityDetection.detect(graphData, algorithm, options)',
+              description: 'Convenience method for direct detection from GraphData',
+              returns: 'Returns Promise<CommunityResult>'
+            },
+            getNodesInCommunity: {
+              name: 'CommunityDetection.getNodesInCommunity(communities, communityId)',
+              description: 'Get array of node IDs in a specific community'
+            },
+            getCommunityGroups: {
+              name: 'CommunityDetection.getCommunityGroups(communities)',
+              description: 'Get object mapping communityId to array of node IDs'
+            }
+          }
         },
         louvain: {
           title: 'LouvainAlgorithm',
-          description: 'Fast modularity optimization (Louvain method)'
+          description: 'Fast modularity optimization using the Louvain method. The most popular community detection algorithm.',
+          complexity: 'Time Complexity: O(V log V)',
+          bestFor: 'Best for: Large networks, general-purpose community detection',
+          constructor: 'new LouvainAlgorithm(options)',
+          options: {
+            resolution: 'Resolution parameter for modularity (default: 1.0). Higher values find smaller communities.',
+            maxIterations: 'Maximum iterations (default: 100)'
+          }
+        },
+        result: {
+          title: 'CommunityResult',
+          description: 'Result object returned by community detection',
+          properties: {
+            communities: 'Object mapping nodeId to communityId (number)',
+            modularity: 'Modularity score (-1 to 1, typically 0.3-0.7 for good partitions)',
+            numCommunities: 'Number of communities found',
+            algorithm: 'Algorithm name used',
+            metadata: 'Optional additional information'
+          }
         },
         customAlgorithm: {
           title: 'Custom Algorithms',
-          description: 'Extend CommunityAlgorithm to create your own algorithms'
+          description: 'Extend CommunityAlgorithm base class to create your own algorithms',
+          note: 'Implement the detect() method and configure worker module path'
         }
       },
       examples: {
+        title: 'Usage Examples',
+        description: 'Complete code examples for common use cases',
+        basic: {
+          title: 'Basic Network Analysis',
+          description: 'Analyze a simple network and compute centrality metrics'
+        },
         csv: {
           title: 'Loading CSV Data',
-          description: 'Import network data from CSV files'
+          description: 'Import network data from CSV files and analyze'
+        },
+        json: {
+          title: 'Working with JSON',
+          description: 'Convert between JSON formats (D3, Cytoscape, NetworkX)'
         },
         layout: {
-          title: 'Graph Layout',
-          description: 'Position nodes using force-directed layout'
+          title: 'Applying Layouts',
+          description: 'Position nodes using layout algorithms'
         },
-        communityStrategy: {
-          title: 'Community Detection (Strategy Pattern)',
-          description: 'Use algorithm instances for community detection'
+        community: {
+          title: 'Community Detection',
+          description: 'Find communities using Louvain algorithm'
+        },
+        complete: {
+          title: 'Complete Workflow',
+          description: 'End-to-end example: load data, analyze, layout, detect communities'
         }
       }
     },
@@ -646,10 +887,6 @@ console.log(results);`
         uncleAuntChildTemplate: '{name}\'s child',
         siblingChildTemplate: '{name}\'s child'
       }
-    },
-    docs: {
-      title: 'Documentation',
-      description: 'Learn how to use @guinetik/graph-js'
     }
   },
 
@@ -794,59 +1031,61 @@ console.log(results);`
     // Home page
     home: {
       hero: {
-        title: 'Lorem Ipsum Análise de Redes',
-        subtitle: 'Dolor sit amet consectetur adipiscing elit',
-        description: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam quis nostrud exercitation.',
+        title: 'Análise de Redes Moderna para JavaScript',
+        subtitle: 'Teoria de grafos e análise de redes poderosa com arquitetura worker-first',
+        description: 'Analise redes sociais, árvores genealógicas e grafos complexos com facilidade. Computação paralela rápida, métricas abrangentes e visualizações bonitas - tudo em JavaScript puro.',
         cta: 'Começar',
         github: 'Ver no GitHub'
       },
       features: [
         {
           icon: '📊',
-          title: 'Lorem Análise',
-          description: 'Consectetur adipiscing elit sed do eiusmod tempor incididunt'
+          title: 'Análise de Redes',
+          description: 'Calcule métricas de centralidade, coeficientes de agrupamento e estatísticas de grafo com ferramentas de análise abrangentes'
         },
         {
           icon: '🔍',
-          title: 'Ipsum Explorador',
-          description: 'Ut labore et dolore magna aliqua enim ad minim veniam'
+          title: 'Explorador Interativo',
+          description: 'Explore redes com arrastar e soltar, zoom, pan e análise em tempo real de nós e comunidades'
         },
         {
           icon: '🎨',
-          title: 'Dolor Layouts',
-          description: 'Quis nostrud exercitation ullamco laboris nisi ut aliquip'
+          title: 'Múltiplos Layouts',
+          description: '11 algoritmos de layout incluindo force-directed, Kamada-Kawai, spectral e layouts hierárquicos'
         },
         {
           icon: '⚡',
-          title: 'Amet Performance',
-          description: 'Ex ea commodo consequat duis aute irure dolor in reprehenderit'
+          title: 'Performance com Workers',
+          description: 'UI não bloqueante com web workers para computação paralela em grafos grandes com milhares de nós'
         },
         {
           icon: '🔗',
-          title: 'Sit Conexões',
-          description: 'Voluptate velit esse cillum dolore eu fugiat nulla pariatur'
+          title: 'Detecção de Comunidades',
+          description: 'Encontre clusters e grupos em redes usando algoritmo Louvain com otimização de modularidade'
         },
         {
           icon: '📈',
-          title: 'Elit Estatísticas',
-          description: 'Excepteur sint occaecat cupidatat non proident sunt in culpa'
+          title: 'Métricas Ricas',
+          description: 'Grau, intermediação, eigenvector, agrupamento, proximidade e mais recursos estatísticos'
         }
       ],
       code: {
-        title: 'Exemplo Lorem Ipsum',
-        snippet: `npm install lorem-ipsum
+        title: 'Exemplo de Início Rápido',
+        snippet: `npm install @guinetik/graph-js
 
-import { Lorem } from 'lorem-ipsum';
+import NetworkStats from '@guinetik/graph-js';
 
 const network = [
-  { source: 'Dolor', target: 'Sit', weight: 1 },
-  { source: 'Amet', target: 'Elit', weight: 2 }
+  { source: 'Alice', target: 'Bob', weight: 1 },
+  { source: 'Bob', target: 'Carol', weight: 2 },
+  { source: 'Carol', target: 'Alice', weight: 1 }
 ];
 
-const analyzer = new Lorem();
-const results = analyzer.analyze(network);
+const analyzer = new NetworkStats({ verbose: true });
+const results = await analyzer.analyze(network, ['degree', 'eigenvector']);
 
-console.log(results);`
+console.log(results);
+// Análise executada em workers para desempenho ideal!`
       }
     },
 
@@ -906,11 +1145,13 @@ console.log(results);`
       },
       networkStats: {
         title: 'NetworkStats',
-        description: 'Classe principal para analisar redes e calcular métricas estatísticas.',
+        description: 'Classe principal para analisar redes e calcular métricas estatísticas. Toda computação acontece em web workers para desempenho ideal.',
         constructor: 'Construtor',
         constructorParams: {
-          maxIter: 'Máximo de iterações para algoritmos (padrão: 100000)',
-          verbose: 'Ativar logging (padrão: true)'
+          verbose: 'Ativar logging detalhado (padrão: true)',
+          maxWorkers: 'Número máximo de workers (padrão: detecta núcleos da CPU automaticamente)',
+          taskTimeout: 'Timeout de tarefa em milissegundos (padrão: 60000)',
+          workerScript: 'Caminho personalizado do script worker para bundlers como Vite'
         },
         analyze: {
           title: 'Método analyze()',
@@ -919,72 +1160,302 @@ console.log(results);`
         features: {
           title: 'Recursos Disponíveis',
           degree: 'Número de conexões por nó',
-          eigenvector: 'Influência baseada na qualidade das conexões',
+          eigenvector: 'Influência baseada na qualidade das conexões (como PageRank)',
+          eigenvectorLaplacian: 'Centralidade eigenvector Laplaciano (para layouts espectrais)',
           betweenness: 'Importância de ponte entre grupos',
           clustering: 'Quão densamente conectados estão os vizinhos',
+          closeness: 'Distância média para todos os outros nós na rede',
           cliques: 'Número de subgrafos completos contendo o nó',
+          egoDensity: 'Densidade da vizinhança imediata do nó',
           modularity: 'Atribuição de comunidade (algoritmo Louvain)'
         }
       },
       adapters: {
-        description: 'Converter entre vários formatos de grafo.',
+        title: 'Adaptadores de Dados',
+        description: 'Converter entre vários formatos de grafo e o formato padrão GraphData. Todos os adaptadores usam métodos estáticos.',
         csv: {
           title: 'CSVAdapter',
-          description: 'Carregar e converter arquivos CSV para formato de grafo'
+          description: 'Carregar e converter arquivos CSV para formato de grafo. Suporta listas de arestas e arquivos de propriedades de nós.',
+          methods: 'Métodos',
+          methodsList: {
+            fromEdgeList: {
+              name: 'fromEdgeList(csvText, options)',
+              description: 'Analisar lista de arestas CSV. Opções: header (padrão: true), delimiter (padrão: ","), weighted (padrão: true)',
+              returns: 'Retorna GraphData com nós e arestas'
+            },
+            fromNodes: {
+              name: 'fromNodes(csvText, options)',
+              description: 'Analisar propriedades de nós CSV',
+              returns: 'Retorna array de objetos NodeData'
+            },
+            loadFromURL: {
+              name: 'loadFromURL(edgeURL, nodeURL, options)',
+              description: 'Método assíncrono para buscar e analisar CSV de URLs',
+              returns: 'Retorna Promise<GraphData>'
+            },
+            toEdgeList: {
+              name: 'toEdgeList(graphData, options)',
+              description: 'Exportar arestas para string CSV',
+              returns: 'Retorna string CSV'
+            },
+            toNodes: {
+              name: 'toNodes(graphData, options)',
+              description: 'Exportar nós para string CSV',
+              returns: 'Retorna string CSV'
+            }
+          }
         },
         json: {
           title: 'JSONAdapter',
-          description: 'Suporte para D3.js, Cytoscape e outros formatos JSON'
+          description: 'Suporte para D3.js, Cytoscape e outros formatos JSON. Detecta formato automaticamente.',
+          methods: 'Métodos',
+          methodsList: {
+            fromD3: {
+              name: 'fromD3(d3Data)',
+              description: 'Converter formato D3.js force-directed (com "links") para GraphData',
+              returns: 'Retorna GraphData'
+            },
+            fromCytoscape: {
+              name: 'fromCytoscape(cytoData)',
+              description: 'Converter formato Cytoscape.js para GraphData',
+              returns: 'Retorna GraphData'
+            },
+            fromFormat: {
+              name: 'fromFormat(jsonData)',
+              description: 'Detectar formato automaticamente (GraphData, D3, Cytoscape, NetworkX)',
+              returns: 'Retorna GraphData'
+            },
+            toD3: {
+              name: 'toD3(graphData)',
+              description: 'Converter para formato D3.js com propriedade "links"',
+              returns: 'Retorna D3GraphData'
+            },
+            toCytoscape: {
+              name: 'toCytoscape(graphData)',
+              description: 'Converter para formato Cytoscape.js',
+              returns: 'Retorna CytoscapeData'
+            },
+            loadFromURL: {
+              name: 'loadFromURL(url)',
+              description: 'Método assíncrono para buscar e analisar JSON',
+              returns: 'Retorna Promise<GraphData>'
+            }
+          }
         },
         networkx: {
           title: 'NetworkXAdapter',
-          description: 'Interoperabilidade com Python NetworkX'
+          description: 'Interoperabilidade com Python NetworkX. Suporta formatos node-link e adjacência.',
+          methods: 'Métodos',
+          methodsList: {
+            fromNodeLink: {
+              name: 'fromNodeLink(nxData)',
+              description: 'Converter formato NetworkX node-link (mais comum)',
+              returns: 'Retorna GraphData'
+            },
+            fromAdjacency: {
+              name: 'fromAdjacency(nxData)',
+              description: 'Converter formato de adjacência NetworkX',
+              returns: 'Retorna GraphData'
+            },
+            toNodeLink: {
+              name: 'toNodeLink(graphData, options)',
+              description: 'Converter para formato node-link. Opções: directed (padrão: false), multigraph (padrão: false)',
+              returns: 'Retorna dados node-link NetworkX'
+            },
+            toAdjacency: {
+              name: 'toAdjacency(graphData)',
+              description: 'Converter para formato de adjacência',
+              returns: 'Retorna array de objetos de nós com listas de adjacência'
+            }
+          }
         }
       },
       layouts: {
-        description: 'Posicionar nós no espaço 2D usando algoritmos baseados em física.',
+        title: 'Layouts de Grafos',
+        description: 'Posicionar nós no espaço 2D usando vários algoritmos. Todos os layouts usam computação assíncrona em Web Workers para desempenho ideal.',
+        note: 'Todos os métodos de layout são assíncronos e retornam Promise<Object> com posições de nós {nodeId: {x, y}}',
         forceDirected: {
           title: 'ForceDirectedLayout',
-          description: 'Modelo spring-elétrico (algoritmo Fruchterman-Reingold)',
+          description: 'Modelo spring-elétrico usando algoritmo Fruchterman-Reingold. Bom para visualização geral de redes.',
+          complexity: 'Complexidade de Tempo: O(iterations × V²)',
+          bestFor: 'Melhor para: Redes gerais, grafos sociais',
+          constructor: 'new ForceDirectedLayout(graph, options)',
           options: {
-            width: 'Largura da área de layout (padrão: 1000)',
-            height: 'Altura da área de layout (padrão: 1000)',
-            iterations: 'Número de passos de simulação (padrão: 100)',
-            repulsion: 'Força de repulsão dos nós (padrão: 50000)',
-            attraction: 'Força de atração das arestas (padrão: 0.1)'
+            iterations: 'Número de passos de simulação (padrão: 50)',
+            k: 'Distância ótima entre nós (padrão: auto-calculado)',
+            scale: 'Fator de escala para posições (padrão: 1)',
+            center: 'Ponto central {x, y} (padrão: {x:0, y:0})',
+            initialPositions: 'Posições iniciais (padrão: aleatório)',
+            threshold: 'Limiar de convergência (padrão: 1e-4)'
+          }
+        },
+        kamadaKawai: {
+          title: 'KamadaKawaiLayout',
+          description: 'Minimização de energia baseada em caminhos mais curtos. Produz layouts esteticamente agradáveis.',
+          complexity: 'Complexidade de Tempo: O(V³ + iterations × V²)',
+          bestFor: 'Melhor para: Grafos pequenos-médios (<1000 nós), árvores, grafos planares',
+          constructor: 'new KamadaKawaiLayout(graph, options)',
+          options: {
+            iterations: 'Máximo de iterações (padrão: 1000)',
+            scale: 'Fator de escala (padrão: 1)',
+            center: 'Ponto central (padrão: {x:0, y:0})',
+            initialPositions: 'Posições iniciais (padrão: circular)',
+            threshold: 'Limiar de convergência (padrão: 1e-4)',
+            K: 'Escala de constante de mola (padrão: auto)'
+          }
+        },
+        spectral: {
+          title: 'SpectralLayout',
+          description: 'Usa autovetores Laplacianos como coordenadas. Excelente para visualizar estrutura de comunidades.',
+          complexity: 'Complexidade de Tempo: O(V) usando autovetores pré-computados',
+          bestFor: 'Melhor para: Visualização de comunidades, topologia de grafo',
+          requires: 'Requer: estatística "eigenvector-laplacian" deve ser pré-computada',
+          constructor: 'new SpectralLayout(graph, options)',
+          options: {
+            scale: 'Fator de escala (padrão: 100)',
+            center: 'Ponto central (padrão: {x:0, y:0})'
           }
         },
         circular: {
           title: 'CircularLayout',
-          description: 'Posicionamento circular baseado em distância'
-        }
+          description: 'Posiciona nós em círculo. Simples e limpo para redes pequenas.',
+          complexity: 'Complexidade de Tempo: O(V)',
+          bestFor: 'Melhor para: Redes pequenas, grafos cíclicos',
+          constructor: 'new CircularLayout(graph, options)',
+          options: {
+            scale: 'Raio do círculo (padrão: 100)',
+            center: 'Ponto central (padrão: {x:0, y:0})',
+            sortBy: 'Função de ordenação opcional para ordem dos nós'
+          }
+        },
+        shell: {
+          title: 'ShellLayout',
+          description: 'Círculos concêntricos baseados no grau do nó. Nós de alto grau no centro.',
+          complexity: 'Complexidade de Tempo: O(V)',
+          bestFor: 'Melhor para: Redes hub-and-spoke, grafos estrela',
+          requires: 'Requer: estatística "degree" deve ser pré-computada',
+          constructor: 'new ShellLayout(graph, options)'
+        },
+        spiral: {
+          title: 'SpiralLayout',
+          description: 'Padrão de espiral arquimediana. Esteticamente agradável para dados ordenados.',
+          complexity: 'Complexidade de Tempo: O(V)',
+          bestFor: 'Melhor para: Redes sequenciais ou temporais',
+          constructor: 'new SpiralLayout(graph, options)'
+        },
+        bfs: {
+          title: 'BFSLayout',
+          description: 'Camadas de busca em largura. Mostra distância do nó raiz.',
+          complexity: 'Complexidade de Tempo: O(V + E)',
+          bestFor: 'Melhor para: Árvores, hierarquias, mostrando propagação',
+          constructor: 'new BFSLayout(graph, options)'
+        },
+        bipartite: {
+          title: 'BipartiteLayout',
+          description: 'Layout de duas camadas para grafos bipartidos.',
+          complexity: 'Complexidade de Tempo: O(V)',
+          bestFor: 'Melhor para: Redes de dois modos, dados ator-evento',
+          constructor: 'new BipartiteLayout(graph, options)'
+        },
+        random: {
+          title: 'RandomLayout',
+          description: 'Posições aleatórias. Útil como ponto de partida para outros layouts.',
+          complexity: 'Complexidade de Tempo: O(V)',
+          bestFor: 'Melhor para: Posições iniciais, testes',
+          constructor: 'new RandomLayout(graph, options)'
+        },
+        usage: 'Padrão de Uso',
+        usageDescription: 'Todos os layouts seguem o mesmo padrão assíncrono'
       },
       community: {
-        description: 'Detectar comunidades (clusters) em redes usando vários algoritmos.',
-        detector: {
-          description: 'Classe orquestradora principal usando Strategy Pattern'
+        title: 'Detecção de Comunidades',
+        description: 'Detectar comunidades (clusters) em redes usando vários algoritmos. Toda computação é executada em Web Workers.',
+        mainClass: {
+          title: 'CommunityDetection',
+          description: 'Classe principal para detectar comunidades em grafos',
+          constructor: 'new CommunityDetection(graph)',
+          methods: {
+            detectCommunities: {
+              name: 'detectCommunities(algorithm, options)',
+              description: 'Detectar comunidades usando algoritmo especificado. Algoritmo pode ser instância ou string ("louvain")',
+              returns: 'Retorna Promise<CommunityResult> com communities, modularity, numCommunities'
+            },
+            calculateModularity: {
+              name: 'calculateModularity(communities)',
+              description: 'Calcular pontuação de modularidade para uma partição',
+              returns: 'Retorna number (-1 a 1, maior é melhor)'
+            }
+          },
+          staticMethods: {
+            detect: {
+              name: 'CommunityDetection.detect(graphData, algorithm, options)',
+              description: 'Método de conveniência para detecção direta de GraphData',
+              returns: 'Retorna Promise<CommunityResult>'
+            },
+            getNodesInCommunity: {
+              name: 'CommunityDetection.getNodesInCommunity(communities, communityId)',
+              description: 'Obter array de IDs de nós em uma comunidade específica'
+            },
+            getCommunityGroups: {
+              name: 'CommunityDetection.getCommunityGroups(communities)',
+              description: 'Obter objeto mapeando communityId para array de IDs de nós'
+            }
+          }
         },
         louvain: {
           title: 'LouvainAlgorithm',
-          description: 'Otimização rápida de modularidade (método Louvain)'
+          description: 'Otimização rápida de modularidade usando o método Louvain. O algoritmo de detecção de comunidades mais popular.',
+          complexity: 'Complexidade de Tempo: O(V log V)',
+          bestFor: 'Melhor para: Redes grandes, detecção de comunidades de uso geral',
+          constructor: 'new LouvainAlgorithm(options)',
+          options: {
+            resolution: 'Parâmetro de resolução para modularidade (padrão: 1.0). Valores maiores encontram comunidades menores.',
+            maxIterations: 'Máximo de iterações (padrão: 100)'
+          }
+        },
+        result: {
+          title: 'CommunityResult',
+          description: 'Objeto de resultado retornado pela detecção de comunidades',
+          properties: {
+            communities: 'Objeto mapeando nodeId para communityId (número)',
+            modularity: 'Pontuação de modularidade (-1 a 1, tipicamente 0.3-0.7 para boas partições)',
+            numCommunities: 'Número de comunidades encontradas',
+            algorithm: 'Nome do algoritmo usado',
+            metadata: 'Informações adicionais opcionais'
+          }
         },
         customAlgorithm: {
           title: 'Algoritmos Personalizados',
-          description: 'Estender CommunityAlgorithm para criar seus próprios algoritmos'
+          description: 'Estender classe base CommunityAlgorithm para criar seus próprios algoritmos',
+          note: 'Implementar o método detect() e configurar caminho do módulo worker'
         }
       },
       examples: {
+        title: 'Exemplos de Uso',
+        description: 'Exemplos de código completos para casos de uso comuns',
+        basic: {
+          title: 'Análise Básica de Redes',
+          description: 'Analisar uma rede simples e computar métricas de centralidade'
+        },
         csv: {
           title: 'Carregando Dados CSV',
-          description: 'Importar dados de rede de arquivos CSV'
+          description: 'Importar dados de rede de arquivos CSV e analisar'
+        },
+        json: {
+          title: 'Trabalhando com JSON',
+          description: 'Converter entre formatos JSON (D3, Cytoscape, NetworkX)'
         },
         layout: {
-          title: 'Layout de Grafo',
-          description: 'Posicionar nós usando layout force-directed'
+          title: 'Aplicando Layouts',
+          description: 'Posicionar nós usando algoritmos de layout'
         },
-        communityStrategy: {
-          title: 'Detecção de Comunidades (Strategy Pattern)',
-          description: 'Usar instâncias de algoritmo para detecção de comunidades'
+        community: {
+          title: 'Detecção de Comunidades',
+          description: 'Encontrar comunidades usando algoritmo Louvain'
+        },
+        complete: {
+          title: 'Fluxo Completo',
+          description: 'Exemplo ponta a ponta: carregar dados, analisar, aplicar layout, detectar comunidades'
         }
       }
     },
@@ -1296,10 +1767,6 @@ console.log(results);`
         uncleAuntChildTemplate: 'Filho(a) de {name}',
         siblingChildTemplate: 'Filho(a) de {name}'
       }
-    },
-    docs: {
-      title: 'Documentação',
-      description: 'Aprenda a usar @guinetik/graph-js'
     }
   }
 };
@@ -1318,7 +1785,7 @@ export function getTranslation(lang, key, replacements = {}) {
   for (const k of keys) {
     value = value?.[k];
     if (value === undefined) {
-      console.warn(`Translation not found: ${key} (${lang})`);
+      log.warn('Translation not found', { key, lang });
       return key;
     }
   }

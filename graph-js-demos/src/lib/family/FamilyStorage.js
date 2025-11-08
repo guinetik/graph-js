@@ -188,8 +188,9 @@ export class FamilyStorage {
    * Reset family tree to initial state
    *
    * @param {Function} loadData - Function to load data into graph
+   * @param {Object} graphInstance - Graph instance ref to listen for ready event
    */
-  resetFamily(loadData) {
+  resetFamily(loadData, graphInstance) {
     // Temporarily stop auto-save to prevent it from saving during reset
     const wasAutoSaveRunning = !!this.autoSaveInterval;
     if (wasAutoSaveRunning) {
@@ -199,27 +200,29 @@ export class FamilyStorage {
     // Remove from localStorage FIRST before loading new data
     // This prevents auto-save from overwriting the reset
     localStorage.removeItem(STORAGE_KEY);
-    
+
     const initialData = this.getInitialDataset();
-    loadData(initialData.nodes, initialData.links);
-    
-    // Restart auto-save if it was running before
-    if (wasAutoSaveRunning) {
-      // Use setTimeout to ensure loadData has completed
-      setTimeout(() => {
-        this.startAutoSave();
-        // Save the reset state immediately to ensure it's persisted
-        setTimeout(() => {
-          this.saveFamily();
-        }, 100);
-      }, 100);
-    } else {
-      // If auto-save wasn't running, save the reset state immediately
-      setTimeout(() => {
+
+    // Listen for graph ready event to know when loadData has completed
+    const graph = graphInstance.value || graphInstance;
+    if (graph) {
+      const onReady = () => {
+        graph.off('ready', onReady);
+
+        // Restart auto-save if it was running before
+        if (wasAutoSaveRunning) {
+          this.startAutoSave();
+        }
+
+        // Save the reset state now that graph is ready
         this.saveFamily();
-      }, 100);
+      };
+
+      graph.on('ready', onReady);
     }
-    
+
+    loadData(initialData.nodes, initialData.links);
+
     this.log.info('Family tree reset');
     this.showStatus(this.t('family.storage.reset'), 'success');
   }

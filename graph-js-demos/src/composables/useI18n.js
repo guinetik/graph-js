@@ -5,6 +5,12 @@
 
 import { ref, computed } from 'vue';
 import { translations } from '../../lib/i18n.js';
+import { createLogger } from '@guinetik/logger';
+
+const log = createLogger({
+  prefix: 'useI18n',
+  level: import.meta.env.DEV ? 'debug' : 'info'
+});
 
 const currentLang = ref(localStorage.getItem('lang') || 'en');
 
@@ -22,7 +28,7 @@ export function useI18n() {
     for (const k of keys) {
       value = value?.[k];
       if (value === undefined) {
-        console.warn(`Translation not found: ${key} (${currentLang.value})`);
+        log.warn('Translation not found', { key, lang: currentLang.value });
         return key;
       }
     }

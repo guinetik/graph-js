@@ -17,7 +17,7 @@
  * // In template: <div ref="graphContainer"></div>
  */
 
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import { NetworkGraphD3 } from '../lib/NetworkGraphD3';
 import { NetworkAnalyzer } from '../lib/NetworkAnalyzer';
 import { createLogger } from '@guinetik/logger';
@@ -256,7 +256,7 @@ export function useNetworkGraph(options = {}) {
    */
   const addLink = async (sourceId, targetId, incremental = false) => {
     if (!graphInstance.value) {
-      console.warn('useNetworkGraph: Graph not initialized yet');
+      log.warn('Graph not initialized yet');
       return false;
     }
 
@@ -275,10 +275,11 @@ export function useNetworkGraph(options = {}) {
           autoComputeEigenvector();
         });
       }
-      
+
+
       return linkAdded;
     } catch (err) {
-      console.error('useNetworkGraph: Failed to add link', err);
+      log.error('Failed to add link', { error: err.message, stack: err.stack });
       error.value = err.message;
       return false;
     }
@@ -528,7 +529,7 @@ export function useNetworkGraph(options = {}) {
    */
   const updateVisualEncoding = (options = {}) => {
     if (!graphInstance.value) {
-      console.warn('useNetworkGraph: Cannot update visual encoding - no graph instance');
+      log.warn('Cannot update visual encoding - no graph instance');
       return;
     }
 
@@ -604,13 +605,12 @@ export function useNetworkGraph(options = {}) {
   };
 
   // Lifecycle hooks
-  onMounted(() => {
-    // Use nextTick or setTimeout to ensure DOM is ready
-    setTimeout(() => {
-      if (graphContainer.value) {
-        initGraph();
-      }
-    }, 0);
+  onMounted(async () => {
+    // Use Vue's nextTick to ensure DOM is ready
+    await nextTick();
+    if (graphContainer.value) {
+      initGraph();
+    }
   });
 
   onUnmounted(() => {

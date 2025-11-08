@@ -409,6 +409,12 @@ import NetworkAnalysis from '../components/NetworkAnalysis.vue';
 import { useNetworkGraph } from '../composables/useNetworkGraph';
 import { useI18n } from '../composables/useI18n';
 import { ExplorerController } from '../lib/ExplorerController';
+import { createLogger } from '@guinetik/logger';
+
+const log = createLogger({
+  prefix: 'ExplorerPage',
+  level: import.meta.env.DEV ? 'debug' : 'info'
+});
 
 /**
  * Use i18n for translations
@@ -500,7 +506,7 @@ const canLoadUpload = computed(() => {
 const handleStatusChange = (message, type) => {
   statusMessage.value = message;
   statusType.value = type;
-  setTimeout(() => { statusMessage.value = ''; }, type === 'error' ? 5000 : 3000);
+  // Status persists - user sees it until next action
 };
 
 /**
@@ -663,7 +669,7 @@ const handleLoadSampleNetwork = async () => {
       setNodeInfo('error', `Failed to load network: ${result.error || 'Unknown error'}`);
     }
   } catch (err) {
-    console.error('Failed to load sample network:', err);
+    log.error('Failed to load sample network', { error: err.message, stack: err.stack });
     loading.value = false;
     setNodeInfo('error', `Failed to load network: ${err.message}`);
   }
@@ -710,7 +716,7 @@ const handleLoadUploadedNetwork = async () => {
       setNodeInfo('error', `Failed to load file: ${result.error || 'Unknown error'}`);
     }
   } catch (err) {
-    console.error('Failed to load uploaded network:', err);
+    log.error('Failed to load uploaded network', { error: err.message, stack: err.stack });
     loading.value = false;
     setNodeInfo('error', `Failed to load file: ${err.message}`);
   }
@@ -745,7 +751,7 @@ const handleAnalyzeGraph = async () => {
         });
       }
   } catch (err) {
-    console.error('Analysis error:', err);
+    log.error('Analysis error', { error: err.message, stack: err.stack });
     setNodeInfo('error', `Analysis failed: ${err.message}`);
   } finally {
     analyzing.value = false;
@@ -769,25 +775,22 @@ const handleApplyLayout = async () => {
       statusMessage.value = `✅ Applied ${selectedLayout.value} layout`;
       statusType.value = 'success';
       setNodeInfo('layout-applied', `Layout Applied: ${selectedLayout.value}`, {
-        description: selectedLayout.value === 'none' 
+        description: selectedLayout.value === 'none'
           ? "Using D3's built-in force simulation"
           : 'Nodes fixed in position (D3 physics disabled)'
       });
-      setTimeout(() => { statusMessage.value = ''; }, 3000);
     } else {
       const errorMsg = result.error || 'Layout application failed';
       statusMessage.value = `❌ ${errorMsg}`;
       statusType.value = 'error';
       setNodeInfo('error', `Layout failed: ${errorMsg}`);
-      setTimeout(() => { statusMessage.value = ''; }, 5000);
     }
   } catch (err) {
-    console.error('Layout error:', err);
+    log.error('Layout error', { error: err.message, stack: err.stack });
     const errorMsg = err.message || 'Layout failed';
     statusMessage.value = `❌ ${errorMsg}`;
     statusType.value = 'error';
     setNodeInfo('error', `Layout failed: ${errorMsg}`);
-    setTimeout(() => { statusMessage.value = ''; }, 5000);
   }
 };
 
@@ -815,7 +818,7 @@ const handleDetectCommunities = async () => {
       setNodeInfo('default', 'Hover over a node to see details...');
     }
   } catch (err) {
-    console.error('Community detection error:', err);
+    log.error('Community detection error', { error: err.message, stack: err.stack });
     setNodeInfo('error', `Community detection failed: ${err.message}`);
   } finally {
     detectingCommunities.value = false;

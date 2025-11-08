@@ -364,6 +364,12 @@ import { useI18n } from '../composables/useI18n';
 import { getTranslation } from '../../lib/i18n.js';
 import { FamilyController, FAMILY_GROUPS, GROUP_COLORS, DIALOG_ACTIONS } from '../lib/FamilyController';
 import { FamilyDialogService } from '../lib/family/FamilyDialogService.js';
+import { createLogger } from '@guinetik/logger';
+
+const log = createLogger({
+  prefix: 'FamilyPage',
+  level: import.meta.env.DEV ? 'debug' : 'info'
+});
 
 // Use i18n for translations
 const { t, lang } = useI18n();
@@ -703,7 +709,7 @@ const handleAnalyzeGraph = async () => {
       handleStatusChange(`✅ Analysis complete - sizing by ${sizeByMetric}`, 'success');
     }
   } catch (err) {
-    console.error('Analysis error:', err);
+    log.error('Analysis error', { error: err.message, stack: err.stack });
     handleStatusChange(`Analysis failed: ${err.message}`, 'error');
   } finally {
     analyzing.value = false;
@@ -726,7 +732,7 @@ const handleApplyLayout = async () => {
       handleStatusChange(result.error || 'Failed to apply layout', 'error');
     }
   } catch (err) {
-    console.error('Layout error:', err);
+    log.error('Layout error', { error: err.message, stack: err.stack });
     handleStatusChange(`Layout failed: ${err.message}`, 'error');
   } finally {
     applyingLayout.value = false;

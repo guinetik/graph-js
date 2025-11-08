@@ -85,9 +85,11 @@ export class NetworkAnalyzer {
         workerScript: this.workerUrl
       });
 
-      // Wait longer for workers to fully initialize
-      // The WorkerManager.initialize() in NetworkStats constructor is async
-      // and we need to give it time to complete
+      // SPECIAL CASE: NetworkStats constructor triggers async worker initialization
+      // but doesn't provide a ready callback or promise. This setTimeout is necessary
+      // to ensure workers are fully initialized before use. This is an acceptable
+      // use case for setTimeout as it's waiting for third-party library initialization.
+      // TODO: Consider polling for worker readiness or requesting a ready event from the library
       await new Promise(resolve => setTimeout(resolve, 500));
       this.log.info('Initialized successfully');
     })();
