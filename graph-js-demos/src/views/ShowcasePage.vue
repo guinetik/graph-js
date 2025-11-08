@@ -4,32 +4,30 @@
       <!-- Header -->
       <div class="demo-controls-header">
         <h1 class="demo-controls-title">
-          🕸️ Interactive Network Graph
+          {{ t('showcase.header.title') }}
         </h1>
         <p class="demo-controls-description">
-          Explore network analysis in real-time. Add nodes, remove them, and watch the graph update dynamically.
+          {{ t('showcase.header.subtitle') }}
         </p>
       </div>
 
       <!-- What is this? -->
       <div class="info-box-blue mb-4">
         <h2 class="text-lg font-semibold text-blue-900 dark:text-blue-300 mb-2">
-          What is this?
+          {{ t('showcase.whatIs.title') }}
         </h2>
-        <p class="text-sm text-blue-800 dark:text-blue-200">
-          This interactive visualization demonstrates <strong>network analysis</strong>.
-          Node size represents centrality: larger nodes are more influential in the network.
+        <p class="text-sm text-blue-800 dark:text-blue-200" v-html="t('showcase.whatIs.description')">
         </p>
       </div>
 
       <!-- Status Section - Fixed at top when scrolling -->
       <div class="sticky top-0 z-20 bg-white/98 dark:bg-gray-800/98 backdrop-blur-md border-b border-[var(--color-border)] pb-4 mb-4 -mx-6 px-6 pt-4 -mt-2 overflow-x-hidden">
-        <h2 class="demo-controls-section-title mb-3">Status</h2>
+        <h2 class="demo-controls-section-title mb-3">{{ t('showcase.status.title') }}</h2>
 
         <div class="bg-[var(--color-bg-secondary)] rounded-md p-4 text-sm shadow-sm border border-[var(--color-border)]">
           <div v-if="!statusMessage" class="text-secondary text-center py-2">
-            <div class="text-xs">Ready for operations</div>
-            <div class="text-xs mt-1 opacity-60">Hover over nodes to see details</div>
+            <div class="text-xs">{{ t('showcase.status.ready') }}</div>
+            <div class="text-xs mt-1 opacity-60">{{ t('showcase.status.hover') }}</div>
           </div>
           <div v-else class="space-y-2">
             <div :class="{
@@ -51,50 +49,50 @@
 
       <!-- Controls Section -->
       <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
-        <h2 class="demo-controls-section-title">Controls</h2>
+        <h2 class="demo-controls-section-title">{{ t('showcase.controls.title') }}</h2>
         <div class="grid grid-cols-3 gap-2">
           <button
             @click="handleAddRandomNode"
             class="btn-primary text-sm px-2 py-2 whitespace-nowrap"
-            title="Add a random node connected to a random existing node"
+            :title="t('showcase.controls.addRandom')"
           >
-            ➕ Add
+            ➕ {{ t('showcase.buttons.add') }}
           </button>
 
           <button
             @click="handleAddToSelected"
             class="btn-secondary text-sm px-2 py-2 whitespace-nowrap"
             :disabled="!getSelectedNode()"
-            :title="getSelectedNode() ? `Add a node connected to ${getSelectedNode().id}` : 'Select a node first'"
+            :title="getSelectedNode() ? t('showcase.controls.addToSelected').replace('{name}', getSelectedNode().id) : t('showcase.controls.selectNodeFirst')"
           >
-            🔗 To Selected
+            🔗 {{ t('showcase.buttons.toSelected') }}
           </button>
 
           <button
             @click="handleRemoveRandomNode"
             class="btn-primary bg-red-600 hover:bg-red-700 text-sm px-2 py-2 whitespace-nowrap"
-            title="Remove a random node"
+            :title="t('showcase.controls.removeRandom')"
           >
-            ➖ Remove
+            ➖ {{ t('showcase.buttons.remove') }}
           </button>
         </div>
       </div>
 
       <!-- Data Loading Section -->
       <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
-        <h2 class="demo-controls-section-title">Load Dataset</h2>
+        <h2 class="demo-controls-section-title">{{ t('showcase.dataLoading.title') }}</h2>
 
         <div class="space-y-2">
           <label class="block text-sm font-medium text-secondary">
-            Choose Dataset:
+            {{ t('showcase.dataLoading.choose') }}
           </label>
           <select
             v-model="selectedDataset"
             class="w-full bg-secondary text-primary border border-color px-3 py-2 rounded-md"
           >
-            <option value="default">Default Inline (15 nodes)</option>
-            <option value="karate">Karate Club JSON (34 nodes)</option>
-            <option value="miserables">Les Misérables CSV (77 nodes)</option>
+            <option value="default">{{ t('showcase.dataLoading.default') }}</option>
+            <option value="karate">{{ t('showcase.dataLoading.karate') }}</option>
+            <option value="miserables">{{ t('showcase.dataLoading.miserables') }}</option>
           </select>
         </div>
 
@@ -103,14 +101,14 @@
           :disabled="loading"
           class="w-full btn-primary mt-3"
         >
-          <span v-if="!loading">📊 Load Dataset</span>
-          <span v-else>⏳ Loading...</span>
+          <span v-if="!loading">{{ t('showcase.dataLoading.loadButton') }}</span>
+          <span v-else>{{ t('showcase.dataLoading.loading') }}</span>
         </button>
       </div>
 
       <!-- Network Analysis Section -->
       <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
-        <h2 class="demo-controls-section-title">⚡ Network Analysis (Node Sizes)</h2>
+        <h2 class="demo-controls-section-title">{{ t('showcase.networkAnalysis.title') }}</h2>
 
         <NetworkAnalysis
           v-model:selected-metrics="selectedFeatures"
@@ -121,15 +119,13 @@
         />
 
         <div class="info-box-green mt-3">
-          <p class="text-xs text-green-800 dark:text-green-200">
-            <strong>Uses @guinetik/graph-js:</strong> Computes centrality metrics
-            in web workers for optimal performance.
+          <p class="text-xs text-green-800 dark:text-green-200" v-html="t('showcase.networkAnalysis.description')">
           </p>
         </div>
       </div>
       <!-- Layout Algorithm Section -->
       <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
-        <h2 class="demo-controls-section-title">Layout Algorithm</h2>
+        <h2 class="demo-controls-section-title">{{ t('showcase.layoutAlgorithm.title') }}</h2>
 
         <LayoutPicker
           v-model="selectedLayout"
@@ -141,7 +137,7 @@
 
       <!-- Community Detection Section -->
       <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
-        <h2 class="demo-controls-section-title">🎨 Community Detection</h2>
+        <h2 class="demo-controls-section-title">{{ t('showcase.communityDetection.title') }}</h2>
 
         <CommunityPicker
           v-model="selectedCommunityAlgorithm"
@@ -152,9 +148,9 @@
           <template #results>
             <div v-if="communityResult" class="info-box-green mt-3">
               <p class="text-sm text-green-800 dark:text-green-200 space-y-1">
-                <div><strong>Communities Found:</strong> {{ communityResult.numCommunities }}</div>
-                <div><strong>Modularity:</strong> {{ communityResult.modularity.toFixed(3) }}</div>
-                <div class="text-xs mt-2">Node colors represent community assignments</div>
+                <div><strong>{{ t('showcase.communityDetection.communitiesFound') }}</strong> {{ communityResult.numCommunities }}</div>
+                <div><strong>{{ t('showcase.communityDetection.modularity') }}</strong> {{ communityResult.modularity.toFixed(3) }}</div>
+                <div class="text-xs mt-2">{{ t('showcase.communityDetection.nodeColorsAssignments') }}</div>
               </p>
             </div>
 
@@ -171,15 +167,15 @@
       <!-- Instructions Box -->
       <div class="info-box-purple">
         <h3 class="text-sm font-semibold text-purple-900 dark:text-purple-300 mb-2">
-          💡 How to interact
+          {{ t('showcase.instructions.title') }}
         </h3>
         <ul class="text-sm text-purple-800 dark:text-purple-200 space-y-1">
-          <li>🖱️ <strong>Drag nodes</strong> to reposition them</li>
-          <li>🔍 <strong>Scroll</strong> to zoom in/out</li>
-          <li>👆 <strong>Drag background</strong> to pan</li>
-          <li>💬 <strong>Hover nodes</strong> to see detailed information</li>
-          <li>📊 <strong>Node size</strong> = centrality</li>
-          <li>🎨 <strong>Color</strong> = group/community</li>
+          <li v-html="t('showcase.instructions.dragNodes')"></li>
+          <li v-html="t('showcase.instructions.scroll')"></li>
+          <li v-html="t('showcase.instructions.dragBackground')"></li>
+          <li v-html="t('showcase.instructions.hoverNodes')"></li>
+          <li v-html="t('showcase.instructions.nodeSize')"></li>
+          <li v-html="t('showcase.instructions.color')"></li>
         </ul>
       </div>
     </template>
@@ -209,7 +205,13 @@ import LayoutPicker from '../components/LayoutPicker.vue';
 import CommunityPicker from '../components/CommunityPicker.vue';
 import NetworkAnalysis from '../components/NetworkAnalysis.vue';
 import { useNetworkGraph } from '../composables/useNetworkGraph';
+import { useI18n } from '../composables/useI18n';
 import { ShowcaseController } from '../lib/ShowcaseController';
+
+/**
+ * Use i18n for translations
+ */
+const { t } = useI18n();
 
 // Use the network graph composable (must be at top level)
 const graphComposable = useNetworkGraph();
@@ -243,7 +245,7 @@ const selectedFeatures = ref(['degree', 'eigenvector', 'betweenness']);
 const selectedSizeMetric = ref('');
 const statusMessage = ref('');
 const statusType = ref('info');
-const loadingMessage = ref('Loading graph...');
+const loadingMessage = ref('');
 
 // Controller instance (business logic)
 let controller = null;
@@ -284,11 +286,13 @@ const initializeShowcase = () => {
 
   controller = new ShowcaseController({
     graphManager,
-    onStatusChange: handleStatusChange
+    onStatusChange: handleStatusChange,
+    translate: (key, replacements) => t(key, replacements)
   });
 
   // Load initial data
   const initialData = controller.getInitialDataset();
+  loadingMessage.value = t('showcase.messages.loadingGraph');
   loadData(initialData.nodes, initialData.links);
 
   // Get available layouts and community algorithms
@@ -333,11 +337,11 @@ const handleLoadDataset = async () => {
   if (!controller) return;
 
   try {
-    loadingMessage.value = `Loading ${selectedDataset.value} dataset...`;
+    loadingMessage.value = t('showcase.messages.loadingDataset').replace('{dataset}', selectedDataset.value);
     const result = await controller.loadDataset(selectedDataset.value);
 
     if (result.success) {
-      loadingMessage.value = `Loading ${result.name} dataset...`;
+      loadingMessage.value = t('showcase.messages.loadingDatasetName').replace('{name}', result.name);
     }
   } catch (err) {
     console.error('Failed to load dataset:', err);
@@ -353,7 +357,7 @@ const handleAnalyzeGraph = async () => {
   if (!controller) return;
 
   try {
-    loadingMessage.value = 'Analyzing network using workers...';
+    loadingMessage.value = t('showcase.messages.analyzing');
     await controller.analyzeGraph(selectedFeatures.value);
   } catch (err) {
     console.error('Analysis error:', err);
@@ -367,7 +371,7 @@ const handleApplyLayout = async () => {
   if (!controller) return;
 
   try {
-    loadingMessage.value = `Applying ${selectedLayout.value} layout...`;
+    loadingMessage.value = t('showcase.messages.applyingLayout').replace('{layout}', selectedLayout.value);
     await controller.applyLayout(selectedLayout.value);
   } catch (err) {
     console.error('Layout error:', err);
@@ -381,7 +385,7 @@ const handleDetectCommunities = async () => {
   if (!controller) return;
 
   try {
-    loadingMessage.value = `Detecting communities using ${selectedCommunityAlgorithm.value}...`;
+    loadingMessage.value = t('showcase.messages.detectingCommunities').replace('{algorithm}', selectedCommunityAlgorithm.value);
     const result = await controller.detectCommunities(selectedCommunityAlgorithm.value);
     
     if (result) {

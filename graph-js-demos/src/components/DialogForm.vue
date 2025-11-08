@@ -11,7 +11,7 @@
 
         <!-- Dialog -->
         <div
-          class="dialog-content relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto"
+          class="dialog-content relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto"
           style="z-index: 10000 !important; position: relative !important;"
           role="dialog"
           aria-modal="true"
@@ -64,7 +64,7 @@
                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   @keyup.esc="handleCancel"
                 >
-                  <option value="" disabled>Select an option</option>
+                  <option value="" disabled>{{ t('family.dialogs.selectOption') }}</option>
                   <option
                     v-for="option in field.options"
                     :key="option.value"
@@ -144,6 +144,7 @@
 
 <script setup>
 import { ref, watch, nextTick, onMounted } from 'vue';
+import { useI18n } from '../composables/useI18n';
 
 /**
  * DialogForm - Vue component for modal dialogs with form fields
@@ -189,6 +190,9 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['confirm', 'cancel']);
+
+// Get i18n translation function
+const { t } = useI18n();
 
 // Generate unique ID for accessibility
 const dialogId = `dialog-${Math.random().toString(36).substr(2, 9)}`;

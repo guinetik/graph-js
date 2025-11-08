@@ -10,13 +10,14 @@ import { FAMILY_GROUPS, GENDER, GENDER_EMOJI } from './FamilyConstants.js';
 
 /**
  * Get gender field options for radio buttons
+ * @param {Function} t - Translation function
  * @returns {Array} Gender options with emoji and text
  */
-function getGenderOptions() {
+function getGenderOptions(t) {
   return [
-    { value: GENDER.MALE, emoji: GENDER_EMOJI[GENDER.MALE], text: 'Male' },
-    { value: GENDER.FEMALE, emoji: GENDER_EMOJI[GENDER.FEMALE], text: 'Female' },
-    { value: GENDER.OTHER, emoji: GENDER_EMOJI[GENDER.OTHER], text: 'Other' }
+    { value: GENDER.MALE, emoji: GENDER_EMOJI[GENDER.MALE], text: t('family.dialogs.genderOptions.male') },
+    { value: GENDER.FEMALE, emoji: GENDER_EMOJI[GENDER.FEMALE], text: t('family.dialogs.genderOptions.female') },
+    { value: GENDER.OTHER, emoji: GENDER_EMOJI[GENDER.OTHER], text: t('family.dialogs.genderOptions.other') }
   ];
 }
 
@@ -46,10 +47,16 @@ export class FamilyDialogService {
    *
    * @param {Function} getGraphInstance - Function that returns the graph instance
    * @param {FamilyValidation} validation - Validation instance
+   * @param {Function} [t] - Translation function (optional, defaults to identity function)
    */
-  constructor(getGraphInstance, validation) {
+  constructor(getGraphInstance, validation, t = (key) => key) {
     this.getGraphInstance = getGraphInstance;
     this.validation = validation;
+    /**
+     * Translation function for i18n support
+     * @type {Function}
+     */
+    this.t = t;
   }
 
   /**
@@ -65,12 +72,12 @@ export class FamilyDialogService {
     }
 
     return {
-      title: 'Add Parents',
+      title: this.t('family.dialogs.addParents'),
       fields: [
-        { label: 'Mother Name', type: 'text', required: false },
-        { label: 'Mother Avatar (optional)', type: 'emoji', required: false, placeholder: '👩 Type an emoji' },
-        { label: 'Father Name', type: 'text', required: false },
-        { label: 'Father Avatar (optional)', type: 'emoji', required: false, placeholder: '👨 Type an emoji' }
+        { label: this.t('family.dialogs.fields.motherName'), type: 'text', required: false },
+        { label: this.t('family.dialogs.fields.motherAvatar'), type: 'emoji', required: false, placeholder: this.t('family.dialogs.placeholders.mother') },
+        { label: this.t('family.dialogs.fields.fatherName'), type: 'text', required: false },
+        { label: this.t('family.dialogs.fields.fatherAvatar'), type: 'emoji', required: false, placeholder: this.t('family.dialogs.placeholders.father') }
       ],
       action: DIALOG_ACTIONS.ADD_PARENTS
     };
@@ -83,11 +90,11 @@ export class FamilyDialogService {
    */
   getAddSiblingDialog() {
     return {
-      title: 'Add Sibling',
+      title: this.t('family.dialogs.addSibling'),
       fields: [
-        { label: 'Sibling Name', type: 'text', required: true },
-        { label: 'Gender', type: 'radio', options: getGenderOptions(), required: true },
-        { label: 'Avatar (optional)', type: 'emoji', required: false, placeholder: '👤 Type an emoji' }
+        { label: this.t('family.dialogs.fields.siblingName'), type: 'text', required: true },
+        { label: this.t('family.dialogs.fields.gender'), type: 'radio', options: getGenderOptions(this.t), required: true },
+        { label: this.t('family.dialogs.fields.avatar'), type: 'emoji', required: false, placeholder: this.t('family.dialogs.placeholders.avatar') }
       ],
       action: DIALOG_ACTIONS.ADD_SIBLING
     };
@@ -109,16 +116,19 @@ export class FamilyDialogService {
       return null; // Will be handled by validation
     }
 
-    const parentOptions = parents.map(p => ({ value: p.id, text: p.id }));
+    const parentOptions = parents.map(p => ({ 
+      value: p.id, 
+      text: this.t('family.dropdownOptions.parentSideTemplate').replace('{name}', p.id)
+    }));
 
     return {
-      title: 'Add Grandparents',
+      title: this.t('family.dialogs.addGrandparents'),
       fields: [
-        { label: "Parent's Side", type: 'select', options: parentOptions, required: true },
-        { label: 'Grandmother Name', type: 'text', required: false },
-        { label: 'Grandmother Avatar (optional)', type: 'emoji', required: false, placeholder: '👵 Type an emoji' },
-        { label: 'Grandfather Name', type: 'text', required: false },
-        { label: 'Grandfather Avatar (optional)', type: 'emoji', required: false, placeholder: '👴 Type an emoji' }
+        { label: this.t('family.dialogs.fields.parentsSide'), type: 'select', options: parentOptions, required: true },
+        { label: this.t('family.dialogs.fields.grandmotherName'), type: 'text', required: false },
+        { label: this.t('family.dialogs.fields.grandmotherAvatar'), type: 'emoji', required: false, placeholder: this.t('family.dialogs.placeholders.grandmother') },
+        { label: this.t('family.dialogs.fields.grandfatherName'), type: 'text', required: false },
+        { label: this.t('family.dialogs.fields.grandfatherAvatar'), type: 'emoji', required: false, placeholder: this.t('family.dialogs.placeholders.grandfather') }
       ],
       action: DIALOG_ACTIONS.ADD_GRANDPARENTS
     };
@@ -140,15 +150,18 @@ export class FamilyDialogService {
       return null; // Will be handled by validation
     }
 
-    const parentOptions = parents.map(p => ({ value: p.id, text: `${p.id}'s sibling` }));
+    const parentOptions = parents.map(p => ({ 
+      value: p.id, 
+      text: this.t('family.dropdownOptions.parentSideTemplate').replace('{name}', p.id)
+    }));
 
     return {
-      title: 'Add Uncle/Aunt',
+      title: this.t('family.dialogs.addUncleAunt'),
       fields: [
-        { label: "Parent's Side", type: 'select', options: parentOptions, required: true },
-        { label: 'Name', type: 'text', required: true },
-        { label: 'Gender', type: 'radio', options: getGenderOptions(), required: true },
-        { label: 'Avatar (optional)', type: 'emoji', required: false, placeholder: '👤 Type an emoji' }
+        { label: this.t('family.dialogs.fields.parentsSide'), type: 'select', options: parentOptions, required: true },
+        { label: this.t('family.dialogs.fields.name'), type: 'text', required: true },
+        { label: this.t('family.dialogs.fields.gender'), type: 'radio', options: getGenderOptions(this.t), required: true },
+        { label: this.t('family.dialogs.fields.avatar'), type: 'emoji', required: false, placeholder: this.t('family.dialogs.placeholders.avatar') }
       ],
       action: DIALOG_ACTIONS.ADD_UNCLE_AUNT
     };
@@ -170,15 +183,18 @@ export class FamilyDialogService {
       return null; // Will be handled by validation
     }
 
-    const uncleAuntOptions = unclesAunts.map(u => ({ value: u.id, text: `${u.id}'s child` }));
+    const uncleAuntOptions = unclesAunts.map(u => ({ 
+      value: u.id, 
+      text: this.t('family.dropdownOptions.uncleAuntChildTemplate').replace('{name}', u.id)
+    }));
 
     return {
-      title: 'Add Cousin',
+      title: this.t('family.dialogs.addCousin'),
       fields: [
-        { label: 'Uncle/Aunt', type: 'select', options: uncleAuntOptions, required: true },
-        { label: 'Name', type: 'text', required: true },
-        { label: 'Gender', type: 'radio', options: getGenderOptions(), required: true },
-        { label: 'Avatar (optional)', type: 'emoji', required: false, placeholder: '👤 Type an emoji' }
+        { label: this.t('family.dialogs.fields.uncleAuntField'), type: 'select', options: uncleAuntOptions, required: true },
+        { label: this.t('family.dialogs.fields.name'), type: 'text', required: true },
+        { label: this.t('family.dialogs.fields.gender'), type: 'radio', options: getGenderOptions(this.t), required: true },
+        { label: this.t('family.dialogs.fields.avatar'), type: 'emoji', required: false, placeholder: this.t('family.dialogs.placeholders.avatar') }
       ],
       action: DIALOG_ACTIONS.ADD_COUSIN
     };
@@ -199,36 +215,36 @@ export class FamilyDialogService {
       let relationship = '';
       switch (node.group) {
         case FAMILY_GROUPS.YOU:
-          relationship = 'Your child';
+          relationship = this.t('family.dropdownOptions.yourChild');
           break;
         case FAMILY_GROUPS.SIBLING:
-          relationship = `${node.id}'s child (your niece/nephew)`;
+          relationship = this.t('family.dropdownOptions.nieceNephewTemplate').replace('{name}', node.id);
           break;
         case FAMILY_GROUPS.COUSIN:
-          relationship = `${node.id}'s child (your cousin's child)`;
+          relationship = this.t('family.dropdownOptions.cousinChildTemplate').replace('{name}', node.id);
           break;
         case FAMILY_GROUPS.CHILD:
-          relationship = `${node.id}'s child (your grandchild)`;
+          relationship = this.t('family.dropdownOptions.grandchildTemplate').replace('{name}', node.id);
           break;
         case FAMILY_GROUPS.NIECE_NEPHEW:
-          relationship = `${node.id}'s child`;
+          relationship = this.t('family.dropdownOptions.childTemplate').replace('{name}', node.id);
           break;
         case FAMILY_GROUPS.PARTNER:
-          relationship = `${node.id}'s child`;
+          relationship = this.t('family.dropdownOptions.childTemplate').replace('{name}', node.id);
           break;
         default:
-          relationship = `${node.id}'s child`;
+          relationship = this.t('family.dropdownOptions.childTemplate').replace('{name}', node.id);
       }
       return { value: node.id, text: relationship };
     });
 
     return {
-      title: 'Add Child',
+      title: this.t('family.dialogs.addChild'),
       fields: [
-        { label: 'Parent', type: 'select', options: parentOptions, required: true },
-        { label: 'Name', type: 'text', required: true },
-        { label: 'Gender', type: 'radio', options: getGenderOptions(), required: true },
-        { label: 'Avatar (optional)', type: 'emoji', required: false, placeholder: '👤 Type an emoji' }
+        { label: this.t('family.dialogs.fields.parent'), type: 'select', options: parentOptions, required: true },
+        { label: this.t('family.dialogs.fields.name'), type: 'text', required: true },
+        { label: this.t('family.dialogs.fields.gender'), type: 'radio', options: getGenderOptions(this.t), required: true },
+        { label: this.t('family.dialogs.fields.avatar'), type: 'emoji', required: false, placeholder: this.t('family.dialogs.placeholders.avatar') }
       ],
       action: DIALOG_ACTIONS.ADD_CHILD
     };
@@ -250,15 +266,18 @@ export class FamilyDialogService {
       return null; // Will be handled by validation
     }
 
-    const siblingOptions = siblings.map(s => ({ value: s.id, text: `${s.id}'s child` }));
+    const siblingOptions = siblings.map(s => ({ 
+      value: s.id, 
+      text: this.t('family.dropdownOptions.siblingChildTemplate').replace('{name}', s.id)
+    }));
 
     return {
-      title: 'Add Niece/Nephew',
+      title: this.t('family.dialogs.addNieceNephew'),
       fields: [
-        { label: 'Sibling', type: 'select', options: siblingOptions, required: true },
-        { label: 'Name', type: 'text', required: true },
-        { label: 'Gender', type: 'radio', options: getGenderOptions(), required: true },
-        { label: 'Avatar (optional)', type: 'emoji', required: false, placeholder: '👤 Type an emoji' }
+        { label: this.t('family.dialogs.fields.sibling'), type: 'select', options: siblingOptions, required: true },
+        { label: this.t('family.dialogs.fields.name'), type: 'text', required: true },
+        { label: this.t('family.dialogs.fields.gender'), type: 'radio', options: getGenderOptions(this.t), required: true },
+        { label: this.t('family.dialogs.fields.avatar'), type: 'emoji', required: false, placeholder: this.t('family.dialogs.placeholders.avatar') }
       ],
       action: DIALOG_ACTIONS.ADD_NIECE_NEPHEW
     };
@@ -279,36 +298,36 @@ export class FamilyDialogService {
       let relationship = '';
       switch (node.group) {
         case FAMILY_GROUPS.YOU:
-          relationship = `Your partner/spouse`;
+          relationship = this.t('family.operations.relationships.yourPartner');
           break;
         case FAMILY_GROUPS.SIBLING:
-          relationship = `${node.id}'s partner (your sibling-in-law)`;
+          relationship = this.t('family.dropdownOptions.siblingPartnerTemplate').replace('{name}', node.id);
           break;
         case FAMILY_GROUPS.COUSIN:
-          relationship = `${node.id}'s partner`;
+          relationship = this.t('family.dropdownOptions.partnerTemplate').replace('{name}', node.id);
           break;
         case FAMILY_GROUPS.UNCLE_AUNT:
-          relationship = `${node.id}'s partner (your aunt/uncle)`;
+          relationship = this.t('family.dropdownOptions.partnerTemplate').replace('{name}', node.id);
           break;
         case FAMILY_GROUPS.NIECE_NEPHEW:
-          relationship = `${node.id}'s partner`;
+          relationship = this.t('family.dropdownOptions.partnerTemplate').replace('{name}', node.id);
           break;
         case FAMILY_GROUPS.CHILD:
-          relationship = `${node.id}'s partner (your child-in-law)`;
+          relationship = this.t('family.dropdownOptions.childPartnerTemplate').replace('{name}', node.id);
           break;
         default:
-          relationship = `${node.id}'s partner`;
+          relationship = this.t('family.dropdownOptions.partnerTemplate').replace('{name}', node.id);
       }
       return { value: node.id, text: relationship };
     });
 
     return {
-      title: 'Add Partner/Spouse',
+      title: this.t('family.dialogs.addPartner'),
       fields: [
-        { label: 'Partner Of', type: 'select', options: partnerOptions, required: true },
-        { label: 'Name', type: 'text', required: true },
-        { label: 'Gender', type: 'radio', options: getGenderOptions(), required: true },
-        { label: 'Avatar (optional)', type: 'emoji', required: false, placeholder: '👤 Type an emoji' }
+        { label: this.t('family.dialogs.fields.partnerOf'), type: 'select', options: partnerOptions, required: true },
+        { label: this.t('family.dialogs.fields.name'), type: 'text', required: true },
+        { label: this.t('family.dialogs.fields.gender'), type: 'radio', options: getGenderOptions(this.t), required: true },
+        { label: this.t('family.dialogs.fields.avatar'), type: 'emoji', required: false, placeholder: this.t('family.dialogs.placeholders.avatar') }
       ],
       action: DIALOG_ACTIONS.ADD_PARTNER
     };

@@ -19,10 +19,12 @@ export class ExplorerController {
    * @param {Object} dependencies - Required dependencies
    * @param {Object} dependencies.graphManager - The graph manager (e.g., from useNetworkGraph)
    * @param {Function} dependencies.onStatusChange - Callback for status updates (message, type)
+   * @param {Function} dependencies.translate - Translation function (key, replacements) => string
    */
-  constructor({ graphManager, onStatusChange = null }) {
+  constructor({ graphManager, onStatusChange = null, translate = null }) {
     this.graphManager = graphManager;
     this.onStatusChange = onStatusChange;
+    this.translate = translate || ((key) => key);
     this.log = createLogger({
       prefix: 'ExplorerController',
       level: import.meta.env.DEV ? 'debug' : 'info'
@@ -70,7 +72,7 @@ export class ExplorerController {
 
     try {
       this.log.debug('Loading sample network', { networkKey, networkName: network.name });
-      this._updateStatus('Loading network data...', 'info');
+      this._updateStatus(this.translate('explorer.messages.loadingNetworkData'), 'info');
       
       // Fetch the JSON file (raw edge list format)
       const response = await fetch(network.file);
@@ -112,7 +114,11 @@ export class ExplorerController {
       // Load data into graph
       this.graphManager.loadData(d3Data.nodes, d3Data.links);
 
-      const message = `✅ Loaded ${network.name} (${nodes.length} nodes, ${edges.length} edges)`;
+      const message = this.translate('explorer.messages.loadedNetwork', {
+        name: network.name,
+        nodes: nodes.length,
+        edges: edges.length
+      });
       this.log.info('Sample network loaded successfully', { 
         name: network.name, 
         nodeCount: nodes.length, 
@@ -130,7 +136,7 @@ export class ExplorerController {
         useWorkers: nodes.length >= 500 && this.workersSupported
       };
     } catch (err) {
-      const message = `❌ Failed to load network: ${err.message}`;
+      const message = this.translate('explorer.messages.failedToLoadNetwork', { error: err.message });
       this.log.error('Failed to load sample network', { networkKey, error: err.message, stack: err.stack });
       this._updateStatus(message, 'error');
       
@@ -153,7 +159,7 @@ export class ExplorerController {
   async loadUploadedNetwork(format, edgeFile, nodeFile, dataFile) {
     try {
       this.log.debug('Loading uploaded network', { format });
-      this._updateStatus('Loading uploaded file...', 'info');
+      this._updateStatus(this.translate('explorer.messages.loadingUploadedFile'), 'info');
 
       let graphData;
 
@@ -228,7 +234,11 @@ export class ExplorerController {
       this.graphManager.loadData(nodes, links);
 
       const fileName = dataFile?.name || edgeFile?.name || 'uploaded file';
-      const message = `✅ Loaded ${fileName} (${nodes.length} nodes, ${links.length} edges)`;
+      const message = this.translate('explorer.messages.loadedFile', {
+        fileName: fileName,
+        nodes: nodes.length,
+        edges: links.length
+      });
       this.log.info('Uploaded network loaded successfully', { 
         fileName,
         nodeCount: nodes.length, 
@@ -246,7 +256,7 @@ export class ExplorerController {
         useWorkers: nodes.length >= 500 && this.workersSupported
       };
     } catch (err) {
-      const message = `❌ Failed to load file: ${err.message}`;
+      const message = this.translate('explorer.messages.failedToLoadFile', { error: err.message });
       this.log.error('Failed to load uploaded network', { format, error: err.message, stack: err.stack });
       this._updateStatus(message, 'error');
       
@@ -267,7 +277,7 @@ export class ExplorerController {
   async analyzeGraph(metrics = ['degree', 'eigenvector'], sizeMetric = null) {
     try {
       this.log.debug('Starting graph analysis', { metrics, sizeMetric });
-      this._updateStatus('Analyzing network using workers...', 'info');
+      this._updateStatus(this.translate('explorer.messages.analyzingNetwork'), 'info');
       
       const results = await this.graphManager.analyzeGraph(metrics, {
         includeGraphStats: true,
@@ -295,7 +305,7 @@ export class ExplorerController {
           });
         }
 
-        const message = `✅ Analysis complete! Computed ${nodeCount} node metrics`;
+        const message = this.translate('explorer.messages.analysisComplete', { count: nodeCount });
         this.log.info('Graph analysis complete', { 
           nodeCount, 
           metrics,
@@ -319,7 +329,7 @@ export class ExplorerController {
       this.log.warn('Analysis returned no results');
       return { success: false, error: 'Analysis returned no results' };
     } catch (err) {
-      const message = `❌ Analysis failed: ${err.message}`;
+      const message = this.translate('explorer.messages.analysisFailed', { error: err.message });
       this.log.error('Graph analysis failed', { error: err.message, stack: err.stack, metrics });
       this._updateStatus(message, 'error');
       
@@ -338,7 +348,7 @@ export class ExplorerController {
    */
   async applyLayout(layoutId) {
     if (layoutId === 'none') {
-      const message = 'ℹ️ Using D3 physics simulation (no layout algorithm)';
+      const message = this.translate('explorer.messages.usingD3Physics');
       this.log.debug('Using default D3 physics simulation');
       this._updateStatus(message, 'info');
 
@@ -354,12 +364,12 @@ export class ExplorerController {
 
     try {
       this.log.debug('Applying layout algorithm', { layoutId });
-      this._updateStatus(`Applying ${layoutId} layout...`, 'info');
+      this._updateStatus(this.translate('explorer.messages.applyingLayout', { layout: layoutId }), 'info');
       
       const success = await this.graphManager.applyLayout(layoutId);
 
       if (success) {
-        const message = `✅ Applied ${layoutId} layout algorithm`;
+        const message = this.translate('explorer.messages.appliedLayout', { layout: layoutId });
         this.log.info('Layout applied successfully', { layoutId });
         this._updateStatus(message, 'success');
         
@@ -372,7 +382,7 @@ export class ExplorerController {
       this.log.warn('Layout application failed', { layoutId });
       return { success: false, error: 'Layout application failed' };
     } catch (err) {
-      const message = `❌ Layout failed: ${err.message}`;
+      const message = this.translate('explorer.messages.layoutFailed', { error: err.message });
       this.log.error('Layout application failed', { layoutId, error: err.message, stack: err.stack });
       this._updateStatus(message, 'error');
       
@@ -391,27 +401,30 @@ export class ExplorerController {
    */
   async detectCommunities(algorithmId) {
     if (!this.graphManager.graphInstance.value) {
-      this._updateStatus('Graph not initialized', 'error');
+      this._updateStatus(this.translate('explorer.messages.graphNotInitialized'), 'error');
       return null;
     }
 
     const nodeCount = this.graphManager.getNodeIds().length;
     if (nodeCount === 0) {
-      this._updateStatus('Graph is empty', 'error');
+      this._updateStatus(this.translate('explorer.messages.graphIsEmpty'), 'error');
       return null;
     }
 
     try {
-      this._updateStatus(`Detecting communities using ${algorithmId}...`, 'info');
+      this._updateStatus(this.translate('explorer.messages.detectingCommunities', { algorithm: algorithmId }), 'info');
 
       const result = await this.graphManager.detectCommunities(algorithmId);
 
       if (result) {
-        const message = `Found ${result.numCommunities} communities (modularity: ${result.modularity.toFixed(3)})`;
+        const message = this.translate('explorer.messages.foundCommunities', {
+          count: result.numCommunities,
+          modularity: result.modularity.toFixed(3)
+        });
         this._updateStatus(message, 'success');
         return result;
       } else {
-        this._updateStatus('Community detection failed', 'error');
+        this._updateStatus(this.translate('explorer.messages.communityDetectionFailed'), 'error');
         return null;
       }
     } catch (error) {
@@ -420,7 +433,7 @@ export class ExplorerController {
         error: error.message, 
         stack: error.stack 
       });
-      this._updateStatus(`Error: ${error.message}`, 'error');
+      this._updateStatus(this.translate('explorer.messages.analysisFailed', { error: error.message }), 'error');
       return null;
     }
   }

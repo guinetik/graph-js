@@ -4,41 +4,39 @@
       <!-- Header -->
       <div class="demo-controls-header">
         <h1 class="demo-controls-title">
-          🔍 Network Explorer
+          {{ t('explorer.header.title') }}
         </h1>
         <p class="demo-controls-description">
-          Explore sample networks and upload your own files. Supports CSV, JSON, and NetworkX formats.
+          {{ t('explorer.header.subtitle') }}
         </p>
       </div>
 
       <!-- What is this? -->
       <div class="info-box-blue mb-4">
         <h2 class="text-lg font-semibold text-blue-900 dark:text-blue-300 mb-2">
-          🚀 Parallel Computation Demo
+          {{ t('explorer.parallelComputation.title') }}
         </h2>
-        <p class="text-sm text-blue-800 dark:text-blue-200 mb-3">
-          This demo showcases <strong>Web Workers</strong> for parallel network analysis.
-          Large networks are processed across multiple CPU cores for faster computation.
+        <p class="text-sm text-blue-800 dark:text-blue-200 mb-3" v-html="t('explorer.parallelComputation.description')">
         </p>
         <div class="flex items-center gap-2 text-xs">
           <span :class="workerInfo.supported ? 'badge badge-green' : 'badge badge-red'">
-            <span v-if="workerInfo.supported">✓ Workers Supported</span>
-            <span v-else>✗ Workers Not Supported</span>
+            <span v-if="workerInfo.supported">{{ t('explorer.parallelComputation.workersSupported') }}</span>
+            <span v-else>{{ t('explorer.parallelComputation.workersNotSupported') }}</span>
           </span>
           <span v-if="workerInfo.supported" class="badge badge-yellow">
-            {{ workerInfo.count }} cores
+            {{ workerInfo.count }} {{ t('explorer.parallelComputation.cores') }}
           </span>
         </div>
       </div>
 
       <!-- Status Section - Fixed at top when scrolling -->
       <div class="sticky top-0 z-20 bg-white/98 dark:bg-gray-800/98 backdrop-blur-md border-b border-[var(--color-border)] pb-4 mb-4 -mx-6 px-6 pt-4 -mt-2 shadow-sm">
-        <h2 class="demo-controls-section-title mb-3">Status</h2>
+        <h2 class="demo-controls-section-title mb-3">{{ t('explorer.status.title') }}</h2>
 
         <div class="bg-[var(--color-bg-secondary)] rounded-md p-4 text-sm shadow-sm border border-[var(--color-border)]">
           <div v-if="!statusMessage" class="text-secondary text-center py-2">
-            <div class="text-xs">Ready for operations</div>
-            <div class="text-xs mt-1 opacity-60">Load a network to begin</div>
+            <div class="text-xs">{{ t('explorer.status.ready') }}</div>
+            <div class="text-xs mt-1 opacity-60">{{ t('explorer.status.loadNetwork') }}</div>
           </div>
           <div v-else class="space-y-2">
             <div :class="{
@@ -60,7 +58,7 @@
 
       <!-- Data Loading Section -->
       <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
-        <h2 class="demo-controls-section-title">Data Loading</h2>
+        <h2 class="demo-controls-section-title">{{ t('explorer.dataLoading.title') }}</h2>
 
         <!-- Tab Selection -->
         <div class="flex gap-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg mb-4">
@@ -69,30 +67,30 @@
             :class="dataLoadMode === 'sample' ? 'bg-white dark:bg-gray-700 shadow' : 'hover:bg-gray-200 dark:hover:bg-gray-700'"
             class="flex-1 px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors"
           >
-            📊 Sample Networks
+            {{ t('explorer.dataLoading.sampleNetworks') }}
           </button>
           <button
             @click="dataLoadMode = 'upload'"
             :class="dataLoadMode === 'upload' ? 'bg-white dark:bg-gray-700 shadow' : 'hover:bg-gray-200 dark:hover:bg-gray-700'"
             class="flex-1 px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors"
           >
-            📁 Upload File
+            {{ t('explorer.dataLoading.uploadFile') }}
           </button>
         </div>
 
         <!-- Sample Networks Tab -->
         <div v-show="dataLoadMode === 'sample'" class="space-y-2">
           <label class="block text-sm font-medium text-secondary">
-            Choose Network:
+            {{ t('explorer.dataLoading.chooseNetwork') }}
           </label>
           <select
             v-model="selectedNetwork"
             class="w-full bg-secondary text-primary border border-color px-3 py-2 rounded-md"
           >
-            <option value="">-- Choose a city --</option>
-            <option value="caruaru">Caruaru (~130 edges, small)</option>
-            <option value="rj">Rio de Janeiro (~1,900 edges, medium)</option>
-            <option value="niteroi">Niterói (~18,500 edges, large)</option>
+            <option value="">{{ t('explorer.dataLoading.chooseCity') }}</option>
+            <option value="caruaru">{{ t('explorer.dataLoading.caruaru') }}</option>
+            <option value="rj">{{ t('explorer.dataLoading.rj') }}</option>
+            <option value="niteroi">{{ t('explorer.dataLoading.niteroi') }}</option>
           </select>
 
           <button
@@ -100,8 +98,8 @@
             :disabled="!selectedNetwork || loading"
             class="w-full btn-primary mt-3"
           >
-            <span v-if="!loading">📊 Load Network</span>
-            <span v-else>⏳ Loading...</span>
+            <span v-if="!loading">{{ t('explorer.dataLoading.loadNetwork') }}</span>
+            <span v-else>{{ t('explorer.dataLoading.loading') }}</span>
           </button>
         </div>
 
@@ -109,22 +107,22 @@
         <div v-show="dataLoadMode === 'upload'" class="space-y-3">
           <div class="space-y-2">
             <label class="block text-sm font-medium text-secondary">
-              File Format:
+              {{ t('explorer.dataLoading.fileFormat') }}
             </label>
             <select
               v-model="uploadFormat"
               class="w-full bg-secondary text-primary border border-color px-3 py-2 rounded-md"
             >
-              <option value="json">JSON (nodes/edges, D3, Cytoscape)</option>
-              <option value="csv">CSV (edge list)</option>
-              <option value="networkx">NetworkX (node-link, adjacency)</option>
+              <option value="json">{{ t('explorer.dataLoading.formatJSON') }}</option>
+              <option value="csv">{{ t('explorer.dataLoading.formatCSV') }}</option>
+              <option value="networkx">{{ t('explorer.dataLoading.formatNetworkX') }}</option>
             </select>
           </div>
 
           <!-- CSV requires edges file + optional nodes file -->
           <div v-show="uploadFormat === 'csv'" class="space-y-2">
             <label class="block text-sm font-medium text-secondary">
-              Edges CSV (Required):
+              {{ t('explorer.dataLoading.edgesCSV') }}
             </label>
             <input
               type="file"
@@ -134,7 +132,7 @@
             />
 
             <label class="block text-sm font-medium text-secondary mt-2">
-              Nodes CSV (Optional):
+              {{ t('explorer.dataLoading.nodesCSV') }}
             </label>
             <input
               type="file"
@@ -143,17 +141,15 @@
               class="w-full text-sm text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 dark:file:bg-purple-900/30 dark:file:text-purple-300"
             />
 
-            <div class="text-xs text-secondary bg-[var(--color-bg-secondary)] rounded p-2">
-              <strong>Edge CSV format:</strong> source,target,weight<br>
-              <strong>Node CSV format:</strong> id,group,label,...
+            <div class="text-xs text-secondary bg-[var(--color-bg-secondary)] rounded p-2" v-html="t('explorer.dataLoading.edgeCSVFormat')">
             </div>
           </div>
 
           <!-- JSON/NetworkX require single file -->
           <div v-show="uploadFormat === 'json' || uploadFormat === 'networkx'" class="space-y-2">
             <label class="block text-sm font-medium text-secondary">
-              <span v-if="uploadFormat === 'json'">JSON File:</span>
-              <span v-else>NetworkX JSON File:</span>
+              <span v-if="uploadFormat === 'json'">{{ t('explorer.dataLoading.jsonFile') }}</span>
+              <span v-else>{{ t('explorer.dataLoading.networkxFile') }}</span>
             </label>
             <input
               type="file"
@@ -163,10 +159,10 @@
             />
 
             <div v-if="uploadFormat === 'json'" class="text-xs text-secondary bg-[var(--color-bg-secondary)] rounded p-2">
-              Supports: Standard (nodes/edges), D3 (nodes/links), Cytoscape, or raw edge list array
+              {{ t('explorer.dataLoading.jsonSupports') }}
             </div>
             <div v-else class="text-xs text-secondary bg-[var(--color-bg-secondary)] rounded p-2">
-              Supports: node-link format, adjacency format
+              {{ t('explorer.dataLoading.networkxSupports') }}
             </div>
           </div>
 
@@ -175,65 +171,65 @@
             :disabled="!canLoadUpload || loading"
             class="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-4 py-3 rounded-md font-semibold transition-colors mt-3"
           >
-            <span v-if="!loading">📁 Load Uploaded File</span>
-            <span v-else>⏳ Loading...</span>
+            <span v-if="!loading">{{ t('explorer.dataLoading.loadUploadedFile') }}</span>
+            <span v-else>{{ t('explorer.dataLoading.loading') }}</span>
           </button>
         </div>
       </div>
 
       <!-- Network Statistics -->
       <div v-if="networkLoaded" class="demo-controls-section border-t border-[var(--color-border)] pt-4">
-        <h2 class="demo-controls-section-title">Network Statistics</h2>
+        <h2 class="demo-controls-section-title">{{ t('explorer.networkStats.title') }}</h2>
 
         <div class="metrics-grid-row mb-3">
           <div class="metric-card">
-            <div class="text-xs text-secondary">Nodes</div>
+            <div class="text-xs text-secondary">{{ t('explorer.networkStats.nodes') }}</div>
             <div class="text-xl font-bold text-purple-600 dark:text-purple-400">{{ stats.nodes }}</div>
           </div>
           <div class="metric-card">
-            <div class="text-xs text-secondary">Edges</div>
+            <div class="text-xs text-secondary">{{ t('explorer.networkStats.edges') }}</div>
             <div class="text-xl font-bold text-pink-600 dark:text-pink-400">{{ stats.edges }}</div>
           </div>
           <div class="metric-card">
-            <div class="text-xs text-secondary">Avg Degree</div>
+            <div class="text-xs text-secondary">{{ t('explorer.networkStats.avgDegree') }}</div>
             <div class="text-xl font-bold text-blue-600 dark:text-blue-400">{{ stats.avgDegree }}</div>
           </div>
           <div class="metric-card">
-            <div class="text-xs text-secondary">Analysis Time</div>
+            <div class="text-xs text-secondary">{{ t('explorer.networkStats.analysisTime') }}</div>
             <div class="text-xl font-bold text-green-600 dark:text-green-400">{{ stats.analysisTime }}</div>
           </div>
           <div v-if="stats.communities" class="metric-card">
-            <div class="text-xs text-secondary">Communities</div>
+            <div class="text-xs text-secondary">{{ t('explorer.networkStats.communities') }}</div>
             <div class="text-xl font-bold text-orange-600 dark:text-orange-400">{{ stats.communities }}</div>
           </div>
           <div v-if="stats.modularity" class="metric-card">
-            <div class="text-xs text-secondary">Modularity</div>
+            <div class="text-xs text-secondary">{{ t('explorer.networkStats.modularity') }}</div>
             <div class="text-xl font-bold text-cyan-600 dark:text-cyan-400">{{ stats.modularity }}</div>
           </div>
         </div>
 
         <div v-if="useWorkers" class="info-box-green text-xs">
           <span class="font-semibold text-green-800 dark:text-green-300">
-            ⚡ Using parallel computation
+            {{ t('explorer.networkStats.usingParallel') }}
           </span>
           <span class="text-green-700 dark:text-green-400">
-            - {{ workerInfo.count }} workers active
+            - {{ workerInfo.count }} {{ t('explorer.networkStats.workersActive') }}
           </span>
         </div>
 
         <div v-if="!useWorkers && networkLoaded" class="info-box-yellow text-xs">
           <span class="font-semibold text-yellow-800 dark:text-yellow-300">
-            ⚠ Single-threaded mode
+            {{ t('explorer.networkStats.singleThreaded') }}
           </span>
           <span class="text-yellow-700 dark:text-yellow-400">
-            - Network too small for workers
+            - {{ t('explorer.networkStats.networkTooSmall') }}
           </span>
         </div>
       </div>
 
       <!-- Network Analysis Section -->
       <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
-        <h2 class="demo-controls-section-title">⚡ Network Analysis (Node Sizes)</h2>
+        <h2 class="demo-controls-section-title">{{ t('explorer.networkAnalysis.title') }}</h2>
 
         <NetworkAnalysis
           v-model:selected-metrics="selectedFeatures"
@@ -248,7 +244,7 @@
 
       <!-- Layout Algorithm Section -->
       <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
-        <h2 class="demo-controls-section-title">🎯 Layout Algorithm</h2>
+        <h2 class="demo-controls-section-title">{{ t('explorer.layoutAlgorithm.title') }}</h2>
 
         <LayoutPicker
           v-model="selectedLayout"
@@ -264,7 +260,7 @@
               <div>
                 <strong>{{ layout.name }}:</strong>
                 {{ layout.description }}
-                <span v-if="layout.requiresStats" class="italic"> (requires analysis)</span>
+                <span v-if="layout.requiresStats" class="italic"> ({{ t('explorer.layoutAlgorithm.requiresAnalysis') }})</span>
                 <br>
               </div>
             </template>
@@ -276,41 +272,41 @@
       <div v-if="hasGraphStats" class="demo-controls-section border-t border-[var(--color-border)] pt-4">
         <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-lg p-4 border-2 border-blue-200 dark:border-blue-700">
           <h3 class="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-3 flex items-center gap-2">
-            📊 Graph Statistics
+            {{ t('explorer.graphStats.title') }}
           </h3>
           <div class="space-y-2">
             <div class="flex justify-between items-center">
-              <span class="text-sm text-blue-800 dark:text-blue-200">Density:</span>
+              <span class="text-sm text-blue-800 dark:text-blue-200">{{ t('explorer.graphStats.density') }}</span>
               <span class="text-sm font-mono text-blue-600 dark:text-blue-400">
                 {{ graphStats?.density?.toFixed(4) || '-' }}
               </span>
             </div>
             <div class="flex justify-between items-center">
-              <span class="text-sm text-blue-800 dark:text-blue-200">Diameter:</span>
+              <span class="text-sm text-blue-800 dark:text-blue-200">{{ t('explorer.graphStats.diameter') }}</span>
               <span class="text-sm font-mono text-blue-600 dark:text-blue-400">
                 {{ graphStats?.diameter === Infinity ? '∞' : (graphStats?.diameter || '-') }}
               </span>
             </div>
             <div class="flex justify-between items-center">
-              <span class="text-sm text-blue-800 dark:text-blue-200">Avg Clustering:</span>
+              <span class="text-sm text-blue-800 dark:text-blue-200">{{ t('explorer.graphStats.avgClustering') }}</span>
               <span class="text-sm font-mono text-blue-600 dark:text-blue-400">
                 {{ graphStats?.['average_clustering']?.toFixed(4) || '-' }}
               </span>
             </div>
             <div class="flex justify-between items-center">
-              <span class="text-sm text-blue-800 dark:text-blue-200">Avg Path Length:</span>
+              <span class="text-sm text-blue-800 dark:text-blue-200">{{ t('explorer.graphStats.avgPathLength') }}</span>
               <span class="text-sm font-mono text-blue-600 dark:text-blue-400">
                 {{ graphStats?.['average_shortest_path'] === Infinity ? '∞' : (graphStats?.['average_shortest_path']?.toFixed(2) || '-') }}
               </span>
             </div>
             <div class="flex justify-between items-center">
-              <span class="text-sm text-blue-800 dark:text-blue-200">Components:</span>
+              <span class="text-sm text-blue-800 dark:text-blue-200">{{ t('explorer.graphStats.components') }}</span>
               <span class="text-sm font-mono text-blue-600 dark:text-blue-400">
                 {{ graphStats?.['connected_components'] || '-' }}
               </span>
             </div>
             <div class="flex justify-between items-center">
-              <span class="text-sm text-blue-800 dark:text-blue-200">Avg Degree:</span>
+              <span class="text-sm text-blue-800 dark:text-blue-200">{{ t('explorer.graphStats.avgDegree') }}</span>
               <span class="text-sm font-mono text-blue-600 dark:text-blue-400">
                 {{ graphStats?.['average_degree']?.toFixed(2) || '-' }}
               </span>
@@ -318,7 +314,7 @@
           </div>
           <div class="mt-3 pt-3 border-t border-blue-200 dark:border-blue-700">
             <p class="text-xs text-blue-700 dark:text-blue-300">
-              Calculated alongside node metrics
+              {{ t('explorer.graphStats.calculated') }}
             </p>
           </div>
         </div>
@@ -326,14 +322,14 @@
 
       <!-- Community Detection Section -->
       <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
-        <h2 class="demo-controls-section-title">🎨 Community Detection (Node Colors)</h2>
+        <h2 class="demo-controls-section-title">{{ t('explorer.communityDetection.title') }}</h2>
 
         <CommunityPicker
           v-model="selectedCommunityAlgorithm"
           :available-algorithms="availableCommunityAlgorithms"
           :detecting="detectingCommunities"
           :disabled="!networkLoaded"
-          label="Algorithm:"
+          :label="t('explorer.communityDetection.algorithm')"
           @detect="handleDetectCommunities"
         />
       </div>
@@ -342,31 +338,31 @@
       <div v-if="hasCommunities" class="demo-controls-section border-t border-[var(--color-border)] pt-4">
         <div class="bg-gradient-to-br from-orange-50 to-pink-50 dark:from-orange-900/30 dark:to-pink-900/30 rounded-lg p-4 border-2 border-orange-200 dark:border-orange-700">
           <h3 class="text-sm font-semibold text-orange-900 dark:text-orange-300 mb-3 flex items-center gap-2">
-            🎨 Community Detection Results
+            {{ t('explorer.communityResults.title') }}
           </h3>
           <div class="space-y-2">
             <div class="flex justify-between items-center">
-              <span class="text-sm text-orange-800 dark:text-orange-200">Communities Found:</span>
+              <span class="text-sm text-orange-800 dark:text-orange-200">{{ t('explorer.communityResults.communitiesFound') }}</span>
               <span class="text-lg font-bold text-orange-600 dark:text-orange-400">{{ communityResult?.numCommunities || '-' }}</span>
             </div>
             <div class="flex justify-between items-center">
-              <span class="text-sm text-orange-800 dark:text-orange-200">Modularity Score:</span>
+              <span class="text-sm text-orange-800 dark:text-orange-200">{{ t('explorer.communityResults.modularityScore') }}</span>
               <span class="text-lg font-bold text-orange-600 dark:text-orange-400">
                 {{ communityResult?.modularity?.toFixed(3) || '-' }}
               </span>
             </div>
             <div class="flex justify-between items-center">
-              <span class="text-sm text-orange-800 dark:text-orange-200">Computation Time:</span>
+              <span class="text-sm text-orange-800 dark:text-orange-200">{{ t('explorer.communityResults.computationTime') }}</span>
               <span class="text-sm font-semibold text-orange-600 dark:text-orange-400">{{ communityTime || '-' }}</span>
             </div>
             <div class="flex justify-between items-center">
-              <span class="text-sm text-orange-800 dark:text-orange-200">Algorithm:</span>
+              <span class="text-sm text-orange-800 dark:text-orange-200">{{ t('explorer.communityResults.algorithm') }}</span>
               <span class="text-sm font-semibold text-orange-600 dark:text-orange-400">{{ selectedCommunityAlgorithm }}</span>
             </div>
           </div>
           <div class="mt-3 pt-3 border-t border-orange-200 dark:border-orange-700">
             <p class="text-xs text-orange-700 dark:text-orange-300">
-              Node colors represent their community assignments
+              {{ t('explorer.communityResults.nodeColorsRepresent') }}
             </p>
           </div>
         </div>
@@ -374,14 +370,14 @@
 
       <!-- Instructions -->
       <div class="info-box-purple">
-        <h3 class="text-sm font-semibold text-purple-900 dark:text-purple-300 mb-2">💡 How to interact</h3>
+        <h3 class="text-sm font-semibold text-purple-900 dark:text-purple-300 mb-2">{{ t('explorer.instructions.title') }}</h3>
         <ul class="text-sm text-purple-800 dark:text-purple-200 space-y-1">
-          <li>🖱️ <strong>Drag nodes</strong> to reposition them</li>
-          <li>🔍 <strong>Scroll</strong> to zoom in/out</li>
-          <li>👆 <strong>Drag background</strong> to pan</li>
-          <li>💬 <strong>Hover nodes</strong> to see detailed information</li>
-          <li>📊 <strong>Node size</strong> = selected metric</li>
-          <li>🎨 <strong>Color</strong> = community</li>
+          <li v-html="t('explorer.instructions.dragNodes')"></li>
+          <li v-html="t('explorer.instructions.scroll')"></li>
+          <li v-html="t('explorer.instructions.dragBackground')"></li>
+          <li v-html="t('explorer.instructions.hoverNodes')"></li>
+          <li v-html="t('explorer.instructions.nodeSize')"></li>
+          <li v-html="t('explorer.instructions.color')"></li>
         </ul>
       </div>
     </template>
@@ -411,7 +407,13 @@ import LayoutPicker from '../components/LayoutPicker.vue';
 import CommunityPicker from '../components/CommunityPicker.vue';
 import NetworkAnalysis from '../components/NetworkAnalysis.vue';
 import { useNetworkGraph } from '../composables/useNetworkGraph';
+import { useI18n } from '../composables/useI18n';
 import { ExplorerController } from '../lib/ExplorerController';
+
+/**
+ * Use i18n for translations
+ */
+const { t } = useI18n();
 
 // Use the network graph composable
 const graphComposable = useNetworkGraph();
@@ -527,7 +529,8 @@ const initializeExplorer = () => {
 
   controller = new ExplorerController({
     graphManager,
-    onStatusChange: handleStatusChange
+    onStatusChange: handleStatusChange,
+    translate: (key, replacements) => t(key, replacements)
   });
 
   // Get available layouts and community algorithms

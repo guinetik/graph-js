@@ -2,7 +2,7 @@
   <div class="layout-picker">
     <div class="space-y-2">
       <label class="block text-sm font-medium text-secondary">
-        Choose Layout:
+        {{ t('showcase.layoutPicker.chooseLayout') }}
       </label>
       <select
         :value="modelValue"
@@ -25,8 +25,8 @@
       :disabled="disabled || loading"
       class="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white px-4 py-3 rounded-md font-semibold transition-colors mt-3"
     >
-      <span v-if="!loading">🎯 Apply Layout</span>
-      <span v-else>⏳ Applying...</span>
+      <span v-if="!loading">{{ t('showcase.layoutPicker.applyButton') }}</span>
+      <span v-else>{{ t('showcase.layoutPicker.applyingButton') }}</span>
     </button>
 
     <div v-if="modelValue !== 'none' && selectedLayoutInfo" class="info-box-yellow mt-3">
@@ -40,6 +40,12 @@
 
 <script setup>
 import { computed } from 'vue';
+import { useI18n } from '../composables/useI18n';
+
+/**
+ * Use i18n for translations
+ */
+const { t } = useI18n();
 
 const props = defineProps({
   modelValue: {

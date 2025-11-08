@@ -2,7 +2,7 @@
   <div class="community-picker">
     <div class="space-y-2">
       <label class="block text-sm font-medium text-secondary">
-        {{ label || 'Choose Algorithm:' }}
+        {{ label || t('showcase.communityPicker.chooseAlgorithm') }}
       </label>
       <select
         :value="modelValue"
@@ -25,8 +25,8 @@
       :disabled="disabled || detecting"
       class="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 text-white px-4 py-3 rounded-md font-semibold transition-colors mt-3"
     >
-      <span v-if="!detecting">🎨 Detect Communities</span>
-      <span v-else>⏳ Detecting...</span>
+      <span v-if="!detecting">{{ t('showcase.communityPicker.detectButton') }}</span>
+      <span v-else>{{ t('showcase.communityPicker.detectingButton') }}</span>
     </button>
 
     <!-- Optional inline results display (can be hidden via slot) -->
@@ -35,6 +35,13 @@
 </template>
 
 <script setup>
+import { useI18n } from '../composables/useI18n';
+
+/**
+ * Use i18n for translations
+ */
+const { t } = useI18n();
+
 const props = defineProps({
   modelValue: {
     type: String,
@@ -54,7 +61,7 @@ const props = defineProps({
   },
   label: {
     type: String,
-    default: 'Choose Algorithm:'
+    default: ''
   }
 });
 

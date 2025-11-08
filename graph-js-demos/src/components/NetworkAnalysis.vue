@@ -3,7 +3,7 @@
     <!-- Metrics Selection -->
     <div class="bg-[var(--color-bg-secondary)] rounded-md p-4 space-y-2 mb-3">
       <h3 class="text-sm font-semibold text-primary">
-        Metrics to Calculate
+        {{ t('showcase.networkAnalysis.metricsTitle') }}
       </h3>
       <div class="space-y-2">
         <label class="flex items-center gap-2 text-sm">
@@ -13,7 +13,7 @@
             @change="updateMetrics('degree', $event.target.checked)"
             class="rounded"
           >
-          <span class="text-secondary">Degree Centrality</span>
+          <span class="text-secondary">{{ t('showcase.networkAnalysis.degreeCentrality') }}</span>
         </label>
         <label class="flex items-center gap-2 text-sm">
           <input
@@ -22,7 +22,7 @@
             @change="updateMetrics('betweenness', $event.target.checked)"
             class="rounded"
           >
-          <span class="text-secondary">Betweenness Centrality</span>
+          <span class="text-secondary">{{ t('showcase.networkAnalysis.betweennessCentrality') }}</span>
         </label>
         <label class="flex items-center gap-2 text-sm">
           <input
@@ -31,7 +31,7 @@
             @change="updateMetrics('clustering', $event.target.checked)"
             class="rounded"
           >
-          <span class="text-secondary">Clustering Coefficient</span>
+          <span class="text-secondary">{{ t('showcase.networkAnalysis.clusteringCoefficient') }}</span>
         </label>
         <label class="flex items-center gap-2 text-sm">
           <input
@@ -40,7 +40,7 @@
             @change="updateMetrics('eigenvector', $event.target.checked)"
             class="rounded"
           >
-          <span class="text-secondary">Eigenvector Centrality</span>
+          <span class="text-secondary">{{ t('showcase.networkAnalysis.eigenvectorCentrality') }}</span>
         </label>
         <label v-if="showSpectralMetric" class="flex items-center gap-2 text-sm">
           <input
@@ -49,7 +49,7 @@
             @change="updateMetrics('eigenvector-laplacian', $event.target.checked)"
             class="rounded"
           >
-          <span class="text-secondary">Eigenvector (Laplacian) - for Spectral layout</span>
+          <span class="text-secondary">{{ t('showcase.networkAnalysis.eigenvectorLaplacian') }}</span>
         </label>
       </div>
     </div>
@@ -57,7 +57,7 @@
     <!-- Size Metric Selection -->
     <div class="space-y-2 mb-3">
       <label class="block text-sm font-medium text-secondary">
-        Node Size Based On:
+        {{ t('showcase.networkAnalysis.nodeSizeLabel') }}
       </label>
       <select
         :value="sizeMetric"
@@ -65,11 +65,11 @@
         :disabled="disabled || selectedMetrics.length === 0"
         class="w-full bg-secondary text-primary border border-color px-3 py-2 rounded-md disabled:opacity-50"
       >
-        <option value="">-- Select a metric --</option>
-        <option v-if="selectedMetrics.includes('degree')" value="degree">Degree</option>
-        <option v-if="selectedMetrics.includes('betweenness')" value="betweenness">Betweenness</option>
-        <option v-if="selectedMetrics.includes('clustering')" value="clustering">Clustering</option>
-        <option v-if="selectedMetrics.includes('eigenvector')" value="eigenvector">Eigenvector</option>
+        <option value="">{{ t('showcase.networkAnalysis.selectMetric') }}</option>
+        <option v-if="selectedMetrics.includes('degree')" value="degree">{{ t('showcase.networkAnalysis.degreeName') }}</option>
+        <option v-if="selectedMetrics.includes('betweenness')" value="betweenness">{{ t('showcase.networkAnalysis.betweennessName') }}</option>
+        <option v-if="selectedMetrics.includes('clustering')" value="clustering">{{ t('showcase.networkAnalysis.clusteringName') }}</option>
+        <option v-if="selectedMetrics.includes('eigenvector')" value="eigenvector">{{ t('showcase.networkAnalysis.eigenvectorName') }}</option>
       </select>
     </div>
 
@@ -79,8 +79,8 @@
       :disabled="disabled || analyzing || selectedMetrics.length === 0"
       class="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white px-4 py-3 rounded-md font-semibold transition-colors"
     >
-      <span v-if="!analyzing">⚡ Analyze Network</span>
-      <span v-else>⏳ Analyzing...</span>
+      <span v-if="!analyzing">{{ t('showcase.networkAnalysis.analyzeButton') }}</span>
+      <span v-else>{{ t('showcase.networkAnalysis.analyzingButton') }}</span>
     </button>
 
     <!-- Progress Bar -->
@@ -99,6 +99,13 @@
 </template>
 
 <script setup>
+import { useI18n } from '../composables/useI18n';
+
+/**
+ * Use i18n for translations
+ */
+const { t } = useI18n();
+
 const props = defineProps({
   selectedMetrics: {
     type: Array,

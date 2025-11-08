@@ -8,6 +8,7 @@
  */
 
 import { createLogger } from '@guinetik/logger';
+import { getTranslation } from '../../lib/i18n.js';
 import { FAMILY_GROUPS, GROUP_COLORS } from './family/FamilyConstants.js';
 import { FamilyValidation } from './family/FamilyValidation.js';
 import { FamilyOperations } from './family/FamilyOperations.js';
@@ -31,10 +32,12 @@ export class FamilyController {
    * @param {Object} dependencies - Required dependencies
    * @param {Object} dependencies.graphManager - The graph manager (e.g., from useNetworkGraph)
    * @param {Function} dependencies.onStatusChange - Callback for status updates (message, type)
+   * @param {string} [dependencies.lang] - Language code for translations ('en' or 'pt', defaults to 'en')
    */
-  constructor({ graphManager, onStatusChange = null }) {
+  constructor({ graphManager, onStatusChange = null, lang = 'en' }) {
     this.graphManager = graphManager;
     this.onStatusChange = onStatusChange;
+    this.lang = lang;
     this.log = createLogger({
       prefix: 'FamilyController',
       level: import.meta.env.DEV ? 'debug' : 'info'
@@ -43,16 +46,19 @@ export class FamilyController {
     // Get graph instance helper
     const getGraphInstance = () => this.getGraphInstance();
 
+    // Create translation function for this language
+    const t = (key) => getTranslation(this.lang, key);
+
     // Initialize modules
-    this.validation = new FamilyValidation(getGraphInstance);
-    this.storage = new FamilyStorage(getGraphInstance, onStatusChange, this.log);
+    this.validation = new FamilyValidation(getGraphInstance, t);
+    this.storage = new FamilyStorage(getGraphInstance, onStatusChange, this.log, t);
     this.operations = new FamilyOperations(
       graphManager,
       getGraphInstance,
       this.validation,
       () => this.storage.saveFamily()
     );
-    this.dialogService = new FamilyDialogService(getGraphInstance, this.validation);
+    this.dialogService = new FamilyDialogService(getGraphInstance, this.validation, t);
 
     // Initialize undo/redo history (max 10 snapshots)
     this.mementoHistory = new MementoHistory({ maxHistorySize: 10 });

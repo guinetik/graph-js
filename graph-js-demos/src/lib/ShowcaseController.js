@@ -19,10 +19,12 @@ export class ShowcaseController {
    * @param {Object} dependencies - Required dependencies
    * @param {Object} dependencies.graphManager - The graph manager (e.g., from useNetworkGraph)
    * @param {Function} dependencies.onStatusChange - Callback for status updates (message, type)
+   * @param {Function} dependencies.translate - Translation function (key, replacements) => string
    */
-  constructor({ graphManager, onStatusChange = null }) {
+  constructor({ graphManager, onStatusChange = null, translate = null }) {
     this.graphManager = graphManager;
     this.onStatusChange = onStatusChange;
+    this.translate = translate || ((key) => key); // Fallback to key if no translation function
     this.log = createLogger({
       prefix: 'ShowcaseController',
       level: import.meta.env.DEV ? 'debug' : 'info'
@@ -176,7 +178,11 @@ export class ShowcaseController {
       // Load data into graph
       this.graphManager.loadData(d3Data.nodes, d3Data.links);
 
-      const message = `✅ Loaded ${dataset.name} dataset (${d3Data.nodes.length} nodes, ${d3Data.links.length} edges)`;
+      const message = this.translate('showcase.messages.loadedDataset', {
+        name: dataset.name,
+        nodes: d3Data.nodes.length,
+        edges: d3Data.links.length
+      });
       this.log.info('Dataset loaded successfully', { 
         name: dataset.name, 
         nodeCount: d3Data.nodes.length, 
@@ -192,7 +198,7 @@ export class ShowcaseController {
         edgeCount: d3Data.links.length
       };
     } catch (err) {
-      const message = `❌ Failed to load dataset: ${err.message}`;
+      const message = this.translate('showcase.messages.failedToLoadDataset', { error: err.message });
       this.log.error('Failed to load dataset', { datasetKey, error: err.message, stack: err.stack });
       this._updateStatus(message, 'error');
       
@@ -223,7 +229,10 @@ export class ShowcaseController {
     const newNode = this.graphManager.addNode([randomNode], null, null, true); // incremental = true
 
     if (newNode) {
-      const message = `✅ Added node "${newNode.id}" connected to "${randomNode}"`;
+      const message = this.translate('showcase.messages.addedNode', { 
+        nodeId: newNode.id, 
+        connectedTo: randomNode 
+      });
       this.log.debug('Added random node', { nodeId: newNode.id, connectedTo: randomNode });
       this._updateStatus(message, 'success');
 
@@ -252,7 +261,7 @@ export class ShowcaseController {
     const selectedNode = this.graphManager.getSelectedNode();
 
     if (!selectedNode) {
-      const message = '❌ No node selected. Click on a node to select it first.';
+      const message = this.translate('showcase.messages.noNodeSelected');
       this.log.warn('No node selected');
       this._updateStatus(message, 'error');
 
@@ -266,7 +275,10 @@ export class ShowcaseController {
     const newNode = this.graphManager.addNode([targetNodeId], null, null, true); // incremental = true
 
     if (newNode) {
-      const message = `✅ Added node "${newNode.id}" connected to "${targetNodeId}"`;
+      const message = this.translate('showcase.messages.addedNode', { 
+        nodeId: newNode.id, 
+        connectedTo: targetNodeId 
+      });
       this.log.debug('Added node connected to selected', { nodeId: newNode.id, targetNodeId });
       this._updateStatus(message, 'success');
 
@@ -293,7 +305,7 @@ export class ShowcaseController {
 
     const nodeIds = this.graphManager.getNodeIds();
     if (nodeIds.length === 0) {
-      const message = '❌ No nodes to remove';
+      const message = this.translate('showcase.messages.noNodesToRemove');
       this._updateStatus(message, 'error');
 
       return { success: false, error: 'No nodes to remove' };
@@ -303,7 +315,7 @@ export class ShowcaseController {
     const success = this.graphManager.removeNode(randomId, true); // incremental = true
 
     if (success) {
-      const message = `🗑️ Removed node "${randomId}"`;
+      const message = this.translate('showcase.messages.removedNode', { nodeId: randomId });
       this.log.debug('Removed random node', { nodeId: randomId });
       this._updateStatus(message, 'info');
 
@@ -331,7 +343,7 @@ export class ShowcaseController {
       const results = await this.graphManager.analyzeGraph(metrics);
 
       if (results) {
-        const message = `✅ Analysis complete! Computed ${results.nodes.length} node metrics using web workers`;
+        const message = this.translate('showcase.messages.analysisComplete', { count: results.nodes.length });
         this.log.info('Graph analysis complete', { 
           nodeCount: results.nodes.length, 
           metrics 
@@ -349,7 +361,7 @@ export class ShowcaseController {
       this.log.warn('Analysis returned no results');
       return { success: false, error: 'Analysis returned no results' };
     } catch (err) {
-      const message = `❌ Analysis failed: ${err.message}`;
+      const message = this.translate('showcase.messages.analysisFailed', { error: err.message });
       this.log.error('Graph analysis failed', { error: err.message, stack: err.stack, metrics });
       this._updateStatus(message, 'error');
       
@@ -368,7 +380,7 @@ export class ShowcaseController {
    */
   async applyLayout(layoutId) {
     if (layoutId === 'none') {
-      const message = 'ℹ️ Using D3 physics simulation (no layout algorithm)';
+      const message = this.translate('showcase.messages.usingD3Physics');
       this.log.debug('Using default D3 physics simulation');
       this._updateStatus(message, 'info');
 
@@ -389,7 +401,7 @@ export class ShowcaseController {
       const success = await this.graphManager.applyLayout(layoutId);
 
       if (success) {
-        const message = `✅ Applied ${layoutId} layout algorithm`;
+        const message = this.translate('showcase.messages.appliedLayout', { layout: layoutId });
         this.log.info('Layout applied successfully', { layoutId });
         this._updateStatus(message, 'success');
         
@@ -402,7 +414,7 @@ export class ShowcaseController {
       this.log.warn('Layout application failed', { layoutId });
       return { success: false, error: 'Layout application failed' };
     } catch (err) {
-      const message = `❌ Layout failed: ${err.message}`;
+      const message = this.translate('showcase.messages.layoutFailed', { error: err.message });
       this.log.error('Layout application failed', { layoutId, error: err.message, stack: err.stack });
       this._updateStatus(message, 'error');
       
@@ -470,13 +482,13 @@ export class ShowcaseController {
    */
   async detectCommunities(algorithmId) {
     if (!this.isGraphReady()) {
-      this._updateStatus('Graph not initialized', 'error');
+      this._updateStatus(this.translate('showcase.messages.graphNotInitialized'), 'error');
       return null;
     }
 
     const nodeCount = this.getNodeCount();
     if (nodeCount === 0) {
-      this._updateStatus('Graph is empty', 'error');
+      this._updateStatus(this.translate('showcase.messages.graphIsEmpty'), 'error');
       return null;
     }
 
@@ -486,11 +498,14 @@ export class ShowcaseController {
       const result = await this.graphManager.detectCommunities(algorithmId);
 
       if (result) {
-        const message = `Found ${result.numCommunities} communities (modularity: ${result.modularity.toFixed(3)})`;
+        const message = this.translate('showcase.messages.foundCommunities', {
+          count: result.numCommunities,
+          modularity: result.modularity.toFixed(3)
+        });
         this._updateStatus(message, 'success');
         return result;
       } else {
-        this._updateStatus('Community detection failed', 'error');
+        this._updateStatus(this.translate('showcase.messages.communityDetectionFailed'), 'error');
         return null;
       }
     } catch (error) {

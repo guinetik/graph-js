@@ -20,6 +20,8 @@ function normalizeLinkId(source) {
 /**
  * FamilyStorage - Storage operations for family tree
  *
+ * Handles localStorage persistence and auto-save with i18n support
+ *
  * @class
  */
 export class FamilyStorage {
@@ -29,11 +31,17 @@ export class FamilyStorage {
    * @param {Function} getGraphInstance - Function that returns the graph instance
    * @param {Function} onStatusChange - Callback for status updates
    * @param {Object} log - Logger instance
+   * @param {Function} [t] - Translation function (optional, defaults to identity function)
    */
-  constructor(getGraphInstance, onStatusChange, log) {
+  constructor(getGraphInstance, onStatusChange, log, t = (key) => key) {
     this.getGraphInstance = getGraphInstance;
     this.onStatusChange = onStatusChange;
     this.log = log;
+    /**
+     * Translation function for i18n support
+     * @type {Function}
+     */
+    this.t = t;
 
     // Auto-save interval
     this.autoSaveInterval = null;
@@ -169,10 +177,10 @@ export class FamilyStorage {
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       this.log.debug('Family tree saved', { nodeCount: data.nodes.length, linkCount: data.links.length });
-      this.showStatus('Family tree saved!', 'success');
+      this.showStatus(this.t('family.storage.saved'), 'success');
     } catch (err) {
       this.log.error('Failed to save family tree', { error: err.message });
-      this.showStatus('Failed to save family tree', 'error');
+      this.showStatus(this.t('family.storage.error'), 'error');
     }
   }
 
@@ -213,7 +221,7 @@ export class FamilyStorage {
     }
     
     this.log.info('Family tree reset');
-    this.showStatus('Family tree reset', 'success');
+    this.showStatus(this.t('family.storage.reset'), 'success');
   }
 
   /**

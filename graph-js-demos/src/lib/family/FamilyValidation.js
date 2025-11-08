@@ -20,6 +20,8 @@ function normalizeLinkId(source) {
 /**
  * FamilyValidation - Validation logic for family tree
  *
+ * Handles validation checks with i18n support for error messages
+ *
  * @class
  */
 export class FamilyValidation {
@@ -27,9 +29,15 @@ export class FamilyValidation {
    * Creates a new FamilyValidation instance
    *
    * @param {Function} getGraphInstance - Function that returns the graph instance
+   * @param {Function} [t] - Translation function (optional, defaults to identity function)
    */
-  constructor(getGraphInstance) {
+  constructor(getGraphInstance, t = (key) => key) {
     this.getGraphInstance = getGraphInstance;
+    /**
+     * Translation function for i18n support
+     * @type {Function}
+     */
+    this.t = t;
   }
 
   /**
@@ -51,7 +59,7 @@ export class FamilyValidation {
       return {
         canAdd: false,
         existingCount: existingParents.length,
-        message: 'You already have 2 parents added. You cannot add more than 2 parents.'
+        message: this.t('family.operations.validation.maxParents')
       };
     }
 

@@ -4,32 +4,31 @@
       <!-- Header -->
       <div class="demo-controls-header">
         <h1 class="demo-controls-title">
-          🌳 Family Tree Builder
+          {{ t('family.header.title') }}
         </h1>
         <p class="demo-controls-description">
-          Build and visualize your family tree interactively. Start with yourself and add relatives to see the network grow.
+          {{ t('family.header.subtitle') }}
         </p>
       </div>
 
       <!-- What is this? -->
       <div class="info-box-green mb-4">
         <h2 class="text-lg font-semibold text-green-900 dark:text-green-300 mb-2">
-          What is this?
+          {{ t('family.whatIs.title') }}
         </h2>
         <p class="text-sm text-green-800 dark:text-green-200">
-          A network visualization of family relationships. Each color represents a different
-          relationship type. The tree auto-saves to your browser's storage every 30 seconds.
+          {{ t('family.whatIs.description') }}
         </p>
       </div>
 
       <!-- Status Section -->
       <div class="sticky top-0 z-20 bg-white/98 dark:bg-gray-800/98 backdrop-blur-md border-b border-[var(--color-border)] pb-4 mb-4 -mx-6 px-6 pt-4 -mt-2 overflow-x-hidden">
-        <h2 class="demo-controls-section-title mb-3">Status</h2>
+        <h2 class="demo-controls-section-title mb-3">{{ t('family.status.title') }}</h2>
 
         <div class="bg-[var(--color-bg-secondary)] rounded-md p-4 text-sm shadow-sm border border-[var(--color-border)]">
           <div v-if="!statusMessage" class="text-secondary text-center py-2">
-            <div class="text-xs">Ready for operations</div>
-            <div class="text-xs mt-1 opacity-60">Click buttons to add relatives</div>
+            <div class="text-xs">{{ t('family.status.ready') }}</div>
+            <div class="text-xs mt-1 opacity-60">{{ t('family.status.clickToAdd') }}</div>
           </div>
           <div v-else class="space-y-2">
             <div :class="{
@@ -51,7 +50,7 @@
 
       <!-- Add Relatives Section -->
       <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
-        <h2 class="demo-controls-section-title">Add Relatives</h2>
+        <h2 class="demo-controls-section-title">{{ t('family.addRelatives.title') }}</h2>
 
         <div class="grid grid-cols-2 gap-2">
           <!-- Row 1: Parents & Grandparents -->
@@ -60,14 +59,14 @@
             class="bg-pink-600 hover:bg-pink-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
             type="button"
           >
-            👨‍👩‍👧 Parents
+            {{ t('family.addRelatives.parents') }}
           </button>
 
           <button
             @click="handleAddGrandparents"
             class="bg-amber-700 hover:bg-amber-800 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
           >
-            👴👵 Grandparents
+            {{ t('family.addRelatives.grandparents') }}
           </button>
 
           <!-- Row 2: Sibling & Niece/Nephew -->
@@ -75,14 +74,14 @@
             @click="handleAddSibling"
             class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
           >
-            👫 Sibling
+            {{ t('family.addRelatives.sibling') }}
           </button>
 
           <button
             @click="handleAddNieceNephew"
             class="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
           >
-            🧒 Niece/Nephew
+            {{ t('family.addRelatives.nieceNephew') }}
           </button>
 
           <!-- Row 3: Uncle/Aunt & Cousin -->
@@ -90,14 +89,14 @@
             @click="handleAddUncleAunt"
             class="bg-orange-600 hover:bg-orange-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
           >
-            🧑‍🤝‍🧑 Uncle/Aunt
+            {{ t('family.addRelatives.uncleAunt') }}
           </button>
 
           <button
             @click="handleAddCousin"
             class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
           >
-            👯 Cousin
+            {{ t('family.addRelatives.cousin') }}
           </button>
 
           <!-- Row 4: Partner & Child -->
@@ -105,49 +104,49 @@
             @click="handleAddPartner"
             class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
           >
-            💑 Partner
+            {{ t('family.addRelatives.partner') }}
           </button>
 
           <button
             @click="handleAddChild"
             class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
           >
-            👶 Child
+            {{ t('family.addRelatives.child') }}
           </button>
         </div>
       </div>
 
       <!-- Actions Section -->
       <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
-        <h2 class="demo-controls-section-title">Actions</h2>
+        <h2 class="demo-controls-section-title">{{ t('family.actions.title') }}</h2>
 
         <div class="grid grid-cols-2 gap-2">
           <button
             @click="handleSaveFamily"
             class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
           >
-            💾 Save Family
+            {{ t('family.actions.saveFamily') }}
           </button>
 
           <button
             @click="handleSaveImage"
             class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
           >
-            📸 Save as Image
+            {{ t('family.actions.saveImage') }}
           </button>
 
           <button
             @click="handleLockGraph"
             class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
           >
-            🔒 Lock Graph
+            {{ t('family.actions.lockGraph') }}
           </button>
 
           <button
             @click="handleUnlockGraph"
             class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
           >
-            🔓 Unlock Graph
+            {{ t('family.actions.unlockGraph') }}
           </button>
 
           <button
@@ -155,7 +154,7 @@
             :disabled="!canUndo"
             class="bg-violet-600 hover:bg-violet-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
           >
-            ↩️ Undo
+            {{ t('family.actions.undo') }}
           </button>
 
           <button
@@ -163,21 +162,21 @@
             :disabled="!canRedo"
             class="bg-fuchsia-600 hover:bg-fuchsia-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
           >
-            ↪️ Redo
+            {{ t('family.actions.redo') }}
           </button>
 
           <button
             @click="handleResetTree"
             class="col-span-2 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
           >
-            🗑️ Reset Tree
+            {{ t('family.actions.resetTree') }}
           </button>
         </div>
       </div>
 
       <!-- Render Mode Section -->
       <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
-        <h2 class="demo-controls-section-title">🎨 Render Nodes</h2>
+        <h2 class="demo-controls-section-title">{{ t('family.renderNodes.title') }}</h2>
 
         <div class="flex flex-wrap gap-2 mb-3">
           <label
@@ -195,7 +194,7 @@
               class="text-green-600 focus:ring-green-500"
             />
             <span class="text-xl">🎨</span>
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Colors</span>
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('family.renderNodes.colors') }}</span>
           </label>
 
           <label
@@ -213,21 +212,21 @@
               class="text-green-600 focus:ring-green-500"
             />
             <span class="text-xl">👤</span>
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Avatars</span>
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('family.renderNodes.avatars') }}</span>
           </label>
         </div>
 
         <div class="info-box-blue">
           <p class="text-xs text-blue-800 dark:text-blue-200">
-            <strong>Colors:</strong> Nodes colored by relationship type.<br>
-            <strong>Avatars:</strong> Nodes shown as emoji avatars (if set).
+            <strong>{{ t('family.renderNodes.colors') }}:</strong> {{ t('family.renderNodes.colorsDesc') }}<br>
+            <strong>{{ t('family.renderNodes.avatars') }}:</strong> {{ t('family.renderNodes.avatarsDesc') }}
           </p>
         </div>
       </div>
 
       <!-- Network Analysis Section -->
       <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
-        <h2 class="demo-controls-section-title">⚡ Network Analysis (Node Sizes)</h2>
+        <h2 class="demo-controls-section-title">{{ t('family.networkAnalysis.title') }}</h2>
 
         <NetworkAnalysis
           v-model:selected-metrics="selectedFeatures"
@@ -241,51 +240,51 @@
       <!-- Legend -->
       <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
         <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-          Relationship Colors
+          {{ t('family.relationshipColors.title') }}
         </h3>
         <div class="space-y-2 text-sm">
           <div class="flex items-center gap-2">
             <div class="w-4 h-4 rounded-full bg-indigo-500"></div>
-            <span class="text-gray-700 dark:text-gray-300">You</span>
+            <span class="text-gray-700 dark:text-gray-300">{{ t('family.relationshipColors.you') }}</span>
           </div>
           <div class="flex items-center gap-2">
             <div class="w-4 h-4 rounded-full bg-pink-500"></div>
-            <span class="text-gray-700 dark:text-gray-300">Parents</span>
+            <span class="text-gray-700 dark:text-gray-300">{{ t('family.relationshipColors.parents') }}</span>
           </div>
           <div class="flex items-center gap-2">
             <div class="w-4 h-4 rounded-full bg-blue-500"></div>
-            <span class="text-gray-700 dark:text-gray-300">Siblings</span>
+            <span class="text-gray-700 dark:text-gray-300">{{ t('family.relationshipColors.siblings') }}</span>
           </div>
           <div class="flex items-center gap-2">
             <div class="w-4 h-4 rounded-full bg-orange-500"></div>
-            <span class="text-gray-700 dark:text-gray-300">Uncles/Aunts</span>
+            <span class="text-gray-700 dark:text-gray-300">{{ t('family.relationshipColors.unclesAunts') }}</span>
           </div>
           <div class="flex items-center gap-2">
             <div class="w-4 h-4 rounded-full bg-purple-500"></div>
-            <span class="text-gray-700 dark:text-gray-300">Cousins</span>
+            <span class="text-gray-700 dark:text-gray-300">{{ t('family.relationshipColors.cousins') }}</span>
           </div>
           <div class="flex items-center gap-2">
             <div class="w-4 h-4 rounded-full bg-amber-700"></div>
-            <span class="text-gray-700 dark:text-gray-300">Grandparents</span>
+            <span class="text-gray-700 dark:text-gray-300">{{ t('family.relationshipColors.grandparents') }}</span>
           </div>
           <div class="flex items-center gap-2">
             <div class="w-4 h-4 rounded-full bg-cyan-500"></div>
-            <span class="text-gray-700 dark:text-gray-300">Nieces/Nephews</span>
+            <span class="text-gray-700 dark:text-gray-300">{{ t('family.relationshipColors.nieces') }}</span>
           </div>
           <div class="flex items-center gap-2">
             <div class="w-4 h-4 rounded-full bg-rose-500"></div>
-            <span class="text-gray-700 dark:text-gray-300">Partners/Spouses</span>
+            <span class="text-gray-700 dark:text-gray-300">{{ t('family.relationshipColors.partners') }}</span>
           </div>
           <div class="flex items-center gap-2">
             <div class="w-4 h-4 rounded-full bg-teal-500"></div>
-            <span class="text-gray-700 dark:text-gray-300">Children</span>
+            <span class="text-gray-700 dark:text-gray-300">{{ t('family.relationshipColors.children') }}</span>
           </div>
         </div>
       </div>
 
       <!-- Layout Algorithm Section -->
       <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
-        <h2 class="demo-controls-section-title">🎯 Layout Algorithm</h2>
+        <h2 class="demo-controls-section-title">{{ t('family.layoutAlgorithm.title') }}</h2>
 
         <LayoutPicker
           v-model="selectedLayout"
@@ -311,16 +310,16 @@
       <!-- Instructions Box -->
       <div class="info-box-blue">
         <h3 class="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-2">
-          💡 How to use
+          {{ t('family.instructions.title') }}
         </h3>
         <ul class="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-          <li>🖱️ <strong>Drag nodes</strong> to arrange your tree</li>
-          <li>💾 <strong>Auto-saves</strong> every 30 seconds</li>
-          <li>🔒 <strong>Lock</strong> to freeze positions</li>
-          <li>📸 <strong>Download</strong> as PNG image</li>
-          <li>⚡ <strong>Analyze</strong> to size nodes by centrality metrics</li>
-          <li>🎯 <strong>Apply layouts</strong> to visualize your tree differently</li>
-          <li>↩️ <strong>Undo/Redo</strong> with buttons or Ctrl+Z / Ctrl+Y (up to 10 actions)</li>
+          <li v-html="t('family.instructions.dragNodes')"></li>
+          <li v-html="t('family.instructions.autoSaves')"></li>
+          <li v-html="t('family.instructions.lock')"></li>
+          <li v-html="t('family.instructions.download')"></li>
+          <li v-html="t('family.instructions.analyze')"></li>
+          <li v-html="t('family.instructions.layouts')"></li>
+          <li v-html="t('family.instructions.undoRedo')"></li>
         </ul>
       </div>
     </template>
@@ -361,7 +360,13 @@ import DialogForm from '../components/DialogForm.vue';
 import LayoutPicker from '../components/LayoutPicker.vue';
 import NetworkAnalysis from '../components/NetworkAnalysis.vue';
 import { useNetworkGraph } from '../composables/useNetworkGraph';
+import { useI18n } from '../composables/useI18n';
+import { getTranslation } from '../../lib/i18n.js';
 import { FamilyController, FAMILY_GROUPS, GROUP_COLORS, DIALOG_ACTIONS } from '../lib/FamilyController';
+import { FamilyDialogService } from '../lib/family/FamilyDialogService.js';
+
+// Use i18n for translations
+const { t, lang } = useI18n();
 
 // Use the network graph composable with custom color function for family groups
 const graphComposable = useNetworkGraph({
@@ -473,10 +478,11 @@ const initializeFamily = () => {
     getAvailableLayouts
   };
 
-  // Create controller
+  // Create controller with current language
   controller = new FamilyController({
     graphManager,
-    onStatusChange: handleStatusChange
+    onStatusChange: handleStatusChange,
+    lang: lang.value
   });
 
   // Get available layouts
@@ -734,6 +740,25 @@ watch(graphInstance, (newInstance) => {
     updateUndoRedoStates();
   }
 }, { immediate: true });
+
+// Watch for language changes and update controller
+watch(lang, (newLang) => {
+  if (controller) {
+    // Update controller language for translations
+    controller.lang = newLang;
+    // Create translation function for new language
+    const tFunc = (key) => getTranslation(newLang, key);
+    // Recreate the dialog service with new language
+    controller.dialogService = new FamilyDialogService(
+      () => controller.getGraphInstance(),
+      controller.validation,
+      tFunc
+    );
+    // Update validation and storage with new language
+    controller.validation.t = tFunc;
+    controller.storage.t = tFunc;
+  }
+});
 
 // Watch for render mode changes
 watch(renderMode, (newMode) => {
