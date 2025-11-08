@@ -1,7 +1,7 @@
 {
   "name": "@guinetik/graph-js",
-  "version": "1.0.0",
-  "description": "Graph and Network Analysis for NodeJS and the Browser.",
+  "version": "0.0.2",
+  "description": "Graph and Network Analysis for NodeJS and the Browser. Supports Worker-First architecture for parallel computation.",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./types/index.d.ts",
