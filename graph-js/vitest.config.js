@@ -4,7 +4,8 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/*.test.js'],
-    globals: true
+    globals: true,
+    setupFiles: ['./src/test-setup.js']
   },
   resolve: {
     extensions: ['.js']

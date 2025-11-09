@@ -244,7 +244,7 @@ export async function betweennessCompute(graphData, nodeIds, options, progressCa
   // Calculate betweenness from each source node
   sourceNodes.forEach((source, index) => {
     const paths = bfs(graph, source);
-    accumulateBetweenness(betweenness, paths, allNodes);
+    accumulateBetweenness(betweenness, paths, allNodes, source);
 
     // Report progress
     if (index % Math.max(1, Math.floor(sourceNodes.length / 10)) === 0) {
@@ -268,7 +268,7 @@ export async function betweennessCompute(graphData, nodeIds, options, progressCa
  * Accumulate betweenness from shortest paths
  * @private
  */
-function accumulateBetweenness(betweenness, paths, allNodes) {
+function accumulateBetweenness(betweenness, paths, allNodes, source) {
   const { pathCount, predecessors, stack } = paths;
   const dependency = new Map();
 
@@ -286,7 +286,8 @@ function accumulateBetweenness(betweenness, paths, allNodes) {
       dependency.set(pred, dependency.get(pred) + contrib);
     });
 
-    if (node !== stack[0]) {
+    // Don't add source node's dependency to its betweenness
+    if (node !== source) {
       betweenness[node] += dependency.get(node);
     }
   }

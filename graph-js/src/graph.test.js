@@ -34,8 +34,8 @@ describe("Graph", () => {
 
     // Check edge list
     expect(graph.edges.length).toBe(1);
-    expect(graph.edges[0].source).toBe("A");
-    expect(graph.edges[0].target).toBe("B");
+    expect(graph.edges[0].u).toBe("A");
+    expect(graph.edges[0].v).toBe("B");
     expect(graph.edges[0].weight).toBe(2);
   });
 
@@ -84,8 +84,8 @@ describe("Graph", () => {
     expect(edges).toHaveLength(3);
     expect(edges[0]).toEqual(
       expect.objectContaining({
-        source: "A",
-        target: "B",
+        u: "A",
+        v: "B",
         weight: 2,
       })
     );
@@ -179,7 +179,7 @@ describe("Graph", () => {
       expect(graph.getEdgeWeight("B", "A")).toBe(5); // Undirected
 
       // Check edge object also updated
-      const edge = graph.edges.find(e => e.hasNode("A") && e.hasNode("B"));
+      const edge = graph.edges.find(e => (e.u === "A" && e.v === "B") || (e.u === "B" && e.v === "A"));
       expect(edge.weight).toBe(5);
     });
 

@@ -27,6 +27,11 @@ export class WorkerAdapter {
    * worker.postMessage({ type: 'compute', data: [...] });
    */
   static create(workerScript) {
+    // Check for test environment flag (set in test setup)
+    if (typeof globalThis !== 'undefined' && globalThis.__USE_MOCK_WORKERS__) {
+      return new MockWorkerAdapter(workerScript);
+    }
+
     if (typeof Worker !== 'undefined') {
       return new BrowserWorkerAdapter(workerScript);
     } else if (typeof require !== 'undefined') {
@@ -210,15 +215,27 @@ export class MockWorkerAdapter extends WorkerAdapter {
 
   postMessage(message, transferList = []) {
     // Simulate async execution
-    setTimeout(() => {
+    setTimeout(async () => {
       if (this.messageHandler) {
         try {
-          // In real implementation, this would execute worker code
-          const result = this.executeSync(message);
-          this.messageHandler(result);
+          // Execute the task synchronously using the module registry
+          const result = await this.executeSync(message);
+          this.messageHandler({
+            id: message.id,
+            status: 'complete',
+            result
+          });
         } catch (error) {
           if (this.errorHandler) {
             this.errorHandler(error);
+          } else {
+            // Send error message back through message handler
+            this.messageHandler({
+              id: message.id,
+              status: 'error',
+              error: error.message || 'Unknown error',
+              stack: error.stack
+            });
           }
         }
       }
@@ -239,16 +256,13 @@ export class MockWorkerAdapter extends WorkerAdapter {
   }
 
   /**
-   * Synchronous execution placeholder
+   * Synchronous execution using module registry
    * @private
    */
-  executeSync(message) {
-    // This would need to import and execute the actual worker code
-    // For now, return echo
-    return {
-      id: message.id,
-      status: 'complete',
-      result: { mock: true }
-    };
+  async executeSync(message) {
+    // Dynamically import the module registry to avoid circular dependencies
+    // and to keep it out of production builds
+    const { executeTask } = await import('./module-registry.js');
+    return executeTask(message);
   }
 }

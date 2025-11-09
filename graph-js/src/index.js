@@ -138,11 +138,16 @@ export class NetworkStats {
    * });
    */
   constructor(options = {}) {
+    // Store all options (for passing to algorithms)
     this.options = {
       verbose: options.verbose !== undefined ? options.verbose : true,
       maxWorkers: options.maxWorkers,
       taskTimeout: options.taskTimeout || 60000,
-      workerScript: options.workerScript
+      workerScript: options.workerScript,
+      // Algorithm-specific options
+      maxIter: options.maxIter,
+      tolerance: options.tolerance,
+      ...options  // Keep any other options
     };
 
     // Initialize logger
@@ -261,7 +266,10 @@ export class NetworkStats {
       } else if (this.statisticClasses[feature]) {
         // Use statistic class (delegates to worker)
         const StatClass = this.statisticClasses[feature];
-        const statInstance = new StatClass();
+        // Pass algorithm options from constructor
+        const algorithmOptions = this.options.maxIter || this.options.tolerance ?
+          { maxIter: this.options.maxIter, tolerance: this.options.tolerance } : {};
+        const statInstance = new StatClass(algorithmOptions);
 
         this.log.debug(`Calculating ${feature}...`);
         const result = await statInstance.calculate(graph, null, {

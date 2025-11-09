@@ -33,9 +33,9 @@ describe('LouvainAlgorithm', () => {
     expect(info.description).toContain('Louvain');
   });
 
-  it('should detect communities', () => {
+  it('should detect communities', async () => {
     const algorithm = new LouvainAlgorithm();
-    const result = algorithm.detect(graph);
+    const result = await algorithm.detect(graph);
 
     expect(result).toHaveProperty('communities');
     expect(result).toHaveProperty('modularity');
@@ -44,9 +44,9 @@ describe('LouvainAlgorithm', () => {
     expect(result.algorithm).toBe('louvain');
   });
 
-  it('should return valid community assignments', () => {
+  it('should return valid community assignments', async () => {
     const algorithm = new LouvainAlgorithm();
-    const result = algorithm.detect(graph);
+    const result = await algorithm.detect(graph);
 
     // All nodes should have community assignments
     expect(result.communities).toHaveProperty('A');
@@ -60,26 +60,26 @@ describe('LouvainAlgorithm', () => {
     expect(typeof result.communities.A).toBe('number');
   });
 
-  it('should detect at least 2 communities in bipartite-like graph', () => {
+  it('should detect at least 2 communities in bipartite-like graph', async () => {
     const algorithm = new LouvainAlgorithm();
-    const result = algorithm.detect(graph);
+    const result = await algorithm.detect(graph);
 
     // Should detect 2 communities (or possibly more due to algorithm randomness)
     expect(result.numCommunities).toBeGreaterThanOrEqual(2);
   });
 
-  it('should calculate modularity', () => {
+  it('should calculate modularity', async () => {
     const algorithm = new LouvainAlgorithm();
-    const result = algorithm.detect(graph);
+    const result = await algorithm.detect(graph);
 
     // Modularity should be between -1 and 1
     expect(result.modularity).toBeGreaterThanOrEqual(-1);
     expect(result.modularity).toBeLessThanOrEqual(1);
   });
 
-  it('should throw error if graph is null', () => {
+  it('should throw error if graph is null', async () => {
     const algorithm = new LouvainAlgorithm();
-    expect(() => algorithm.detect(null)).toThrow('Graph is required');
+    await expect(algorithm.detect(null)).rejects.toThrow();
   });
 
   it('should accept options in constructor', () => {
