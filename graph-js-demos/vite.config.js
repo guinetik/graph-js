@@ -2,11 +2,31 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+// Plugin to copy the worker file from node_modules to dist
+const copyWorkerPlugin = () => ({
+  name: 'copy-graph-worker',
+  closeBundle() {
+    // Copy the worker file from node_modules to dist/assets
+    const workerSource = path.resolve(__dirname, 'node_modules/@guinetik/graph-js/dist/network-worker.js');
+    const workerDest = path.resolve(__dirname, 'dist/assets/network-worker.js');
+
+    try {
+      if (fs.existsSync(workerSource)) {
+        fs.copyFileSync(workerSource, workerDest);
+        console.log('✓ Copied network-worker.js to dist/assets/');
+      }
+    } catch (err) {
+      console.error('Failed to copy worker file:', err.message);
+    }
+  }
+});
+
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [vue(), copyWorkerPlugin()],
   root: './',
   server: {
     port: 3001,

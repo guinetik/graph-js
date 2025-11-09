@@ -1,21 +1,44 @@
 /**
  * Vite configuration for @guinetik/graph-js library build
  *
- * Builds both:
- * 1. Main library (dist/index.js)
- * 2. Worker file (dist/network-worker.js)
+ * Two-stage build:
+ * 1. Main library + worker-url (externalized deps)
+ * 2. Worker file (all dependencies bundled)
  */
 
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
-export default defineConfig({
+// Check if building worker only
+const buildWorker = process.env.BUILD_WORKER === 'true';
+
+const workerConfig = {
   build: {
-    target: 'esnext', // Support private class fields
+    target: 'esnext',
+    lib: {
+      entry: resolve(__dirname, 'src/compute/network-worker.js'),
+      formats: ['es'],
+      fileName: () => 'network-worker.js'
+    },
+    rollupOptions: {
+      external: [], // Bundle everything
+      output: {
+        preserveModules: false,
+        inlineDynamicImports: true
+      }
+    },
+    sourcemap: true,
+    outDir: 'dist',
+    emptyOutDir: false // Don't delete existing dist files
+  }
+};
+
+const mainConfig = {
+  build: {
+    target: 'esnext',
     lib: {
       entry: {
         index: resolve(__dirname, 'src/index.js'),
-        'network-worker': resolve(__dirname, 'src/compute/network-worker.js'),
         'worker-url': resolve(__dirname, 'src/worker-url.js')
       },
       formats: ['es'],
@@ -30,4 +53,7 @@ export default defineConfig({
     sourcemap: true,
     outDir: 'dist'
   }
-});
+};
+
+// Export the appropriate config
+export default defineConfig(buildWorker ? workerConfig : mainConfig);

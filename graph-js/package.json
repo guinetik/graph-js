@@ -1,6 +1,6 @@
 {
   "name": "@guinetik/graph-js",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Graph and Network Analysis for NodeJS and the Browser. Supports Worker-First architecture for parallel computation.",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -21,7 +21,9 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "vite build",
+    "build": "npm run build:lib && npm run build:worker",
+    "build:lib": "vite build",
+    "build:worker": "cross-env BUILD_WORKER=true vite build",
     "build:watch": "vite build --watch",
     "prepublishOnly": "npm run build",
     "test": "vitest run --coverage",
@@ -51,6 +53,7 @@
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^0.34.6",
+    "cross-env": "^7.0.3",
     "vite": "^7.1.12",
     "vitest": "^0.34.6"
   }

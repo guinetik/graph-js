@@ -45,17 +45,30 @@ import {
   BFSLayout
 } from '@guinetik/graph-js';
 
-// Import worker URL from the library
-// This works whether the library is installed from NPM or linked locally
-import workerUrl from '@guinetik/graph-js/worker-url';
 import { createLogger } from '@guinetik/logger';
+
+// Construct worker URL based on environment
+// In production, the worker file is copied to /assets/network-worker.js by Vite plugin
+// In dev, we use the library's worker-url export
+const getWorkerUrl = async () => {
+  if (import.meta.env.PROD) {
+    // Production: Use the copied worker file as a plain string path
+    // This avoids Vite trying to inline it as a data URI
+    const base = import.meta.env.BASE_URL || '/';
+    return base + 'assets/network-worker.js';
+  } else {
+    // Development: Import from library
+    const { default: workerUrl } = await import('@guinetik/graph-js/worker-url');
+    return workerUrl;
+  }
+};
 
 export class NetworkAnalyzer {
   constructor() {
     this.analyzer = null;
     this.initPromise = null;
     this.lastAnalysisResults = null;
-    this.workerUrl = workerUrl;
+    this.workerUrl = null;
     this.log = createLogger({
       prefix: 'NetworkAnalyzer',
       level: import.meta.env.DEV ? 'debug' : 'info'
@@ -76,6 +89,8 @@ export class NetworkAnalyzer {
     }
 
     this.initPromise = (async () => {
+      // Get worker URL based on environment
+      this.workerUrl = await getWorkerUrl();
       this.log.debug('Initializing with worker', { workerUrl: this.workerUrl });
 
       // Pass the worker URL to NetworkStats

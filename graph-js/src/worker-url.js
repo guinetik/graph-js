@@ -7,11 +7,18 @@
  * - Linked locally
  * - Used in a monorepo
  *
- * Usage in your app:
- * ```javascript
- * import NetworkStats from '@guinetik/graph-js';
- * import workerUrl from '@guinetik/graph-js/worker-url';
+ * NOTE: This approach works in dev but may fail in production builds
+ * when the consuming application bundles this code. For production builds,
+ * import the worker directly with ?url suffix:
  *
+ * ```javascript
+ * import workerUrl from '@guinetik/graph-js/worker?url';
+ * const analyzer = new NetworkStats({ workerScript: workerUrl });
+ * ```
+ *
+ * Legacy usage (works in dev only):
+ * ```javascript
+ * import workerUrl from '@guinetik/graph-js/worker-url';
  * const analyzer = new NetworkStats({ workerScript: workerUrl });
  * ```
  */
