@@ -511,3 +511,259 @@
 .info-box-green {
   @apply info-box bg-green-50 dark:bg-green-900/30;
 }
+
+/* ===========================================
+   Documentation Page Styles
+   =========================================== */
+
+/* Docs Section */
+.docs-section {
+  @apply mb-12;
+}
+
+.docs-section-header {
+  @apply text-3xl font-bold mb-8 flex items-center;
+}
+
+.docs-section-header-icon {
+  @apply mr-3;
+}
+
+.docs-section-intro {
+  @apply text-xl text-secondary mb-8;
+}
+
+/* Docs Cards */
+.docs-card {
+  @apply card p-8 mb-8;
+}
+
+.docs-card-compact {
+  @apply card p-6;
+}
+
+.docs-card-title {
+  @apply text-2xl font-bold text-accent mb-4;
+}
+
+.docs-card-title-blue {
+  @apply text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4;
+}
+
+.docs-card-title-green {
+  @apply text-2xl font-bold text-green-600 dark:text-green-400 mb-4;
+}
+
+.docs-card-title-yellow {
+  @apply text-2xl font-bold text-yellow-600 dark:text-yellow-400 mb-4;
+}
+
+.docs-card-title-purple {
+  @apply text-2xl font-bold text-purple-600 dark:text-purple-400 mb-4;
+}
+
+.docs-card-title-indigo {
+  @apply text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-4;
+}
+
+.docs-card-title-pink {
+  @apply text-2xl font-bold text-pink-600 dark:text-pink-400 mb-4;
+}
+
+.docs-card-title-orange {
+  @apply text-2xl font-bold text-orange-600 dark:text-orange-400 mb-4;
+}
+
+.docs-card-title-red {
+  @apply text-2xl font-bold text-red-600 dark:text-red-400 mb-4;
+}
+
+.docs-card-title-teal {
+  @apply text-2xl font-bold text-teal-600 dark:text-teal-400 mb-4;
+}
+
+.docs-card-title-gray {
+  @apply text-2xl font-bold text-gray-600 dark:text-gray-400 mb-4;
+}
+
+.docs-card-title-sm {
+  @apply text-xl font-bold mb-3;
+}
+
+.docs-card-description {
+  @apply text-secondary mb-6;
+}
+
+/* Docs Subsections */
+.docs-subsection-title {
+  @apply text-xl font-bold mb-3;
+}
+
+.docs-subsection-title-accent {
+  @apply text-xl font-bold text-accent mb-3;
+}
+
+.docs-subsection-title-lg {
+  @apply text-lg font-bold mb-3;
+}
+
+/* Method/API Documentation */
+.docs-method-list {
+  @apply space-y-3 mb-6;
+}
+
+.docs-method-item {
+  @apply border-l-4 border-[var(--color-accent)] pl-4 py-2;
+}
+
+.docs-method-item-blue {
+  @apply border-l-4 border-blue-500 pl-4 py-2;
+}
+
+.docs-method-item-green {
+  @apply border-l-4 border-green-500 pl-4 py-2;
+}
+
+.docs-method-item-yellow {
+  @apply border-l-4 border-yellow-500 pl-4 py-2;
+}
+
+.docs-method-item-purple {
+  @apply border-l-4 border-purple-500 pl-4 py-2;
+}
+
+.docs-method-name {
+  @apply text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded;
+}
+
+.docs-method-description {
+  @apply text-secondary text-sm mt-1;
+}
+
+.docs-method-returns {
+  @apply text-xs text-accent mt-1;
+}
+
+/* Inline Code */
+.docs-code-inline {
+  @apply text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded;
+}
+
+.docs-code-inline-xs {
+  @apply text-xs bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded;
+}
+
+/* Code Blocks (non-highlighted) */
+.docs-code-block {
+  @apply bg-gray-900 rounded-lg p-4 mb-6;
+}
+
+.docs-code-block-text {
+  @apply text-sm text-gray-200;
+}
+
+.docs-code-block-green {
+  @apply text-green-400;
+}
+
+/* Options/Config Box */
+.docs-options-box {
+  @apply bg-gray-100 dark:bg-gray-900 p-4 rounded mb-4;
+}
+
+.docs-options-title {
+  @apply font-semibold mb-2;
+}
+
+.docs-options-list {
+  @apply space-y-1 text-sm;
+}
+
+.docs-options-code {
+  @apply text-xs;
+}
+
+/* Feature Badge */
+.docs-feature-badge {
+  @apply font-mono text-xs px-2 py-1 rounded mr-3;
+  @apply bg-purple-100 dark:bg-purple-900/50;
+  @apply text-purple-700 dark:text-purple-300;
+}
+
+.docs-feature-item {
+  @apply flex items-start;
+}
+
+.docs-feature-description {
+  @apply text-secondary text-sm;
+}
+
+/* Table of Contents */
+.docs-toc {
+  @apply card mb-12 p-6;
+}
+
+.docs-toc-title {
+  @apply text-2xl font-bold mb-4;
+}
+
+.docs-toc-grid {
+  @apply grid md:grid-cols-3 gap-4;
+}
+
+.docs-toc-link {
+  @apply flex items-center text-accent hover:underline;
+}
+
+.docs-toc-icon {
+  @apply mr-2;
+}
+
+/* Docs Page Header */
+.docs-page-header {
+  @apply section-header mb-12;
+}
+
+.docs-page-title {
+  @apply text-5xl font-bold mb-4;
+}
+
+/* Feature Grid (for layouts) */
+.docs-feature-grid {
+  @apply grid md:grid-cols-2 gap-6;
+}
+
+.docs-feature-grid-item {
+  @apply grid md:grid-cols-2 gap-4;
+}
+
+/* Complexity/Notes text */
+.docs-complexity {
+  @apply text-sm text-gray-600 dark:text-gray-400 mb-2;
+}
+
+.docs-best-for {
+  @apply text-sm text-accent mb-4;
+}
+
+.docs-warning {
+  @apply text-sm text-red-600 dark:text-red-400 mb-4;
+}
+
+.docs-note {
+  @apply text-sm text-accent mb-8;
+}
+
+/* Tip Box */
+.docs-tip-box {
+  @apply card p-6 mt-8 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800;
+}
+
+/* Footer */
+.docs-footer {
+  @apply text-center pt-12 pb-6 border-t border-[var(--color-border)];
+}
+
+.docs-footer-link {
+  @apply text-purple-600 dark:text-purple-400 hover:underline;
+}

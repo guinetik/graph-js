@@ -1,107 +1,107 @@
 <template>
   <div class="page-content">
     <!-- Header -->
-    <div class="section-header mb-12">
-      <h1 class="text-5xl font-bold mb-4">{{ t('docs.title') }}</h1>
+    <div class="docs-page-header">
+      <h1 class="docs-page-title">{{ t('docs.title') }}</h1>
       <p class="section-description">{{ t('docs.subtitle') }}</p>
     </div>
 
     <!-- Table of Contents -->
-    <div class="card mb-12 p-6">
-      <h2 class="text-2xl font-bold mb-4">📚 Contents</h2>
-      <div class="grid md:grid-cols-3 gap-4">
-        <a href="#quick-start" class="flex items-center text-accent hover:underline">
-          <span class="mr-2">🚀</span>
+    <div class="docs-toc">
+      <h2 class="docs-toc-title">📚 Contents</h2>
+      <div class="docs-toc-grid">
+        <a href="#quick-start" class="docs-toc-link">
+          <span class="docs-toc-icon">🚀</span>
           <span>{{ t('docs.sections.quickStart') }}</span>
         </a>
-        <a href="#core-classes" class="flex items-center text-accent hover:underline">
-          <span class="mr-2">🧱</span>
+        <a href="#core-classes" class="docs-toc-link">
+          <span class="docs-toc-icon">🧱</span>
           <span>{{ t('docs.sections.coreClasses') }}</span>
         </a>
-        <a href="#adapters" class="flex items-center text-accent hover:underline">
-          <span class="mr-2">🔄</span>
+        <a href="#adapters" class="docs-toc-link">
+          <span class="docs-toc-icon">🔄</span>
           <span>{{ t('docs.sections.adapters') }}</span>
         </a>
-        <a href="#layouts" class="flex items-center text-accent hover:underline">
-          <span class="mr-2">🎯</span>
+        <a href="#layouts" class="docs-toc-link">
+          <span class="docs-toc-icon">🎯</span>
           <span>{{ t('docs.sections.layouts') }}</span>
         </a>
-        <a href="#community" class="flex items-center text-accent hover:underline">
-          <span class="mr-2">🎨</span>
+        <a href="#community" class="docs-toc-link">
+          <span class="docs-toc-icon">🎨</span>
           <span>{{ t('docs.sections.community') }}</span>
         </a>
-        <a href="#examples" class="flex items-center text-accent hover:underline">
-          <span class="mr-2">💡</span>
+        <a href="#examples" class="docs-toc-link">
+          <span class="docs-toc-icon">💡</span>
           <span>{{ t('docs.sections.examples') }}</span>
         </a>
       </div>
     </div>
 
     <!-- Quick Start -->
-    <section id="quick-start" class="mb-12">
-      <h2 class="text-3xl font-bold mb-8 flex items-center">
-        <span class="mr-3">🚀</span>
+    <section id="quick-start" class="docs-section">
+      <h2 class="docs-section-header">
+        <span class="docs-section-header-icon">🚀</span>
         <span>{{ t('docs.quickStart.title') }}</span>
       </h2>
 
-      <div class="card p-8">
-        <p class="text-secondary mb-6">{{ t('docs.quickStart.description') }}</p>
+      <div class="docs-card">
+        <p class="docs-card-description">{{ t('docs.quickStart.description') }}</p>
 
-        <h3 class="text-xl font-bold text-accent mb-3">{{ t('docs.quickStart.install') }}</h3>
-        <div class="bg-gray-900 rounded-lg p-4 mb-6">
-          <code class="text-green-400">{{ t('docs.quickStart.installCmd') }}</code>
+        <h3 class="docs-subsection-title-accent">{{ t('docs.quickStart.install') }}</h3>
+        <div class="docs-code-block">
+          <code class="docs-code-block-green">{{ t('docs.quickStart.installCmd') }}</code>
         </div>
 
-        <h3 class="text-xl font-bold text-accent mb-3">{{ t('docs.quickStart.basicUsage') }}</h3>
+        <h3 class="docs-subsection-title-accent">{{ t('docs.quickStart.basicUsage') }}</h3>
         <CodeBlock :code="basicUsageCode" language="javascript" />
       </div>
     </section>
 
     <!-- Core Classes -->
-    <section id="core-classes" class="mb-12">
-      <h2 class="text-3xl font-bold mb-8 flex items-center">
-        <span class="mr-3">🧱</span>
+    <section id="core-classes" class="docs-section">
+      <h2 class="docs-section-header">
+        <span class="docs-section-header-icon">🧱</span>
         <span>{{ t('docs.sections.coreClasses') }}</span>
       </h2>
 
       <!-- Graph Class -->
-      <div class="card p-8 mb-8">
-        <h3 class="text-2xl font-bold text-accent mb-4">{{ t('docs.graph.title') }}</h3>
-        <p class="text-secondary mb-6">{{ t('docs.graph.description') }}</p>
+      <div class="docs-card">
+        <h3 class="docs-card-title">{{ t('docs.graph.title') }}</h3>
+        <p class="docs-card-description">{{ t('docs.graph.description') }}</p>
 
-        <div class="bg-gray-900 rounded-lg p-4 mb-6">
-          <code class="text-sm text-gray-200">const graph = new Graph();</code>
+        <div class="docs-code-block">
+          <code class="docs-code-block-text">const graph = new Graph();</code>
         </div>
 
-        <h4 class="text-xl font-bold mb-4">{{ t('docs.graph.methods') }}</h4>
-        <div class="space-y-3">
-          <div class="border-l-4 border-accent pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.graph.methodsList.addNode.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.graph.methodsList.addNode.description') }}</p>
+        <h4 class="docs-subsection-title">{{ t('docs.graph.methods') }}</h4>
+        <div class="docs-method-list">
+          <div class="docs-method-item">
+            <code class="docs-method-name">{{ t('docs.graph.methodsList.addNode.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.graph.methodsList.addNode.description') }}</p>
           </div>
-          <div class="border-l-4 border-accent pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.graph.methodsList.addNodesFrom.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.graph.methodsList.addNodesFrom.description') }}</p>
+          <div class="docs-method-item">
+            <code class="docs-method-name">{{ t('docs.graph.methodsList.addNodesFrom.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.graph.methodsList.addNodesFrom.description') }}</p>
           </div>
-          <div class="border-l-4 border-accent pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.graph.methodsList.addEdge.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.graph.methodsList.addEdge.description') }}</p>
+          <div class="docs-method-item">
+            <code class="docs-method-name">{{ t('docs.graph.methodsList.addEdge.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.graph.methodsList.addEdge.description') }}</p>
           </div>
-          <div class="border-l-4 border-accent pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.graph.methodsList.removeNode.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.graph.methodsList.removeNode.description') }}</p>
+          <div class="docs-method-item">
+            <code class="docs-method-name">{{ t('docs.graph.methodsList.removeNode.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.graph.methodsList.removeNode.description') }}</p>
           </div>
-          <div class="border-l-4 border-accent pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.graph.methodsList.getNeighbors.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.graph.methodsList.getNeighbors.description') }}</p>
+          <div class="docs-method-item">
+            <code class="docs-method-name">{{ t('docs.graph.methodsList.getNeighbors.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.graph.methodsList.getNeighbors.description') }}</p>
           </div>
-          <div class="border-l-4 border-accent pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.graph.methodsList.hasEdge.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.graph.methodsList.hasEdge.description') }}</p>
+          <div class="docs-method-item">
+            <code class="docs-method-name">{{ t('docs.graph.methodsList.hasEdge.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.graph.methodsList.hasEdge.description') }}</p>
           </div>
-          <div class="border-l-4 border-accent pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.graph.methodsList.numberOfNodes.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.graph.methodsList.numberOfNodes.description') }}</p>
+          <div class="docs-method-item">
+            <code class="docs-method-name">{{ t('docs.graph.methodsList.numberOfNodes.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.graph.methodsList.numberOfNodes.description') }}</p>
           </div>
         </div>
 
@@ -109,106 +109,106 @@
       </div>
 
       <!-- NetworkStats Class -->
-      <div class="card p-8">
-        <h3 class="text-2xl font-bold text-accent mb-4">{{ t('docs.networkStats.title') }}</h3>
-        <p class="text-secondary mb-6">{{ t('docs.networkStats.description') }}</p>
+      <div class="docs-card">
+        <h3 class="docs-card-title">{{ t('docs.networkStats.title') }}</h3>
+        <p class="docs-card-description">{{ t('docs.networkStats.description') }}</p>
 
-        <h4 class="text-xl font-bold mb-3">{{ t('docs.networkStats.constructor') }}</h4>
-        <div class="bg-gray-900 rounded-lg p-4 mb-4">
-          <code class="text-sm text-gray-200">new NetworkStats(options?)</code>
+        <h4 class="docs-subsection-title">{{ t('docs.networkStats.constructor') }}</h4>
+        <div class="docs-code-block">
+          <code class="docs-code-block-text">new NetworkStats(options?)</code>
         </div>
         <ul class="list-disc pl-6 space-y-2 text-secondary mb-6">
-          <li><code class="bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded text-xs">maxIter:</code> {{ t('docs.networkStats.constructorParams.maxIter') }}</li>
-          <li><code class="bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded text-xs">verbose:</code> {{ t('docs.networkStats.constructorParams.verbose') }}</li>
+          <li><code class="docs-code-inline-xs">maxIter:</code> {{ t('docs.networkStats.constructorParams.maxIter') }}</li>
+          <li><code class="docs-code-inline-xs">verbose:</code> {{ t('docs.networkStats.constructorParams.verbose') }}</li>
         </ul>
 
-        <h4 class="text-xl font-bold mb-3">{{ t('docs.networkStats.analyze.title') }}</h4>
+        <h4 class="docs-subsection-title">{{ t('docs.networkStats.analyze.title') }}</h4>
         <p class="text-secondary mb-3">{{ t('docs.networkStats.analyze.description') }}</p>
-        <div class="bg-gray-900 rounded-lg p-4 mb-4">
-          <code class="text-sm text-gray-200">analyzer.analyze(network, features?)</code>
+        <div class="docs-code-block">
+          <code class="docs-code-block-text">analyzer.analyze(network, features?)</code>
         </div>
 
-        <h4 class="text-xl font-bold mb-3">{{ t('docs.networkStats.features.title') }}</h4>
-        <div class="grid md:grid-cols-2 gap-4">
-          <div class="flex items-start">
-            <span class="font-mono text-xs bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 px-2 py-1 rounded mr-3">degree</span>
-            <span class="text-secondary text-sm">{{ t('docs.networkStats.features.degree') }}</span>
+        <h4 class="docs-subsection-title">{{ t('docs.networkStats.features.title') }}</h4>
+        <div class="docs-feature-grid-item">
+          <div class="docs-feature-item">
+            <span class="docs-feature-badge">degree</span>
+            <span class="docs-feature-description">{{ t('docs.networkStats.features.degree') }}</span>
           </div>
-          <div class="flex items-start">
-            <span class="font-mono text-xs bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 px-2 py-1 rounded mr-3">eigenvector</span>
-            <span class="text-secondary text-sm">{{ t('docs.networkStats.features.eigenvector') }}</span>
+          <div class="docs-feature-item">
+            <span class="docs-feature-badge">eigenvector</span>
+            <span class="docs-feature-description">{{ t('docs.networkStats.features.eigenvector') }}</span>
           </div>
-          <div class="flex items-start">
-            <span class="font-mono text-xs bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 px-2 py-1 rounded mr-3">eigenvector-laplacian</span>
-            <span class="text-secondary text-sm">{{ t('docs.networkStats.features.eigenvectorLaplacian') }}</span>
+          <div class="docs-feature-item">
+            <span class="docs-feature-badge">eigenvector-laplacian</span>
+            <span class="docs-feature-description">{{ t('docs.networkStats.features.eigenvectorLaplacian') }}</span>
           </div>
-          <div class="flex items-start">
-            <span class="font-mono text-xs bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 px-2 py-1 rounded mr-3">betweenness</span>
-            <span class="text-secondary text-sm">{{ t('docs.networkStats.features.betweenness') }}</span>
+          <div class="docs-feature-item">
+            <span class="docs-feature-badge">betweenness</span>
+            <span class="docs-feature-description">{{ t('docs.networkStats.features.betweenness') }}</span>
           </div>
-          <div class="flex items-start">
-            <span class="font-mono text-xs bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 px-2 py-1 rounded mr-3">clustering</span>
-            <span class="text-secondary text-sm">{{ t('docs.networkStats.features.clustering') }}</span>
+          <div class="docs-feature-item">
+            <span class="docs-feature-badge">clustering</span>
+            <span class="docs-feature-description">{{ t('docs.networkStats.features.clustering') }}</span>
           </div>
-          <div class="flex items-start">
-            <span class="font-mono text-xs bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 px-2 py-1 rounded mr-3">closeness</span>
-            <span class="text-secondary text-sm">{{ t('docs.networkStats.features.closeness') }}</span>
+          <div class="docs-feature-item">
+            <span class="docs-feature-badge">closeness</span>
+            <span class="docs-feature-description">{{ t('docs.networkStats.features.closeness') }}</span>
           </div>
-          <div class="flex items-start">
-            <span class="font-mono text-xs bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 px-2 py-1 rounded mr-3">cliques</span>
-            <span class="text-secondary text-sm">{{ t('docs.networkStats.features.cliques') }}</span>
+          <div class="docs-feature-item">
+            <span class="docs-feature-badge">cliques</span>
+            <span class="docs-feature-description">{{ t('docs.networkStats.features.cliques') }}</span>
           </div>
-          <div class="flex items-start">
-            <span class="font-mono text-xs bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 px-2 py-1 rounded mr-3">ego-density</span>
-            <span class="text-secondary text-sm">{{ t('docs.networkStats.features.egoDensity') }}</span>
+          <div class="docs-feature-item">
+            <span class="docs-feature-badge">ego-density</span>
+            <span class="docs-feature-description">{{ t('docs.networkStats.features.egoDensity') }}</span>
           </div>
-          <div class="flex items-start">
-            <span class="font-mono text-xs bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 px-2 py-1 rounded mr-3">modularity</span>
-            <span class="text-secondary text-sm">{{ t('docs.networkStats.features.modularity') }}</span>
+          <div class="docs-feature-item">
+            <span class="docs-feature-badge">modularity</span>
+            <span class="docs-feature-description">{{ t('docs.networkStats.features.modularity') }}</span>
           </div>
         </div>
       </div>
     </section>
 
     <!-- Data Adapters -->
-    <section id="adapters" class="mb-12">
-      <h2 class="text-3xl font-bold mb-8 flex items-center">
-        <span class="mr-3">🔄</span>
+    <section id="adapters" class="docs-section">
+      <h2 class="docs-section-header">
+        <span class="docs-section-header-icon">🔄</span>
         <span>{{ t('docs.adapters.title') }}</span>
       </h2>
-      <p class="text-xl text-secondary mb-8">{{ t('docs.adapters.description') }}</p>
+      <p class="docs-section-intro">{{ t('docs.adapters.description') }}</p>
 
       <!-- CSV Adapter -->
-      <div class="card p-8 mb-8">
-        <h3 class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4">{{ t('docs.adapters.csv.title') }}</h3>
-        <p class="text-secondary mb-6">{{ t('docs.adapters.csv.description') }}</p>
+      <div class="docs-card">
+        <h3 class="docs-card-title-blue">{{ t('docs.adapters.csv.title') }}</h3>
+        <p class="docs-card-description">{{ t('docs.adapters.csv.description') }}</p>
 
-        <h4 class="text-xl font-bold mb-4">{{ t('docs.adapters.csv.methods') }}</h4>
-        <div class="space-y-3 mb-6">
-          <div class="border-l-4 border-blue-500 pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.adapters.csv.methodsList.fromEdgeList.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.adapters.csv.methodsList.fromEdgeList.description') }}</p>
-            <p class="text-xs text-accent mt-1">{{ t('docs.adapters.csv.methodsList.fromEdgeList.returns') }}</p>
+        <h4 class="docs-subsection-title">{{ t('docs.adapters.csv.methods') }}</h4>
+        <div class="docs-method-list">
+          <div class="docs-method-item-blue">
+            <code class="docs-method-name">{{ t('docs.adapters.csv.methodsList.fromEdgeList.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.adapters.csv.methodsList.fromEdgeList.description') }}</p>
+            <p class="docs-method-returns">{{ t('docs.adapters.csv.methodsList.fromEdgeList.returns') }}</p>
           </div>
-          <div class="border-l-4 border-blue-500 pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.adapters.csv.methodsList.fromNodes.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.adapters.csv.methodsList.fromNodes.description') }}</p>
-            <p class="text-xs text-accent mt-1">{{ t('docs.adapters.csv.methodsList.fromNodes.returns') }}</p>
+          <div class="docs-method-item-blue">
+            <code class="docs-method-name">{{ t('docs.adapters.csv.methodsList.fromNodes.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.adapters.csv.methodsList.fromNodes.description') }}</p>
+            <p class="docs-method-returns">{{ t('docs.adapters.csv.methodsList.fromNodes.returns') }}</p>
           </div>
-          <div class="border-l-4 border-blue-500 pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.adapters.csv.methodsList.loadFromURL.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.adapters.csv.methodsList.loadFromURL.description') }}</p>
-            <p class="text-xs text-accent mt-1">{{ t('docs.adapters.csv.methodsList.loadFromURL.returns') }}</p>
+          <div class="docs-method-item-blue">
+            <code class="docs-method-name">{{ t('docs.adapters.csv.methodsList.loadFromURL.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.adapters.csv.methodsList.loadFromURL.description') }}</p>
+            <p class="docs-method-returns">{{ t('docs.adapters.csv.methodsList.loadFromURL.returns') }}</p>
           </div>
-          <div class="border-l-4 border-blue-500 pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.adapters.csv.methodsList.toEdgeList.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.adapters.csv.methodsList.toEdgeList.description') }}</p>
-            <p class="text-xs text-accent mt-1">{{ t('docs.adapters.csv.methodsList.toEdgeList.returns') }}</p>
+          <div class="docs-method-item-blue">
+            <code class="docs-method-name">{{ t('docs.adapters.csv.methodsList.toEdgeList.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.adapters.csv.methodsList.toEdgeList.description') }}</p>
+            <p class="docs-method-returns">{{ t('docs.adapters.csv.methodsList.toEdgeList.returns') }}</p>
           </div>
-          <div class="border-l-4 border-blue-500 pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.adapters.csv.methodsList.toNodes.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.adapters.csv.methodsList.toNodes.description') }}</p>
-            <p class="text-xs text-accent mt-1">{{ t('docs.adapters.csv.methodsList.toNodes.returns') }}</p>
+          <div class="docs-method-item-blue">
+            <code class="docs-method-name">{{ t('docs.adapters.csv.methodsList.toNodes.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.adapters.csv.methodsList.toNodes.description') }}</p>
+            <p class="docs-method-returns">{{ t('docs.adapters.csv.methodsList.toNodes.returns') }}</p>
           </div>
         </div>
 
@@ -216,41 +216,41 @@
       </div>
 
       <!-- JSON Adapter -->
-      <div class="card p-8 mb-8">
-        <h3 class="text-2xl font-bold text-green-600 dark:text-green-400 mb-4">{{ t('docs.adapters.json.title') }}</h3>
-        <p class="text-secondary mb-6">{{ t('docs.adapters.json.description') }}</p>
+      <div class="docs-card">
+        <h3 class="docs-card-title-green">{{ t('docs.adapters.json.title') }}</h3>
+        <p class="docs-card-description">{{ t('docs.adapters.json.description') }}</p>
 
-        <h4 class="text-xl font-bold mb-4">{{ t('docs.adapters.json.methods') }}</h4>
-        <div class="space-y-3 mb-6">
-          <div class="border-l-4 border-green-500 pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.adapters.json.methodsList.fromD3.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.adapters.json.methodsList.fromD3.description') }}</p>
-            <p class="text-xs text-accent mt-1">{{ t('docs.adapters.json.methodsList.fromD3.returns') }}</p>
+        <h4 class="docs-subsection-title">{{ t('docs.adapters.json.methods') }}</h4>
+        <div class="docs-method-list">
+          <div class="docs-method-item-green">
+            <code class="docs-method-name">{{ t('docs.adapters.json.methodsList.fromD3.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.adapters.json.methodsList.fromD3.description') }}</p>
+            <p class="docs-method-returns">{{ t('docs.adapters.json.methodsList.fromD3.returns') }}</p>
           </div>
-          <div class="border-l-4 border-green-500 pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.adapters.json.methodsList.fromCytoscape.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.adapters.json.methodsList.fromCytoscape.description') }}</p>
-            <p class="text-xs text-accent mt-1">{{ t('docs.adapters.json.methodsList.fromCytoscape.returns') }}</p>
+          <div class="docs-method-item-green">
+            <code class="docs-method-name">{{ t('docs.adapters.json.methodsList.fromCytoscape.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.adapters.json.methodsList.fromCytoscape.description') }}</p>
+            <p class="docs-method-returns">{{ t('docs.adapters.json.methodsList.fromCytoscape.returns') }}</p>
           </div>
-          <div class="border-l-4 border-green-500 pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.adapters.json.methodsList.fromFormat.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.adapters.json.methodsList.fromFormat.description') }}</p>
-            <p class="text-xs text-accent mt-1">{{ t('docs.adapters.json.methodsList.fromFormat.returns') }}</p>
+          <div class="docs-method-item-green">
+            <code class="docs-method-name">{{ t('docs.adapters.json.methodsList.fromFormat.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.adapters.json.methodsList.fromFormat.description') }}</p>
+            <p class="docs-method-returns">{{ t('docs.adapters.json.methodsList.fromFormat.returns') }}</p>
           </div>
-          <div class="border-l-4 border-green-500 pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.adapters.json.methodsList.toD3.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.adapters.json.methodsList.toD3.description') }}</p>
-            <p class="text-xs text-accent mt-1">{{ t('docs.adapters.json.methodsList.toD3.returns') }}</p>
+          <div class="docs-method-item-green">
+            <code class="docs-method-name">{{ t('docs.adapters.json.methodsList.toD3.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.adapters.json.methodsList.toD3.description') }}</p>
+            <p class="docs-method-returns">{{ t('docs.adapters.json.methodsList.toD3.returns') }}</p>
           </div>
-          <div class="border-l-4 border-green-500 pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.adapters.json.methodsList.toCytoscape.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.adapters.json.methodsList.toCytoscape.description') }}</p>
-            <p class="text-xs text-accent mt-1">{{ t('docs.adapters.json.methodsList.toCytoscape.returns') }}</p>
+          <div class="docs-method-item-green">
+            <code class="docs-method-name">{{ t('docs.adapters.json.methodsList.toCytoscape.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.adapters.json.methodsList.toCytoscape.description') }}</p>
+            <p class="docs-method-returns">{{ t('docs.adapters.json.methodsList.toCytoscape.returns') }}</p>
           </div>
-          <div class="border-l-4 border-green-500 pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.adapters.json.methodsList.loadFromURL.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.adapters.json.methodsList.loadFromURL.description') }}</p>
-            <p class="text-xs text-accent mt-1">{{ t('docs.adapters.json.methodsList.loadFromURL.returns') }}</p>
+          <div class="docs-method-item-green">
+            <code class="docs-method-name">{{ t('docs.adapters.json.methodsList.loadFromURL.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.adapters.json.methodsList.loadFromURL.description') }}</p>
+            <p class="docs-method-returns">{{ t('docs.adapters.json.methodsList.loadFromURL.returns') }}</p>
           </div>
         </div>
 
@@ -258,31 +258,31 @@
       </div>
 
       <!-- NetworkX Adapter -->
-      <div class="card p-8">
-        <h3 class="text-2xl font-bold text-yellow-600 dark:text-yellow-400 mb-4">{{ t('docs.adapters.networkx.title') }}</h3>
-        <p class="text-secondary mb-6">{{ t('docs.adapters.networkx.description') }}</p>
+      <div class="docs-card">
+        <h3 class="docs-card-title-yellow">{{ t('docs.adapters.networkx.title') }}</h3>
+        <p class="docs-card-description">{{ t('docs.adapters.networkx.description') }}</p>
 
-        <h4 class="text-xl font-bold mb-4">{{ t('docs.adapters.networkx.methods') }}</h4>
-        <div class="space-y-3 mb-6">
-          <div class="border-l-4 border-yellow-500 pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.adapters.networkx.methodsList.fromNodeLink.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.adapters.networkx.methodsList.fromNodeLink.description') }}</p>
-            <p class="text-xs text-accent mt-1">{{ t('docs.adapters.networkx.methodsList.fromNodeLink.returns') }}</p>
+        <h4 class="docs-subsection-title">{{ t('docs.adapters.networkx.methods') }}</h4>
+        <div class="docs-method-list">
+          <div class="docs-method-item-yellow">
+            <code class="docs-method-name">{{ t('docs.adapters.networkx.methodsList.fromNodeLink.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.adapters.networkx.methodsList.fromNodeLink.description') }}</p>
+            <p class="docs-method-returns">{{ t('docs.adapters.networkx.methodsList.fromNodeLink.returns') }}</p>
           </div>
-          <div class="border-l-4 border-yellow-500 pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.adapters.networkx.methodsList.fromAdjacency.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.adapters.networkx.methodsList.fromAdjacency.description') }}</p>
-            <p class="text-xs text-accent mt-1">{{ t('docs.adapters.networkx.methodsList.fromAdjacency.returns') }}</p>
+          <div class="docs-method-item-yellow">
+            <code class="docs-method-name">{{ t('docs.adapters.networkx.methodsList.fromAdjacency.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.adapters.networkx.methodsList.fromAdjacency.description') }}</p>
+            <p class="docs-method-returns">{{ t('docs.adapters.networkx.methodsList.fromAdjacency.returns') }}</p>
           </div>
-          <div class="border-l-4 border-yellow-500 pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.adapters.networkx.methodsList.toNodeLink.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.adapters.networkx.methodsList.toNodeLink.description') }}</p>
-            <p class="text-xs text-accent mt-1">{{ t('docs.adapters.networkx.methodsList.toNodeLink.returns') }}</p>
+          <div class="docs-method-item-yellow">
+            <code class="docs-method-name">{{ t('docs.adapters.networkx.methodsList.toNodeLink.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.adapters.networkx.methodsList.toNodeLink.description') }}</p>
+            <p class="docs-method-returns">{{ t('docs.adapters.networkx.methodsList.toNodeLink.returns') }}</p>
           </div>
-          <div class="border-l-4 border-yellow-500 pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.adapters.networkx.methodsList.toAdjacency.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.adapters.networkx.methodsList.toAdjacency.description') }}</p>
-            <p class="text-xs text-accent mt-1">{{ t('docs.adapters.networkx.methodsList.toAdjacency.returns') }}</p>
+          <div class="docs-method-item-yellow">
+            <code class="docs-method-name">{{ t('docs.adapters.networkx.methodsList.toAdjacency.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.adapters.networkx.methodsList.toAdjacency.description') }}</p>
+            <p class="docs-method-returns">{{ t('docs.adapters.networkx.methodsList.toAdjacency.returns') }}</p>
           </div>
         </div>
 
@@ -291,31 +291,31 @@
     </section>
 
     <!-- Graph Layouts -->
-    <section id="layouts" class="mb-12">
-      <h2 class="text-3xl font-bold mb-8 flex items-center">
-        <span class="mr-3">🎯</span>
+    <section id="layouts" class="docs-section">
+      <h2 class="docs-section-header">
+        <span class="docs-section-header-icon">🎯</span>
         <span>{{ t('docs.layouts.title') }}</span>
       </h2>
-      <p class="text-xl text-secondary mb-4">{{ t('docs.layouts.description') }}</p>
-      <p class="text-sm text-accent mb-8">💡 {{ t('docs.layouts.note') }}</p>
+      <p class="docs-section-intro">{{ t('docs.layouts.description') }}</p>
+      <p class="docs-note">💡 {{ t('docs.layouts.note') }}</p>
 
       <!-- Force-Directed Layout -->
-      <div class="card p-8 mb-8">
-        <h3 class="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-4">{{ t('docs.layouts.forceDirected.title') }}</h3>
+      <div class="docs-card">
+        <h3 class="docs-card-title-purple">{{ t('docs.layouts.forceDirected.title') }}</h3>
         <p class="text-secondary mb-2">{{ t('docs.layouts.forceDirected.description') }}</p>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ t('docs.layouts.forceDirected.complexity') }}</p>
-        <p class="text-sm text-accent mb-4">{{ t('docs.layouts.forceDirected.bestFor') }}</p>
+        <p class="docs-complexity">{{ t('docs.layouts.forceDirected.complexity') }}</p>
+        <p class="docs-best-for">{{ t('docs.layouts.forceDirected.bestFor') }}</p>
 
-        <h4 class="text-lg font-bold mb-3">{{ t('docs.layouts.forceDirected.constructor') }}</h4>
-        <div class="bg-gray-100 dark:bg-gray-900 p-4 rounded mb-4">
-          <h5 class="font-semibold mb-2">Options:</h5>
-          <ul class="space-y-1 text-sm">
-            <li><code class="text-xs">iterations:</code> {{ t('docs.layouts.forceDirected.options.iterations') }}</li>
-            <li><code class="text-xs">k:</code> {{ t('docs.layouts.forceDirected.options.k') }}</li>
-            <li><code class="text-xs">scale:</code> {{ t('docs.layouts.forceDirected.options.scale') }}</li>
-            <li><code class="text-xs">center:</code> {{ t('docs.layouts.forceDirected.options.center') }}</li>
-            <li><code class="text-xs">initialPositions:</code> {{ t('docs.layouts.forceDirected.options.initialPositions') }}</li>
-            <li><code class="text-xs">threshold:</code> {{ t('docs.layouts.forceDirected.options.threshold') }}</li>
+        <h4 class="docs-subsection-title-lg">{{ t('docs.layouts.forceDirected.constructor') }}</h4>
+        <div class="docs-options-box">
+          <h5 class="docs-options-title">Options:</h5>
+          <ul class="docs-options-list">
+            <li><code class="docs-options-code">iterations:</code> {{ t('docs.layouts.forceDirected.options.iterations') }}</li>
+            <li><code class="docs-options-code">k:</code> {{ t('docs.layouts.forceDirected.options.k') }}</li>
+            <li><code class="docs-options-code">scale:</code> {{ t('docs.layouts.forceDirected.options.scale') }}</li>
+            <li><code class="docs-options-code">center:</code> {{ t('docs.layouts.forceDirected.options.center') }}</li>
+            <li><code class="docs-options-code">initialPositions:</code> {{ t('docs.layouts.forceDirected.options.initialPositions') }}</li>
+            <li><code class="docs-options-code">threshold:</code> {{ t('docs.layouts.forceDirected.options.threshold') }}</li>
           </ul>
         </div>
 
@@ -323,22 +323,22 @@
       </div>
 
       <!-- Kamada-Kawai Layout -->
-      <div class="card p-8 mb-8">
-        <h3 class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">{{ t('docs.layouts.kamadaKawai.title') }}</h3>
+      <div class="docs-card">
+        <h3 class="docs-card-title-indigo">{{ t('docs.layouts.kamadaKawai.title') }}</h3>
         <p class="text-secondary mb-2">{{ t('docs.layouts.kamadaKawai.description') }}</p>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ t('docs.layouts.kamadaKawai.complexity') }}</p>
-        <p class="text-sm text-accent mb-4">{{ t('docs.layouts.kamadaKawai.bestFor') }}</p>
+        <p class="docs-complexity">{{ t('docs.layouts.kamadaKawai.complexity') }}</p>
+        <p class="docs-best-for">{{ t('docs.layouts.kamadaKawai.bestFor') }}</p>
 
-        <h4 class="text-lg font-bold mb-3">{{ t('docs.layouts.kamadaKawai.constructor') }}</h4>
-        <div class="bg-gray-100 dark:bg-gray-900 p-4 rounded mb-4">
-          <h5 class="font-semibold mb-2">Options:</h5>
-          <ul class="space-y-1 text-sm">
-            <li><code class="text-xs">iterations:</code> {{ t('docs.layouts.kamadaKawai.options.iterations') }}</li>
-            <li><code class="text-xs">scale:</code> {{ t('docs.layouts.kamadaKawai.options.scale') }}</li>
-            <li><code class="text-xs">center:</code> {{ t('docs.layouts.kamadaKawai.options.center') }}</li>
-            <li><code class="text-xs">initialPositions:</code> {{ t('docs.layouts.kamadaKawai.options.initialPositions') }}</li>
-            <li><code class="text-xs">threshold:</code> {{ t('docs.layouts.kamadaKawai.options.threshold') }}</li>
-            <li><code class="text-xs">K:</code> {{ t('docs.layouts.kamadaKawai.options.K') }}</li>
+        <h4 class="docs-subsection-title-lg">{{ t('docs.layouts.kamadaKawai.constructor') }}</h4>
+        <div class="docs-options-box">
+          <h5 class="docs-options-title">Options:</h5>
+          <ul class="docs-options-list">
+            <li><code class="docs-options-code">iterations:</code> {{ t('docs.layouts.kamadaKawai.options.iterations') }}</li>
+            <li><code class="docs-options-code">scale:</code> {{ t('docs.layouts.kamadaKawai.options.scale') }}</li>
+            <li><code class="docs-options-code">center:</code> {{ t('docs.layouts.kamadaKawai.options.center') }}</li>
+            <li><code class="docs-options-code">initialPositions:</code> {{ t('docs.layouts.kamadaKawai.options.initialPositions') }}</li>
+            <li><code class="docs-options-code">threshold:</code> {{ t('docs.layouts.kamadaKawai.options.threshold') }}</li>
+            <li><code class="docs-options-code">K:</code> {{ t('docs.layouts.kamadaKawai.options.K') }}</li>
           </ul>
         </div>
 
@@ -346,139 +346,139 @@
       </div>
 
       <!-- Spectral Layout -->
-      <div class="card p-8 mb-8">
-        <h3 class="text-2xl font-bold text-pink-600 dark:text-pink-400 mb-4">{{ t('docs.layouts.spectral.title') }}</h3>
+      <div class="docs-card">
+        <h3 class="docs-card-title-pink">{{ t('docs.layouts.spectral.title') }}</h3>
         <p class="text-secondary mb-2">{{ t('docs.layouts.spectral.description') }}</p>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ t('docs.layouts.spectral.complexity') }}</p>
+        <p class="docs-complexity">{{ t('docs.layouts.spectral.complexity') }}</p>
         <p class="text-sm text-accent mb-2">{{ t('docs.layouts.spectral.bestFor') }}</p>
-        <p class="text-sm text-red-600 dark:text-red-400 mb-4">⚠️ {{ t('docs.layouts.spectral.requires') }}</p>
+        <p class="docs-warning">⚠️ {{ t('docs.layouts.spectral.requires') }}</p>
 
         <CodeBlock :code="spectralLayoutCode" language="javascript" />
       </div>
 
       <!-- Other Layouts Grid -->
-      <div class="grid md:grid-cols-2 gap-6">
+      <div class="docs-feature-grid">
         <!-- Circular -->
-        <div class="card p-6">
-          <h3 class="text-xl font-bold text-blue-600 dark:text-blue-400 mb-3">{{ t('docs.layouts.circular.title') }}</h3>
-          <p class="text-secondary text-sm mb-2">{{ t('docs.layouts.circular.description') }}</p>
+        <div class="docs-card-compact">
+          <h3 class="docs-card-title-sm text-blue-600 dark:text-blue-400">{{ t('docs.layouts.circular.title') }}</h3>
+          <p class="docs-feature-description mb-2">{{ t('docs.layouts.circular.description') }}</p>
           <p class="text-xs text-gray-600 dark:text-gray-400 mb-2">{{ t('docs.layouts.circular.complexity') }}</p>
           <p class="text-xs text-accent">{{ t('docs.layouts.circular.bestFor') }}</p>
         </div>
 
         <!-- Shell -->
-        <div class="card p-6">
-          <h3 class="text-xl font-bold text-green-600 dark:text-green-400 mb-3">{{ t('docs.layouts.shell.title') }}</h3>
-          <p class="text-secondary text-sm mb-2">{{ t('docs.layouts.shell.description') }}</p>
+        <div class="docs-card-compact">
+          <h3 class="docs-card-title-sm text-green-600 dark:text-green-400">{{ t('docs.layouts.shell.title') }}</h3>
+          <p class="docs-feature-description mb-2">{{ t('docs.layouts.shell.description') }}</p>
           <p class="text-xs text-gray-600 dark:text-gray-400 mb-2">{{ t('docs.layouts.shell.complexity') }}</p>
           <p class="text-xs text-accent mb-1">{{ t('docs.layouts.shell.bestFor') }}</p>
           <p class="text-xs text-red-600 dark:text-red-400">⚠️ {{ t('docs.layouts.shell.requires') }}</p>
         </div>
 
         <!-- Spiral -->
-        <div class="card p-6">
-          <h3 class="text-xl font-bold text-yellow-600 dark:text-yellow-400 mb-3">{{ t('docs.layouts.spiral.title') }}</h3>
-          <p class="text-secondary text-sm mb-2">{{ t('docs.layouts.spiral.description') }}</p>
+        <div class="docs-card-compact">
+          <h3 class="docs-card-title-sm text-yellow-600 dark:text-yellow-400">{{ t('docs.layouts.spiral.title') }}</h3>
+          <p class="docs-feature-description mb-2">{{ t('docs.layouts.spiral.description') }}</p>
           <p class="text-xs text-gray-600 dark:text-gray-400 mb-2">{{ t('docs.layouts.spiral.complexity') }}</p>
           <p class="text-xs text-accent">{{ t('docs.layouts.spiral.bestFor') }}</p>
         </div>
 
         <!-- BFS -->
-        <div class="card p-6">
-          <h3 class="text-xl font-bold text-red-600 dark:text-red-400 mb-3">{{ t('docs.layouts.bfs.title') }}</h3>
-          <p class="text-secondary text-sm mb-2">{{ t('docs.layouts.bfs.description') }}</p>
+        <div class="docs-card-compact">
+          <h3 class="docs-card-title-sm text-red-600 dark:text-red-400">{{ t('docs.layouts.bfs.title') }}</h3>
+          <p class="docs-feature-description mb-2">{{ t('docs.layouts.bfs.description') }}</p>
           <p class="text-xs text-gray-600 dark:text-gray-400 mb-2">{{ t('docs.layouts.bfs.complexity') }}</p>
           <p class="text-xs text-accent">{{ t('docs.layouts.bfs.bestFor') }}</p>
         </div>
 
         <!-- Bipartite -->
-        <div class="card p-6">
-          <h3 class="text-xl font-bold text-teal-600 dark:text-teal-400 mb-3">{{ t('docs.layouts.bipartite.title') }}</h3>
-          <p class="text-secondary text-sm mb-2">{{ t('docs.layouts.bipartite.description') }}</p>
+        <div class="docs-card-compact">
+          <h3 class="docs-card-title-sm text-teal-600 dark:text-teal-400">{{ t('docs.layouts.bipartite.title') }}</h3>
+          <p class="docs-feature-description mb-2">{{ t('docs.layouts.bipartite.description') }}</p>
           <p class="text-xs text-gray-600 dark:text-gray-400 mb-2">{{ t('docs.layouts.bipartite.complexity') }}</p>
           <p class="text-xs text-accent">{{ t('docs.layouts.bipartite.bestFor') }}</p>
         </div>
 
         <!-- Random -->
-        <div class="card p-6">
-          <h3 class="text-xl font-bold text-gray-600 dark:text-gray-400 mb-3">{{ t('docs.layouts.random.title') }}</h3>
-          <p class="text-secondary text-sm mb-2">{{ t('docs.layouts.random.description') }}</p>
+        <div class="docs-card-compact">
+          <h3 class="docs-card-title-sm text-gray-600 dark:text-gray-400">{{ t('docs.layouts.random.title') }}</h3>
+          <p class="docs-feature-description mb-2">{{ t('docs.layouts.random.description') }}</p>
           <p class="text-xs text-gray-600 dark:text-gray-400 mb-2">{{ t('docs.layouts.random.complexity') }}</p>
           <p class="text-xs text-accent">{{ t('docs.layouts.random.bestFor') }}</p>
         </div>
       </div>
 
       <!-- Usage Pattern -->
-      <div class="card p-6 mt-8 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-        <h4 class="text-lg font-bold mb-3">{{ t('docs.layouts.usage') }}</h4>
+      <div class="docs-tip-box">
+        <h4 class="docs-subsection-title-lg">{{ t('docs.layouts.usage') }}</h4>
         <p class="text-sm text-secondary mb-3">{{ t('docs.layouts.usageDescription') }}</p>
         <CodeBlock :code="layoutUsageCode" language="javascript" />
       </div>
     </section>
 
     <!-- Community Detection -->
-    <section id="community" class="mb-12">
-      <h2 class="text-3xl font-bold mb-8 flex items-center">
-        <span class="mr-3">🎨</span>
+    <section id="community" class="docs-section">
+      <h2 class="docs-section-header">
+        <span class="docs-section-header-icon">🎨</span>
         <span>{{ t('docs.community.title') }}</span>
       </h2>
-      <p class="text-xl text-secondary mb-8">{{ t('docs.community.description') }}</p>
+      <p class="docs-section-intro">{{ t('docs.community.description') }}</p>
 
       <!-- CommunityDetection Class -->
-      <div class="card p-8 mb-8">
-        <h3 class="text-2xl font-bold text-accent mb-4">{{ t('docs.community.mainClass.title') }}</h3>
-        <p class="text-secondary mb-6">{{ t('docs.community.mainClass.description') }}</p>
+      <div class="docs-card">
+        <h3 class="docs-card-title">{{ t('docs.community.mainClass.title') }}</h3>
+        <p class="docs-card-description">{{ t('docs.community.mainClass.description') }}</p>
 
-        <h4 class="text-xl font-bold mb-3">{{ t('docs.community.mainClass.constructor') }}</h4>
-        <div class="bg-gray-900 rounded-lg p-4 mb-6">
-          <code class="text-sm text-gray-200">new CommunityDetection(graph)</code>
+        <h4 class="docs-subsection-title">{{ t('docs.community.mainClass.constructor') }}</h4>
+        <div class="docs-code-block">
+          <code class="docs-code-block-text">new CommunityDetection(graph)</code>
         </div>
 
-        <h4 class="text-xl font-bold mb-4">Methods</h4>
-        <div class="space-y-3 mb-6">
-          <div class="border-l-4 border-accent pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.community.mainClass.methods.detectCommunities.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.community.mainClass.methods.detectCommunities.description') }}</p>
-            <p class="text-xs text-accent mt-1">{{ t('docs.community.mainClass.methods.detectCommunities.returns') }}</p>
+        <h4 class="docs-subsection-title">Methods</h4>
+        <div class="docs-method-list">
+          <div class="docs-method-item">
+            <code class="docs-method-name">{{ t('docs.community.mainClass.methods.detectCommunities.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.community.mainClass.methods.detectCommunities.description') }}</p>
+            <p class="docs-method-returns">{{ t('docs.community.mainClass.methods.detectCommunities.returns') }}</p>
           </div>
-          <div class="border-l-4 border-accent pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.community.mainClass.methods.calculateModularity.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.community.mainClass.methods.calculateModularity.description') }}</p>
-            <p class="text-xs text-accent mt-1">{{ t('docs.community.mainClass.methods.calculateModularity.returns') }}</p>
+          <div class="docs-method-item">
+            <code class="docs-method-name">{{ t('docs.community.mainClass.methods.calculateModularity.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.community.mainClass.methods.calculateModularity.description') }}</p>
+            <p class="docs-method-returns">{{ t('docs.community.mainClass.methods.calculateModularity.returns') }}</p>
           </div>
         </div>
 
-        <h4 class="text-xl font-bold mb-4">Static Methods</h4>
-        <div class="space-y-3">
-          <div class="border-l-4 border-purple-500 pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.community.mainClass.staticMethods.detect.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.community.mainClass.staticMethods.detect.description') }}</p>
-            <p class="text-xs text-accent mt-1">{{ t('docs.community.mainClass.staticMethods.detect.returns') }}</p>
+        <h4 class="docs-subsection-title">Static Methods</h4>
+        <div class="docs-method-list">
+          <div class="docs-method-item-purple">
+            <code class="docs-method-name">{{ t('docs.community.mainClass.staticMethods.detect.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.community.mainClass.staticMethods.detect.description') }}</p>
+            <p class="docs-method-returns">{{ t('docs.community.mainClass.staticMethods.detect.returns') }}</p>
           </div>
-          <div class="border-l-4 border-purple-500 pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.community.mainClass.staticMethods.getNodesInCommunity.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.community.mainClass.staticMethods.getNodesInCommunity.description') }}</p>
+          <div class="docs-method-item-purple">
+            <code class="docs-method-name">{{ t('docs.community.mainClass.staticMethods.getNodesInCommunity.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.community.mainClass.staticMethods.getNodesInCommunity.description') }}</p>
           </div>
-          <div class="border-l-4 border-purple-500 pl-4 py-2">
-            <code class="text-sm bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{{ t('docs.community.mainClass.staticMethods.getCommunityGroups.name') }}</code>
-            <p class="text-secondary text-sm mt-1">{{ t('docs.community.mainClass.staticMethods.getCommunityGroups.description') }}</p>
+          <div class="docs-method-item-purple">
+            <code class="docs-method-name">{{ t('docs.community.mainClass.staticMethods.getCommunityGroups.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.community.mainClass.staticMethods.getCommunityGroups.description') }}</p>
           </div>
         </div>
       </div>
 
       <!-- Louvain Algorithm -->
-      <div class="card p-8 mb-8">
-        <h3 class="text-2xl font-bold text-orange-600 dark:text-orange-400 mb-4">{{ t('docs.community.louvain.title') }}</h3>
+      <div class="docs-card">
+        <h3 class="docs-card-title-orange">{{ t('docs.community.louvain.title') }}</h3>
         <p class="text-secondary mb-2">{{ t('docs.community.louvain.description') }}</p>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ t('docs.community.louvain.complexity') }}</p>
-        <p class="text-sm text-accent mb-6">{{ t('docs.community.louvain.bestFor') }}</p>
+        <p class="docs-complexity">{{ t('docs.community.louvain.complexity') }}</p>
+        <p class="docs-card-description">{{ t('docs.community.louvain.bestFor') }}</p>
 
-        <h4 class="text-lg font-bold mb-3">{{ t('docs.community.louvain.constructor') }}</h4>
-        <div class="bg-gray-100 dark:bg-gray-900 p-4 rounded mb-4">
-          <h5 class="font-semibold mb-2">Options:</h5>
-          <ul class="space-y-1 text-sm">
-            <li><code class="text-xs">resolution:</code> {{ t('docs.community.louvain.options.resolution') }}</li>
-            <li><code class="text-xs">maxIterations:</code> {{ t('docs.community.louvain.options.maxIterations') }}</li>
+        <h4 class="docs-subsection-title-lg">{{ t('docs.community.louvain.constructor') }}</h4>
+        <div class="docs-options-box">
+          <h5 class="docs-options-title">Options:</h5>
+          <ul class="docs-options-list">
+            <li><code class="docs-options-code">resolution:</code> {{ t('docs.community.louvain.options.resolution') }}</li>
+            <li><code class="docs-options-code">maxIterations:</code> {{ t('docs.community.louvain.options.maxIterations') }}</li>
           </ul>
         </div>
 
@@ -486,50 +486,50 @@
       </div>
 
       <!-- CommunityResult -->
-      <div class="card p-8">
-        <h3 class="text-2xl font-bold text-green-600 dark:text-green-400 mb-4">{{ t('docs.community.result.title') }}</h3>
-        <p class="text-secondary mb-6">{{ t('docs.community.result.description') }}</p>
+      <div class="docs-card">
+        <h3 class="docs-card-title-green">{{ t('docs.community.result.title') }}</h3>
+        <p class="docs-card-description">{{ t('docs.community.result.description') }}</p>
 
-        <div class="bg-gray-100 dark:bg-gray-900 p-4 rounded">
-          <h5 class="font-semibold mb-3">Properties:</h5>
-          <ul class="space-y-2 text-sm">
-            <li><code class="text-xs">communities:</code> {{ t('docs.community.result.properties.communities') }}</li>
-            <li><code class="text-xs">modularity:</code> {{ t('docs.community.result.properties.modularity') }}</li>
-            <li><code class="text-xs">numCommunities:</code> {{ t('docs.community.result.properties.numCommunities') }}</li>
-            <li><code class="text-xs">algorithm:</code> {{ t('docs.community.result.properties.algorithm') }}</li>
-            <li><code class="text-xs">metadata:</code> {{ t('docs.community.result.properties.metadata') }}</li>
+        <div class="docs-options-box">
+          <h5 class="docs-options-title">Properties:</h5>
+          <ul class="docs-options-list space-y-2">
+            <li><code class="docs-options-code">communities:</code> {{ t('docs.community.result.properties.communities') }}</li>
+            <li><code class="docs-options-code">modularity:</code> {{ t('docs.community.result.properties.modularity') }}</li>
+            <li><code class="docs-options-code">numCommunities:</code> {{ t('docs.community.result.properties.numCommunities') }}</li>
+            <li><code class="docs-options-code">algorithm:</code> {{ t('docs.community.result.properties.algorithm') }}</li>
+            <li><code class="docs-options-code">metadata:</code> {{ t('docs.community.result.properties.metadata') }}</li>
           </ul>
         </div>
       </div>
     </section>
 
     <!-- Usage Examples -->
-    <section id="examples" class="mb-12">
-      <h2 class="text-3xl font-bold mb-8 flex items-center">
-        <span class="mr-3">💡</span>
+    <section id="examples" class="docs-section">
+      <h2 class="docs-section-header">
+        <span class="docs-section-header-icon">💡</span>
         <span>{{ t('docs.examples.title') }}</span>
       </h2>
-      <p class="text-xl text-secondary mb-8">{{ t('docs.examples.description') }}</p>
+      <p class="docs-section-intro">{{ t('docs.examples.description') }}</p>
 
       <!-- Basic Analysis -->
-      <div class="card p-8 mb-8">
-        <h3 class="text-2xl font-bold text-accent mb-4">{{ t('docs.examples.basic.title') }}</h3>
+      <div class="docs-card">
+        <h3 class="docs-card-title">{{ t('docs.examples.basic.title') }}</h3>
         <p class="text-secondary mb-4">{{ t('docs.examples.basic.description') }}</p>
 
         <CodeBlock :code="basicAnalysisCode" language="javascript" />
       </div>
 
       <!-- CSV Loading -->
-      <div class="card p-8 mb-8">
-        <h3 class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4">{{ t('docs.examples.csv.title') }}</h3>
+      <div class="docs-card">
+        <h3 class="docs-card-title-blue">{{ t('docs.examples.csv.title') }}</h3>
         <p class="text-secondary mb-4">{{ t('docs.examples.csv.description') }}</p>
 
         <CodeBlock :code="csvExampleCode" language="javascript" />
       </div>
 
       <!-- Complete Workflow -->
-      <div class="card p-8">
-        <h3 class="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-4">{{ t('docs.examples.complete.title') }}</h3>
+      <div class="docs-card">
+        <h3 class="docs-card-title-purple">{{ t('docs.examples.complete.title') }}</h3>
         <p class="text-secondary mb-4">{{ t('docs.examples.complete.description') }}</p>
 
         <CodeBlock :code="completeWorkflowCode" language="javascript" />
@@ -537,11 +537,11 @@
     </section>
 
     <!-- Footer -->
-    <div class="text-center pt-12 pb-6 border-t border-[var(--color-border)]">
+    <div class="docs-footer">
       <p class="text-secondary">
         📚 For more details, check out the
         <a href="https://github.com/guinetik/graph-js"
-           class="text-purple-600 dark:text-purple-400 hover:underline"
+           class="docs-footer-link"
            target="_blank">
           GitHub repository
         </a>
