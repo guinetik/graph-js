@@ -767,3 +767,213 @@
 .docs-footer-link {
   @apply text-purple-600 dark:text-purple-400 hover:underline;
 }
+
+/* ===========================================
+   Family/Demo Page Styles
+   =========================================== */
+
+/* Action Buttons - Base */
+.action-btn {
+  @apply px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm text-white;
+}
+
+.action-btn-pink {
+  @apply action-btn bg-pink-600 hover:bg-pink-700;
+}
+
+.action-btn-amber {
+  @apply action-btn bg-amber-700 hover:bg-amber-800;
+}
+
+.action-btn-blue {
+  @apply action-btn bg-blue-600 hover:bg-blue-700;
+}
+
+.action-btn-cyan {
+  @apply action-btn bg-cyan-600 hover:bg-cyan-700;
+}
+
+.action-btn-orange {
+  @apply action-btn bg-orange-600 hover:bg-orange-700;
+}
+
+.action-btn-purple {
+  @apply action-btn bg-purple-600 hover:bg-purple-700;
+}
+
+.action-btn-rose {
+  @apply action-btn bg-rose-600 hover:bg-rose-700;
+}
+
+.action-btn-teal {
+  @apply action-btn bg-teal-600 hover:bg-teal-700;
+}
+
+.action-btn-gray {
+  @apply action-btn bg-gray-600 hover:bg-gray-700;
+}
+
+.action-btn-emerald {
+  @apply action-btn bg-emerald-600 hover:bg-emerald-700;
+}
+
+.action-btn-indigo {
+  @apply action-btn bg-indigo-600 hover:bg-indigo-700;
+}
+
+.action-btn-violet {
+  @apply action-btn bg-violet-600 hover:bg-violet-700;
+}
+
+.action-btn-fuchsia {
+  @apply action-btn bg-fuchsia-600 hover:bg-fuchsia-700;
+}
+
+.action-btn-red {
+  @apply action-btn bg-red-600 hover:bg-red-700;
+}
+
+.action-btn-disabled {
+  @apply disabled:bg-gray-400 disabled:cursor-not-allowed;
+}
+
+/* Info Box Titles */
+.info-box-title {
+  @apply text-lg font-semibold mb-2;
+}
+
+.info-box-title-green {
+  @apply info-box-title text-green-900 dark:text-green-300;
+}
+
+.info-box-title-blue {
+  @apply info-box-title text-blue-900 dark:text-blue-300;
+}
+
+/* Info Box Text */
+.info-box-text-green {
+  @apply text-sm text-green-800 dark:text-green-200;
+}
+
+.info-box-text-blue {
+  @apply text-sm text-blue-800 dark:text-blue-200;
+}
+
+.info-box-text-yellow {
+  @apply text-xs text-yellow-800 dark:text-yellow-200;
+}
+
+/* Status Section */
+.status-section {
+  @apply sticky top-0 z-20 backdrop-blur-md pb-4 mb-4 -mx-6 px-6 pt-4 -mt-2 overflow-x-hidden;
+  @apply border-b border-[var(--color-border)];
+  background-color: rgba(255, 255, 255, 0.98);
+}
+
+.dark .status-section {
+  background-color: rgba(31, 41, 55, 0.98);
+}
+
+.status-box {
+  @apply bg-[var(--color-bg-secondary)] rounded-md p-4 text-sm shadow-sm;
+  @apply border border-[var(--color-border)];
+}
+
+.status-empty {
+  @apply text-secondary text-center py-2;
+}
+
+.status-message {
+  @apply flex items-start space-x-2;
+}
+
+.status-message-success {
+  @apply status-message text-green-600 dark:text-green-400;
+}
+
+.status-message-error {
+  @apply status-message text-red-600 dark:text-red-400;
+}
+
+.status-message-info {
+  @apply status-message text-blue-600 dark:text-blue-400;
+}
+
+.status-icon {
+  @apply flex-shrink-0 mt-0.5;
+}
+
+.status-text {
+  @apply flex-1 break-words;
+}
+
+/* Button Grid */
+.btn-grid {
+  @apply grid grid-cols-2 gap-2;
+}
+
+/* Section with Border */
+.controls-section-bordered {
+  @apply demo-controls-section border-t border-[var(--color-border)] pt-4;
+}
+
+/* Legend */
+.legend-list {
+  @apply space-y-2 text-sm;
+}
+
+.legend-item {
+  @apply flex items-center gap-2;
+}
+
+.legend-dot {
+  @apply w-4 h-4 rounded-full;
+}
+
+.legend-text {
+  @apply text-gray-700 dark:text-gray-300;
+}
+
+/* Render Mode Toggle */
+.render-mode-container {
+  @apply flex flex-wrap gap-2 mb-3;
+}
+
+.render-mode-label {
+  @apply flex items-center gap-2 cursor-pointer px-3 py-2 border-2 rounded-lg transition-all flex-1 min-w-[120px];
+}
+
+.render-mode-label-active {
+  @apply border-green-500 bg-green-50 dark:bg-green-900/20;
+}
+
+.render-mode-label-inactive {
+  @apply border-gray-300 dark:border-gray-600 hover:border-green-300;
+}
+
+.render-mode-radio {
+  @apply text-green-600 focus:ring-green-500;
+}
+
+.render-mode-icon {
+  @apply text-xl;
+}
+
+.render-mode-text {
+  @apply text-sm font-medium text-gray-700 dark:text-gray-300;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+  @apply absolute inset-0 flex items-center justify-center z-10;
+  @apply bg-white/90 dark:bg-gray-900/90;
+}
+
+.loading-spinner {
+  @apply inline-block animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent mb-4;
+}
+
+/* Legend Title */
+.legend-title {
+  @apply text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3;
+}

@@ -1,4 +1,5 @@
 <template>
+  <div class="family-page">
   <DemoLayout>
     <template #controls>
       <!-- Header -->
@@ -13,211 +14,156 @@
 
       <!-- What is this? -->
       <div class="info-box-green mb-4">
-        <h2 class="text-lg font-semibold text-green-900 dark:text-green-300 mb-2">
+        <h2 class="info-box-title-green">
           {{ t('family.whatIs.title') }}
         </h2>
-        <p class="text-sm text-green-800 dark:text-green-200">
+        <p class="info-box-text-green">
           {{ t('family.whatIs.description') }}
         </p>
       </div>
 
       <!-- Status Section -->
-      <div class="sticky top-0 z-20 bg-white/98 dark:bg-gray-800/98 backdrop-blur-md border-b border-[var(--color-border)] pb-4 mb-4 -mx-6 px-6 pt-4 -mt-2 overflow-x-hidden">
+      <div class="status-section">
         <h2 class="demo-controls-section-title mb-3">{{ t('family.status.title') }}</h2>
 
-        <div class="bg-[var(--color-bg-secondary)] rounded-md p-4 text-sm shadow-sm border border-[var(--color-border)]">
-          <div v-if="!statusMessage" class="text-secondary text-center py-2">
+        <div class="status-box">
+          <div v-if="!statusMessage" class="status-empty">
             <div class="text-xs">{{ t('family.status.ready') }}</div>
             <div class="text-xs mt-1 opacity-60">{{ t('family.status.clickToAdd') }}</div>
           </div>
           <div v-else class="space-y-2">
             <div :class="{
-              'flex items-start space-x-2': true,
-              'text-green-600 dark:text-green-400': statusType === 'success',
-              'text-red-600 dark:text-red-400': statusType === 'error',
-              'text-blue-600 dark:text-blue-400': statusType === 'info'
+              'status-message-success': statusType === 'success',
+              'status-message-error': statusType === 'error',
+              'status-message-info': statusType === 'info'
             }">
-              <div class="flex-shrink-0 mt-0.5">
+              <div class="status-icon">
                 <span v-if="statusType === 'success'">✅</span>
                 <span v-else-if="statusType === 'error'">❌</span>
                 <span v-else>ℹ️</span>
               </div>
-              <div class="flex-1 break-words">{{ statusMessage }}</div>
+              <div class="status-text">{{ statusMessage }}</div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Add Relatives Section -->
-      <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
+      <div class="controls-section-bordered">
         <h2 class="demo-controls-section-title">{{ t('family.addRelatives.title') }}</h2>
 
-        <div class="grid grid-cols-2 gap-2">
+        <div class="btn-grid">
           <!-- Row 1: Parents & Grandparents -->
-          <button
-            @click="handleAddParents"
-            class="bg-pink-600 hover:bg-pink-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
-            type="button"
-          >
+          <button @click="handleAddParents" class="action-btn-pink" type="button">
             {{ t('family.addRelatives.parents') }}
           </button>
 
-          <button
-            @click="handleAddGrandparents"
-            class="bg-amber-700 hover:bg-amber-800 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
-          >
+          <button @click="handleAddGrandparents" class="action-btn-amber">
             {{ t('family.addRelatives.grandparents') }}
           </button>
 
           <!-- Row 2: Sibling & Niece/Nephew -->
-          <button
-            @click="handleAddSibling"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
-          >
+          <button @click="handleAddSibling" class="action-btn-blue">
             {{ t('family.addRelatives.sibling') }}
           </button>
 
-          <button
-            @click="handleAddNieceNephew"
-            class="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
-          >
+          <button @click="handleAddNieceNephew" class="action-btn-cyan">
             {{ t('family.addRelatives.nieceNephew') }}
           </button>
 
           <!-- Row 3: Uncle/Aunt & Cousin -->
-          <button
-            @click="handleAddUncleAunt"
-            class="bg-orange-600 hover:bg-orange-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
-          >
+          <button @click="handleAddUncleAunt" class="action-btn-orange">
             {{ t('family.addRelatives.uncleAunt') }}
           </button>
 
-          <button
-            @click="handleAddCousin"
-            class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
-          >
+          <button @click="handleAddCousin" class="action-btn-purple">
             {{ t('family.addRelatives.cousin') }}
           </button>
 
           <!-- Row 4: Partner & Child -->
-          <button
-            @click="handleAddPartner"
-            class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
-          >
+          <button @click="handleAddPartner" class="action-btn-rose">
             {{ t('family.addRelatives.partner') }}
           </button>
 
-          <button
-            @click="handleAddChild"
-            class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
-          >
+          <button @click="handleAddChild" class="action-btn-teal">
             {{ t('family.addRelatives.child') }}
           </button>
         </div>
       </div>
 
       <!-- Actions Section -->
-      <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
+      <div class="controls-section-bordered">
         <h2 class="demo-controls-section-title">{{ t('family.actions.title') }}</h2>
 
-        <div class="grid grid-cols-2 gap-2">
-          <button
-            @click="handleSaveFamily"
-            class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
-          >
+        <div class="btn-grid">
+          <button @click="handleSaveFamily" class="action-btn-gray">
             {{ t('family.actions.saveFamily') }}
           </button>
 
-          <button
-            @click="handleSaveImage"
-            class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
-          >
+          <button @click="handleSaveImage" class="action-btn-emerald">
             {{ t('family.actions.saveImage') }}
           </button>
 
-          <button
-            @click="handleLockGraph"
-            class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
-          >
+          <button @click="handleLockGraph" class="action-btn-indigo">
             {{ t('family.actions.lockGraph') }}
           </button>
 
-          <button
-            @click="handleUnlockGraph"
-            class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
-          >
+          <button @click="handleUnlockGraph" class="action-btn-amber">
             {{ t('family.actions.unlockGraph') }}
           </button>
 
-          <button
-            @click="handleUndo"
-            :disabled="!canUndo"
-            class="bg-violet-600 hover:bg-violet-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
-          >
+          <button @click="handleUndo" :disabled="!canUndo" class="action-btn-violet action-btn-disabled">
             {{ t('family.actions.undo') }}
           </button>
 
-          <button
-            @click="handleRedo"
-            :disabled="!canRedo"
-            class="bg-fuchsia-600 hover:bg-fuchsia-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
-          >
+          <button @click="handleRedo" :disabled="!canRedo" class="action-btn-fuchsia action-btn-disabled">
             {{ t('family.actions.redo') }}
           </button>
 
-          <button
-            @click="handleResetTree"
-            class="col-span-2 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm"
-          >
+          <button @click="handleResetTree" class="action-btn-red col-span-2">
             {{ t('family.actions.resetTree') }}
           </button>
         </div>
       </div>
 
       <!-- Render Mode Section -->
-      <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
+      <div class="controls-section-bordered">
         <h2 class="demo-controls-section-title">{{ t('family.renderNodes.title') }}</h2>
 
-        <div class="flex flex-wrap gap-2 mb-3">
+        <div class="render-mode-container">
           <label
-            class="flex items-center gap-2 cursor-pointer px-3 py-2 border-2 rounded-lg transition-all flex-1 min-w-[120px]"
-            :class="{
-              'border-green-500 bg-green-50 dark:bg-green-900/20': renderMode === 'colors',
-              'border-gray-300 dark:border-gray-600 hover:border-green-300': renderMode !== 'colors'
-            }"
+            class="render-mode-label"
+            :class="renderMode === 'colors' ? 'render-mode-label-active' : 'render-mode-label-inactive'"
           >
             <input
               type="radio"
               name="renderMode"
               value="colors"
               v-model="renderMode"
-              class="text-green-600 focus:ring-green-500"
+              class="render-mode-radio"
             />
-            <span class="text-xl">🎨</span>
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('family.renderNodes.colors') }}</span>
+            <span class="render-mode-icon">🎨</span>
+            <span class="render-mode-text">{{ t('family.renderNodes.colors') }}</span>
           </label>
 
           <label
-            class="flex items-center gap-2 cursor-pointer px-3 py-2 border-2 rounded-lg transition-all flex-1 min-w-[120px]"
-            :class="{
-              'border-green-500 bg-green-50 dark:bg-green-900/20': renderMode === 'avatars',
-              'border-gray-300 dark:border-gray-600 hover:border-green-300': renderMode !== 'avatars'
-            }"
+            class="render-mode-label"
+            :class="renderMode === 'avatars' ? 'render-mode-label-active' : 'render-mode-label-inactive'"
           >
             <input
               type="radio"
               name="renderMode"
               value="avatars"
               v-model="renderMode"
-              class="text-green-600 focus:ring-green-500"
+              class="render-mode-radio"
             />
-            <span class="text-xl">👤</span>
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('family.renderNodes.avatars') }}</span>
+            <span class="render-mode-icon">👤</span>
+            <span class="render-mode-text">{{ t('family.renderNodes.avatars') }}</span>
           </label>
         </div>
 
         <div class="info-box-blue">
-          <p class="text-xs text-blue-800 dark:text-blue-200">
+          <p class="info-box-text-yellow">
             <strong>{{ t('family.renderNodes.colors') }}:</strong> {{ t('family.renderNodes.colorsDesc') }}<br>
             <strong>{{ t('family.renderNodes.avatars') }}:</strong> {{ t('family.renderNodes.avatarsDesc') }}
           </p>
@@ -225,7 +171,7 @@
       </div>
 
       <!-- Network Analysis Section -->
-      <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
+      <div class="controls-section-bordered">
         <h2 class="demo-controls-section-title">{{ t('family.networkAnalysis.title') }}</h2>
 
         <NetworkAnalysis
@@ -238,52 +184,52 @@
       </div>
 
       <!-- Legend -->
-      <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
-        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+      <div class="controls-section-bordered">
+        <h3 class="legend-title">
           {{ t('family.relationshipColors.title') }}
         </h3>
-        <div class="space-y-2 text-sm">
-          <div class="flex items-center gap-2">
-            <div class="w-4 h-4 rounded-full bg-indigo-500"></div>
-            <span class="text-gray-700 dark:text-gray-300">{{ t('family.relationshipColors.you') }}</span>
+        <div class="legend-list">
+          <div class="legend-item">
+            <div class="legend-dot bg-indigo-500"></div>
+            <span class="legend-text">{{ t('family.relationshipColors.you') }}</span>
           </div>
-          <div class="flex items-center gap-2">
-            <div class="w-4 h-4 rounded-full bg-pink-500"></div>
-            <span class="text-gray-700 dark:text-gray-300">{{ t('family.relationshipColors.parents') }}</span>
+          <div class="legend-item">
+            <div class="legend-dot bg-pink-500"></div>
+            <span class="legend-text">{{ t('family.relationshipColors.parents') }}</span>
           </div>
-          <div class="flex items-center gap-2">
-            <div class="w-4 h-4 rounded-full bg-blue-500"></div>
-            <span class="text-gray-700 dark:text-gray-300">{{ t('family.relationshipColors.siblings') }}</span>
+          <div class="legend-item">
+            <div class="legend-dot bg-blue-500"></div>
+            <span class="legend-text">{{ t('family.relationshipColors.siblings') }}</span>
           </div>
-          <div class="flex items-center gap-2">
-            <div class="w-4 h-4 rounded-full bg-orange-500"></div>
-            <span class="text-gray-700 dark:text-gray-300">{{ t('family.relationshipColors.unclesAunts') }}</span>
+          <div class="legend-item">
+            <div class="legend-dot bg-orange-500"></div>
+            <span class="legend-text">{{ t('family.relationshipColors.unclesAunts') }}</span>
           </div>
-          <div class="flex items-center gap-2">
-            <div class="w-4 h-4 rounded-full bg-purple-500"></div>
-            <span class="text-gray-700 dark:text-gray-300">{{ t('family.relationshipColors.cousins') }}</span>
+          <div class="legend-item">
+            <div class="legend-dot bg-purple-500"></div>
+            <span class="legend-text">{{ t('family.relationshipColors.cousins') }}</span>
           </div>
-          <div class="flex items-center gap-2">
-            <div class="w-4 h-4 rounded-full bg-amber-700"></div>
-            <span class="text-gray-700 dark:text-gray-300">{{ t('family.relationshipColors.grandparents') }}</span>
+          <div class="legend-item">
+            <div class="legend-dot bg-amber-700"></div>
+            <span class="legend-text">{{ t('family.relationshipColors.grandparents') }}</span>
           </div>
-          <div class="flex items-center gap-2">
-            <div class="w-4 h-4 rounded-full bg-cyan-500"></div>
-            <span class="text-gray-700 dark:text-gray-300">{{ t('family.relationshipColors.nieces') }}</span>
+          <div class="legend-item">
+            <div class="legend-dot bg-cyan-500"></div>
+            <span class="legend-text">{{ t('family.relationshipColors.nieces') }}</span>
           </div>
-          <div class="flex items-center gap-2">
-            <div class="w-4 h-4 rounded-full bg-rose-500"></div>
-            <span class="text-gray-700 dark:text-gray-300">{{ t('family.relationshipColors.partners') }}</span>
+          <div class="legend-item">
+            <div class="legend-dot bg-rose-500"></div>
+            <span class="legend-text">{{ t('family.relationshipColors.partners') }}</span>
           </div>
-          <div class="flex items-center gap-2">
-            <div class="w-4 h-4 rounded-full bg-teal-500"></div>
-            <span class="text-gray-700 dark:text-gray-300">{{ t('family.relationshipColors.children') }}</span>
+          <div class="legend-item">
+            <div class="legend-dot bg-teal-500"></div>
+            <span class="legend-text">{{ t('family.relationshipColors.children') }}</span>
           </div>
         </div>
       </div>
 
       <!-- Layout Algorithm Section -->
-      <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
+      <div class="controls-section-bordered">
         <h2 class="demo-controls-section-title">{{ t('family.layoutAlgorithm.title') }}</h2>
 
         <LayoutPicker
@@ -294,7 +240,7 @@
         />
 
         <div class="info-box-yellow mt-3">
-          <p class="text-xs text-yellow-800 dark:text-yellow-200">
+          <p class="info-box-text-yellow">
             <template v-for="layout in availableLayouts" :key="layout.id">
               <div>
                 <strong>{{ layout.name }}:</strong>
@@ -309,10 +255,10 @@
 
       <!-- Instructions Box -->
       <div class="info-box-blue">
-        <h3 class="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-2">
+        <h3 class="info-box-title-blue text-sm">
           {{ t('family.instructions.title') }}
         </h3>
-        <ul class="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+        <ul class="info-box-text-blue space-y-1">
           <li v-html="t('family.instructions.dragNodes')"></li>
           <li v-html="t('family.instructions.autoSaves')"></li>
           <li v-html="t('family.instructions.lock')"></li>
@@ -326,12 +272,9 @@
 
     <template #graph>
       <!-- Loading Overlay -->
-      <div
-        v-if="loading || switchingRenderMode"
-        class="absolute inset-0 flex items-center justify-center bg-white/90 dark:bg-gray-900/90 z-10"
-      >
+      <div v-if="loading || switchingRenderMode" class="loading-overlay">
         <div class="text-center">
-          <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent mb-4"></div>
+          <div class="loading-spinner"></div>
           <p class="text-secondary">{{ switchingRenderMode ? 'Switching render mode...' : loadingMessage }}</p>
         </div>
       </div>
@@ -351,6 +294,7 @@
     @confirm="handleDialogConfirm"
     @cancel="handleDialogCancel"
   />
+  </div>
 </template>
 
 <script setup>
