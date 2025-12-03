@@ -1,19 +1,19 @@
 <template>
   <div class="relative">
     <!-- Hero Section -->
-    <div class="relative py-20 px-4">
-      <div class="max-w-4xl mx-auto text-center">
-        <h1 class="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">
+    <div class="hero-section">
+      <div class="hero-container">
+        <h1 class="hero-title">
           {{ t('home.hero.title') }}
         </h1>
-        <p class="text-xl md:text-2xl text-secondary mb-4">
+        <p class="hero-subtitle">
           {{ t('home.hero.subtitle') }}
         </p>
-        <p class="text-lg text-secondary mb-8 max-w-2xl mx-auto">
+        <p class="hero-description">
           {{ t('home.hero.description') }}
         </p>
 
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <div class="hero-cta">
           <router-link to="/showcase" class="btn-primary">
             🚀 {{ t('home.hero.cta') }}
           </router-link>
@@ -25,30 +25,30 @@
     </div>
 
     <!-- Features Grid -->
-    <div class="container-main section py-16">
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="features-section">
+      <div class="features-grid">
         <div
           v-for="(feature, index) in t('home.features')"
           :key="index"
-          class="card p-6 hover:shadow-xl transition-shadow"
+          class="feature-card"
         >
-          <div class="text-4xl mb-4">{{ feature.icon }}</div>
-          <h3 class="text-xl font-bold mb-2">{{ feature.title }}</h3>
-          <p class="text-secondary">{{ feature.description }}</p>
+          <div class="feature-icon">{{ feature.icon }}</div>
+          <h3 class="feature-title">{{ feature.title }}</h3>
+          <p class="feature-description">{{ feature.description }}</p>
         </div>
       </div>
     </div>
 
     <!-- Code Example -->
-    <div class="container-main section py-16">
-      <div class="max-w-3xl mx-auto">
-        <div class="card overflow-hidden">
-          <div class="flex items-center justify-between px-6 py-3 bg-[var(--color-bg-tertiary)] border-b border-[var(--color-border)]">
-            <span class="text-secondary font-mono text-sm">{{ t('home.code.title') }}</span>
-            <div class="flex gap-2">
-              <div class="w-3 h-3 rounded-full bg-red-500"></div>
-              <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-              <div class="w-3 h-3 rounded-full bg-green-500"></div>
+    <div class="code-example-section">
+      <div class="code-example-container">
+        <div class="code-example-card">
+          <div class="code-example-header">
+            <span class="code-example-title">{{ t('home.code.title') }}</span>
+            <div class="code-example-dots">
+              <div class="code-dot-red"></div>
+              <div class="code-dot-yellow"></div>
+              <div class="code-dot-green"></div>
             </div>
           </div>
           <CodeBlock :code="codeExample" language="javascript" />
