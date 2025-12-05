@@ -43,6 +43,8 @@ export class WorkerPool {
    * @param {string} [options.workerScript] - Path to worker script
    * @param {number} [options.taskTimeout] - Task timeout in ms (default: 60000)
    * @param {boolean} [options.verbose] - Enable verbose logging
+   * @param {boolean} [options.enableAffinity=true] - Enable worker affinity (route same algorithm to same worker)
+   * @param {number} [options.affinityCacheLimit=50] - Max cached function keys per worker
    */
   constructor(options = {}) {
     this.maxWorkers = options.maxWorkers || this.detectCPUCount();
@@ -50,12 +52,22 @@ export class WorkerPool {
     this.taskTimeout = options.taskTimeout || 60000; // 60 seconds
     this.verbose = options.verbose || false;
 
+    // Affinity configuration
+    this.affinityCacheLimit = options.affinityCacheLimit || 50;
+    this.enableAffinity = options.enableAffinity !== false; // default: true
+
     this.workers = [];
     this.availableWorkers = [];
     this.taskQueue = [];
-    this.activeTasks = new Map(); // taskId -> { resolve, reject, onProgress, timeout }
+    this.activeTasks = new Map(); // taskId -> { resolve, reject, onProgress, timeout, task }
     this.taskIdCounter = 0;
     this.initialized = false;
+
+    // Affinity metrics
+    this.affinityMetrics = {
+      hits: 0,
+      misses: 0
+    };
 
     // Initialize logger
     this.log = createLogger({
@@ -156,6 +168,11 @@ export class WorkerPool {
     worker.id = id;
     worker.currentTaskId = null;
 
+    // Affinity tracking metadata
+    worker.cachedFunctions = new Set();  // tracks module:functionName keys
+    worker.tasksExecuted = 0;            // for least-loaded selection
+    worker.lastTaskTime = 0;             // for metrics/debugging
+
     worker.onMessage((message) => {
       this.handleWorkerMessage(worker, message);
     });
@@ -203,20 +220,27 @@ export class WorkerPool {
         this.handleTaskTimeout(taskId);
       }, timeout);
 
-      // Store task info
+      // Store task info (including task for affinity key extraction on completion)
       this.activeTasks.set(taskId, {
         resolve,
         reject,
         onProgress: options.onProgress,
         timeoutId,
-        startTime: Date.now()
+        startTime: Date.now(),
+        task: taskWithId  // Store task for affinity tracking
       });
 
-      // Try to assign to available worker
-      if (this.availableWorkers.length > 0) {
-        const worker = this.availableWorkers.pop();
+      // Try to assign to available worker using affinity-aware selection
+      const worker = this._selectWorker(taskWithId);
+      if (worker) {
         this.assignTask(worker, taskWithId);
-        this.log.debug('Task assigned to worker', { taskId, workerId: worker.id });
+        const affinityKey = this._getAffinityKey(taskWithId);
+        const affinityMatch = affinityKey && worker.cachedFunctions.has(affinityKey);
+        this.log.debug('Task assigned to worker', {
+          taskId,
+          workerId: worker.id,
+          affinityMatch
+        });
       } else {
         // Queue task if no workers available
         this.taskQueue.push(taskWithId);
@@ -235,6 +259,134 @@ export class WorkerPool {
     worker.currentTaskId = task.id;
     worker.postMessage(task);
   }
+
+  // ============================================================================
+  // WORKER AFFINITY METHODS
+  // ============================================================================
+
+  /**
+   * Generate affinity key from task
+   * @private
+   * @param {Object} task - Task with module and functionName
+   * @returns {string|null} Affinity key or null if not applicable
+   */
+  _getAffinityKey(task) {
+    if (task && task.module && task.functionName) {
+      return `${task.module}:${task.functionName}`;
+    }
+    return null;
+  }
+
+  /**
+   * Select optimal worker for task using affinity-aware algorithm
+   * @private
+   * @param {Object} task - Task to assign
+   * @returns {WorkerAdapter|null} Selected worker or null if none available
+   */
+  _selectWorker(task) {
+    if (this.availableWorkers.length === 0) {
+      return null;
+    }
+
+    // If affinity is disabled, use simple FIFO
+    if (!this.enableAffinity) {
+      return this.availableWorkers.pop();
+    }
+
+    const affinityKey = this._getAffinityKey(task);
+
+    // Priority 1: Find worker with affinity match (same algorithm previously run)
+    if (affinityKey) {
+      const affinityMatch = this.availableWorkers.find(
+        w => w.cachedFunctions.has(affinityKey)
+      );
+      if (affinityMatch) {
+        this._recordAffinityHit();
+        return this._removeFromAvailable(affinityMatch);
+      }
+      this._recordAffinityMiss();
+    }
+
+    // Priority 2: Find worker with fewest tasks executed (cold start optimization)
+    const leastLoaded = this.availableWorkers.reduce((min, w) =>
+      w.tasksExecuted < min.tasksExecuted ? w : min
+    );
+
+    return this._removeFromAvailable(leastLoaded);
+  }
+
+  /**
+   * Remove worker from available pool and return it
+   * @private
+   * @param {WorkerAdapter} worker - Worker to remove
+   * @returns {WorkerAdapter} The removed worker
+   */
+  _removeFromAvailable(worker) {
+    const index = this.availableWorkers.indexOf(worker);
+    if (index > -1) {
+      this.availableWorkers.splice(index, 1);
+    }
+    return worker;
+  }
+
+  /**
+   * Record affinity cache hit
+   * @private
+   */
+  _recordAffinityHit() {
+    this.affinityMetrics.hits++;
+  }
+
+  /**
+   * Record affinity cache miss
+   * @private
+   */
+  _recordAffinityMiss() {
+    this.affinityMetrics.misses++;
+  }
+
+  /**
+   * Update worker's affinity cache after task completion
+   * @private
+   * @param {WorkerAdapter} worker - Worker that completed task
+   * @param {Object} task - Completed task
+   */
+  _updateWorkerAffinity(worker, task) {
+    const affinityKey = this._getAffinityKey(task);
+    if (!affinityKey) return;
+
+    // Add to cache
+    worker.cachedFunctions.add(affinityKey);
+    worker.tasksExecuted++;
+    worker.lastTaskTime = Date.now();
+
+    // Enforce cache size limit
+    if (worker.cachedFunctions.size > this.affinityCacheLimit) {
+      this._evictAffinityEntries(worker);
+    }
+  }
+
+  /**
+   * Evict oldest entries from worker's affinity cache
+   * @private
+   * @param {WorkerAdapter} worker - Worker to evict entries from
+   */
+  _evictAffinityEntries(worker) {
+    // Simple strategy: clear half the entries
+    const entries = Array.from(worker.cachedFunctions);
+    const toRemove = entries.slice(0, Math.floor(entries.length / 2));
+    toRemove.forEach(key => worker.cachedFunctions.delete(key));
+
+    this.log.debug('Evicted affinity entries', {
+      workerId: worker.id,
+      evicted: toRemove.length,
+      remaining: worker.cachedFunctions.size
+    });
+  }
+
+  // ============================================================================
+  // END WORKER AFFINITY METHODS
+  // ============================================================================
 
   /**
    * Handle message from worker
@@ -264,6 +416,12 @@ export class WorkerPool {
 
       clearTimeout(taskInfo.timeoutId);
       taskInfo.resolve(result);
+
+      // Update worker's affinity cache with completed task
+      if (taskInfo.task) {
+        this._updateWorkerAffinity(worker, taskInfo.task);
+      }
+
       this.activeTasks.delete(id);
       this.freeWorker(worker);
     } else if (status === 'error') {
@@ -364,7 +522,10 @@ export class WorkerPool {
       this.workers[index] = newWorker;
       this.availableWorkers.push(newWorker);
 
-      this.log.info('Worker restarted successfully', { workerId: oldWorker.id });
+      this.log.info('Worker restarted successfully', {
+        workerId: oldWorker.id,
+        lostAffinityEntries: oldWorker.cachedFunctions?.size || 0
+      });
     } catch (error) {
       this.log.error('Failed to restart worker', { 
         workerId: oldWorker.id, 
@@ -457,13 +618,44 @@ export class WorkerPool {
    * console.log(`Queue: ${status.queuedTasks}, Active: ${status.activeTasks}`);
    */
   getStatus() {
+    const affinityStats = this.getAffinityStats();
     return {
       initialized: this.initialized,
       totalWorkers: this.workers.length,
       availableWorkers: this.availableWorkers.length,
       busyWorkers: this.workers.length - this.availableWorkers.length,
       activeTasks: this.activeTasks.size,
-      queuedTasks: this.taskQueue.length
+      queuedTasks: this.taskQueue.length,
+      // Affinity info
+      affinity: {
+        enabled: this.enableAffinity,
+        cacheLimit: this.affinityCacheLimit,
+        hitRate: affinityStats.hitRate
+      }
+    };
+  }
+
+  /**
+   * Get detailed affinity statistics
+   *
+   * @returns {Object} Affinity metrics including per-worker cache info
+   *
+   * @example
+   * const stats = pool.getAffinityStats();
+   * console.log(`Affinity hit rate: ${(stats.hitRate * 100).toFixed(1)}%`);
+   * console.log(`Hits: ${stats.hits}, Misses: ${stats.misses}`);
+   */
+  getAffinityStats() {
+    const total = this.affinityMetrics.hits + this.affinityMetrics.misses;
+    return {
+      hits: this.affinityMetrics.hits,
+      misses: this.affinityMetrics.misses,
+      hitRate: total > 0 ? this.affinityMetrics.hits / total : 0,
+      workerCaches: this.workers.map(w => ({
+        workerId: w.id,
+        cachedFunctions: Array.from(w.cachedFunctions || []),
+        tasksExecuted: w.tasksExecuted || 0
+      }))
     };
   }
 
