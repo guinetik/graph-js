@@ -737,19 +737,23 @@ const handleAnalyzeGraph = async () => {
     const result = await controller.analyzeGraph(selectedFeatures.value, selectedSizeMetric.value);
     const duration = performance.now() - startTime;
 
-      if (result.success) {
-        stats.value.analysisTime = `${(duration / 1000).toFixed(2)}s`;
-        if (result.graphStats) {
-          graphStats.value = result.graphStats;
-          hasGraphStats.value = true;
-        }
-        setNodeInfo('success', 'Analysis complete', {
-          nodes: result.nodeCount,
-          edges: result.linkCount,
-          time: stats.value.analysisTime,
-          metric: selectedSizeMetric.value || selectedFeatures.value[0]
-        });
+    // Always record analysis time
+    stats.value.analysisTime = `${(duration / 1000).toFixed(2)}s`;
+
+    if (result.success) {
+      if (result.graphStats) {
+        graphStats.value = result.graphStats;
+        hasGraphStats.value = true;
       }
+      setNodeInfo('success', 'Analysis complete', {
+        nodes: result.nodeCount,
+        edges: result.linkCount,
+        time: stats.value.analysisTime,
+        metric: selectedSizeMetric.value || selectedFeatures.value[0]
+      });
+    } else {
+      log.warn('Analysis completed but returned unsuccessful', { result });
+    }
   } catch (err) {
     log.error('Analysis error', { error: err.message, stack: err.stack });
     setNodeInfo('error', `Analysis failed: ${err.message}`);
