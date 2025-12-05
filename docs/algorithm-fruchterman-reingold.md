@@ -71,3 +71,4 @@ temperature = initial_temp × (1 - iteration / max_iterations)
 - [[layout-force-directed]] - ForceDirectedLayout implementation
 - [[layouts-overview]] - All layout algorithms
 
+

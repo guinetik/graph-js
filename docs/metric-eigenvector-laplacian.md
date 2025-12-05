@@ -74,3 +74,4 @@ The Laplacian eigenvector is specifically designed for use with [[layout-spectra
 - [[layout-spectral]] - Spectral layout algorithm
 - [[metric-eigenvector]] - Standard eigenvector centrality
 
+

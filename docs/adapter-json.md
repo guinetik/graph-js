@@ -83,3 +83,4 @@ const graphData = JSONAdapter.fromCytoscape(cytoscapeData);
 - [[adapters-overview]] - All adapters
 - [[adapter-csv]] - CSV adapter
 
+

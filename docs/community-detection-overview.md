@@ -76,3 +76,4 @@ Modularity measures the quality of a community partition:
 - [[algorithm-louvain]] - Louvain algorithm details
 - [[networkstats-class]] - Using community detection via NetworkStats
 
+

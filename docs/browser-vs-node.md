@@ -70,3 +70,4 @@ Node.js uses worker threads automatically. No special configuration needed.
 - [[worker-architecture]] - Worker system details
 - [[bundle-integration]] - Bundler setup
 
+

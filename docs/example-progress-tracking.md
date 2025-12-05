@@ -76,3 +76,4 @@ const results = await analyzer.analyze(network, ['betweenness'], {
 - [[networkstats-class]] - API reference
 - [[metric-betweenness]] - Slow metric that benefits from progress tracking
 
+

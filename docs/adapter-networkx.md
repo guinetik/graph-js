@@ -81,3 +81,4 @@ const graphData = NetworkXAdapter.fromNodeLink(nxData);
 - [[adapters-overview]] - All adapters
 - [[adapter-json]] - JSON adapter
 
+

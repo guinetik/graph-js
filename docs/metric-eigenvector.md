@@ -94,3 +94,4 @@ const analyzer = new NetworkStats({
 - [[statistics-overview]] - All available metrics
 - [[metric-eigenvector-laplacian]] - Laplacian eigenvector variant
 
+

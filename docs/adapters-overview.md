@@ -50,3 +50,4 @@ const results = await analyzer.analyze(graphData, ['degree']);
 - [[adapter-json]] - JSON adapter details
 - [[adapter-networkx]] - NetworkX adapter details
 
+

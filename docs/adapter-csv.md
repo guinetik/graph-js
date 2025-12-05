@@ -88,3 +88,4 @@ C,A,1
 - [[adapters-overview]] - All adapters
 - [[adapter-json]] - JSON adapter
 
+

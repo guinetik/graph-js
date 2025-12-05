@@ -68,3 +68,4 @@ Using gradient descent with Newton's method.
 - [[layout-kamada-kawai]] - KamadaKawaiLayout implementation
 - [[layouts-overview]] - All layout algorithms
 
+
