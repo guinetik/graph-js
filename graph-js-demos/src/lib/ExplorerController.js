@@ -35,17 +35,32 @@ export class ExplorerController {
       caruaru: {
         name: 'Caruaru',
         file: '/data/network_caruaru.json',
-        description: 'Small network (~130 edges)'
+        description: 'Small network (~130 edges)',
+        type: 'json'
       },
       rj: {
         name: 'Rio de Janeiro',
         file: '/data/network_rj.json',
-        description: 'Medium network (~1,900 edges)'
+        description: 'Medium network (~1,900 edges)',
+        type: 'json'
       },
       niteroi: {
         name: 'Niterói',
         file: '/data/network_niteroi.json',
-        description: 'Large network (~18,500 edges)'
+        description: 'Large network (~18,500 edges)',
+        type: 'json'
+      },
+      karate: {
+        name: 'Karate Club',
+        file: '/data/karateclub.json',
+        description: 'Classic social network (34 nodes, 78 edges)',
+        type: 'json'
+      },
+      miserables: {
+        name: 'Les Misérables',
+        file: '/data/les_miserables.csv',
+        description: 'Character co-occurrence network (77 nodes, 254 edges)',
+        type: 'csv'
       }
     };
 
@@ -57,7 +72,7 @@ export class ExplorerController {
   /**
    * Loads a sample network by key
    * 
-   * @param {string} networkKey - Key of the network to load ('caruaru', 'rj', 'niteroi')
+   * @param {string} networkKey - Key of the network to load ('caruaru', 'rj', 'niteroi', 'karate', 'miserables')
    * @returns {Promise<Object>} Result object with success status and data
    */
   async loadSampleNetwork(networkKey) {
@@ -74,55 +89,90 @@ export class ExplorerController {
       this.log.debug('Loading sample network', { networkKey, networkName: network.name });
       this._updateStatus(this.translate('explorer.messages.loadingNetworkData'), 'info');
       
-      // Fetch the JSON file (raw edge list format)
-      const response = await fetch(network.file);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch: ${response.statusText}`);
+      let d3Data;
+      
+      // Handle different file types
+      if (network.type === 'csv') {
+        // Load CSV using CSVAdapter (for Les Misérables)
+        const graphData = await CSVAdapter.loadFromURL(network.file);
+        
+        // Add default group if not present
+        const nodes = graphData.nodes.map(n => ({
+          ...n,
+          group: n.group || 1
+        }));
+        
+        d3Data = {
+          nodes,
+          links: graphData.edges
+        };
+      } else {
+        // Handle JSON files (default for caruaru, rj, niteroi, karate)
+        if (networkKey === 'karate') {
+          // Karate Club uses JSONAdapter (has nodes and edges structure)
+          const graphData = await JSONAdapter.loadFromURL(network.file);
+          
+          // Add group property from club field if present
+          const nodes = graphData.nodes.map(n => ({
+            ...n,
+            group: n.club === 'Mr. Hi' ? 1 : 2
+          }));
+          
+          d3Data = {
+            nodes,
+            links: graphData.edges
+          };
+        } else {
+          // Other JSON files (caruaru, rj, niteroi) use raw edge list format
+          const response = await fetch(network.file);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch: ${response.statusText}`);
+          }
+          
+          const edgeList = await response.json();
+          
+          // Convert edge list to GraphData format
+          const nodeSet = new Set();
+          const edges = [];
+
+          edgeList.forEach(edge => {
+            nodeSet.add(edge.source);
+            nodeSet.add(edge.target);
+            edges.push({
+              source: String(edge.source),
+              target: String(edge.target),
+              weight: edge.weight || 1
+            });
+          });
+
+          const nodes = Array.from(nodeSet).map(id => ({
+            id: String(id),
+            group: 1
+          }));
+
+          d3Data = {
+            nodes,
+            links: edges.map(e => ({
+              source: e.source,
+              target: e.target,
+              weight: e.weight
+            }))
+          };
+        }
       }
-      
-      const edgeList = await response.json();
-      
-      // Convert edge list to GraphData format
-      const nodeSet = new Set();
-      const edges = [];
-
-      edgeList.forEach(edge => {
-        nodeSet.add(edge.source);
-        nodeSet.add(edge.target);
-        edges.push({
-          source: String(edge.source),
-          target: String(edge.target),
-          weight: edge.weight || 1
-        });
-      });
-
-      const nodes = Array.from(nodeSet).map(id => ({
-        id: String(id),
-        group: 1
-      }));
-
-      // Convert to D3 format (nodes/links)
-      const d3Data = {
-        nodes,
-        links: edges.map(e => ({
-          source: e.source,
-          target: e.target,
-          weight: e.weight
-        }))
-      };
 
       // Load data into graph
       this.graphManager.loadData(d3Data.nodes, d3Data.links);
 
       const message = this.translate('explorer.messages.loadedNetwork', {
         name: network.name,
-        nodes: nodes.length,
-        edges: edges.length
+        nodes: d3Data.nodes.length,
+        edges: d3Data.links.length
       });
       this.log.info('Sample network loaded successfully', { 
         name: network.name, 
-        nodeCount: nodes.length, 
-        edgeCount: edges.length 
+        nodeCount: d3Data.nodes.length, 
+        edgeCount: d3Data.links.length 
       });
       this._updateStatus(message, 'success');
 
@@ -130,10 +180,10 @@ export class ExplorerController {
         success: true,
         data: d3Data,
         name: network.name,
-        nodeCount: nodes.length,
-        edgeCount: edges.length,
+        nodeCount: d3Data.nodes.length,
+        edgeCount: d3Data.links.length,
         description: network.description,
-        useWorkers: nodes.length >= 500 && this.workersSupported
+        useWorkers: d3Data.nodes.length >= 500 && this.workersSupported
       };
     } catch (err) {
       const message = this.translate('explorer.messages.failedToLoadNetwork', { error: err.message });

@@ -147,11 +147,11 @@
         >
           <template #results>
             <div v-if="communityResult" class="info-box-green mt-3">
-              <p class="text-sm text-green-800 dark:text-green-200 space-y-1">
+              <div class="text-sm text-green-800 dark:text-green-200 space-y-1">
                 <div><strong>{{ t('showcase.communityDetection.communitiesFound') }}</strong> {{ communityResult.numCommunities }}</div>
                 <div><strong>{{ t('showcase.communityDetection.modularity') }}</strong> {{ communityResult.modularity.toFixed(3) }}</div>
                 <div class="text-xs mt-2">{{ t('showcase.communityDetection.nodeColorsAssignments') }}</div>
-              </p>
+              </div>
             </div>
 
             <div v-if="availableCommunityAlgorithms.length > 0 && !communityResult" class="info-box-yellow mt-3">
