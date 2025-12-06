@@ -41,7 +41,7 @@ export class WorkerPool {
    * @param {Object} options - Configuration options
    * @param {number} [options.maxWorkers] - Maximum number of workers (default: CPU count)
    * @param {string} [options.workerScript] - Path to worker script
-   * @param {number} [options.taskTimeout] - Task timeout in ms (default: 60000)
+   * @param {number} [options.taskTimeout] - Task timeout in ms (default: 300000, 5 minutes)
    * @param {boolean} [options.verbose] - Enable verbose logging
    * @param {boolean} [options.enableAffinity=true] - Enable worker affinity (route same algorithm to same worker)
    * @param {number} [options.affinityCacheLimit=50] - Max cached function keys per worker
@@ -49,7 +49,7 @@ export class WorkerPool {
   constructor(options = {}) {
     this.maxWorkers = options.maxWorkers || this.detectCPUCount();
     this.workerScript = options.workerScript || this.getDefaultWorkerScript();
-    this.taskTimeout = options.taskTimeout || 60000; // 60 seconds
+    this.taskTimeout = options.taskTimeout || 300000; // 5 minutes (300 seconds)
     this.verbose = options.verbose || false;
 
     // Affinity configuration
@@ -234,13 +234,7 @@ export class WorkerPool {
       const worker = this._selectWorker(taskWithId);
       if (worker) {
         this.assignTask(worker, taskWithId);
-        const affinityKey = this._getAffinityKey(taskWithId);
-        const affinityMatch = affinityKey && worker.cachedFunctions.has(affinityKey);
-        this.log.debug('Task assigned to worker', {
-          taskId,
-          workerId: worker.id,
-          affinityMatch
-        });
+        // Detailed logging is now handled in _selectWorker
       } else {
         // Queue task if no workers available
         this.taskQueue.push(taskWithId);
@@ -290,7 +284,12 @@ export class WorkerPool {
 
     // If affinity is disabled, use simple FIFO
     if (!this.enableAffinity) {
-      return this.availableWorkers.pop();
+      const worker = this.availableWorkers.pop();
+      this.log.debug('Worker selected (affinity disabled)', { 
+        workerId: worker.id,
+        taskId: task.id 
+      });
+      return worker;
     }
 
     const affinityKey = this._getAffinityKey(task);
@@ -302,15 +301,40 @@ export class WorkerPool {
       );
       if (affinityMatch) {
         this._recordAffinityHit();
+        this.log.info('🎯 Worker selected via affinity', {
+          workerId: affinityMatch.id,
+          taskId: task.id,
+          affinityKey,
+          cachedFunctions: Array.from(affinityMatch.cachedFunctions)
+        });
+        this.log.debug('Worker selected via affinity (detailed)', {
+          workerId: affinityMatch.id,
+          taskId: task.id,
+          affinityKey,
+          cachedFunctions: Array.from(affinityMatch.cachedFunctions),
+          tasksExecuted: affinityMatch.tasksExecuted
+        });
         return this._removeFromAvailable(affinityMatch);
       }
       this._recordAffinityMiss();
+      this.log.debug('No affinity match found', {
+        taskId: task.id,
+        affinityKey,
+        availableWorkers: this.availableWorkers.length
+      });
     }
 
     // Priority 2: Find worker with fewest tasks executed (cold start optimization)
     const leastLoaded = this.availableWorkers.reduce((min, w) =>
       w.tasksExecuted < min.tasksExecuted ? w : min
     );
+
+    this.log.debug('Worker selected (least loaded)', {
+      workerId: leastLoaded.id,
+      taskId: task.id,
+      tasksExecuted: leastLoaded.tasksExecuted,
+      affinityKey: affinityKey || 'none'
+    });
 
     return this._removeFromAvailable(leastLoaded);
   }
@@ -355,14 +379,39 @@ export class WorkerPool {
     const affinityKey = this._getAffinityKey(task);
     if (!affinityKey) return;
 
+    const wasNew = !worker.cachedFunctions.has(affinityKey);
+
     // Add to cache
     worker.cachedFunctions.add(affinityKey);
     worker.tasksExecuted++;
     worker.lastTaskTime = Date.now();
 
+    if (wasNew) {
+      this.log.info('📦 Worker affinity cache updated', {
+        workerId: worker.id,
+        affinityKey,
+        cacheSize: worker.cachedFunctions.size,
+        tasksExecuted: worker.tasksExecuted
+      });
+      this.log.debug('Worker affinity cache updated (detailed)', {
+        workerId: worker.id,
+        affinityKey,
+        cacheSize: worker.cachedFunctions.size,
+        tasksExecuted: worker.tasksExecuted,
+        allCachedFunctions: Array.from(worker.cachedFunctions)
+      });
+    }
+
     // Enforce cache size limit
     if (worker.cachedFunctions.size > this.affinityCacheLimit) {
+      const beforeSize = worker.cachedFunctions.size;
       this._evictAffinityEntries(worker);
+      this.log.debug('Worker affinity cache evicted', {
+        workerId: worker.id,
+        beforeSize,
+        afterSize: worker.cachedFunctions.size,
+        limit: this.affinityCacheLimit
+      });
     }
   }
 

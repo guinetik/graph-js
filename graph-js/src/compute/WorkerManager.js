@@ -39,8 +39,10 @@ class WorkerManager {
    * @param {Object} [options={}] - Configuration options
    * @param {number} [options.maxWorkers] - Maximum number of workers (default: auto-detect CPU cores)
    * @param {string} [options.workerScript] - Path to worker script
-   * @param {number} [options.taskTimeout=60000] - Default task timeout in ms
+   * @param {number} [options.taskTimeout=300000] - Default task timeout in ms (default: 5 minutes)
    * @param {boolean} [options.verbose=false] - Enable verbose logging
+   * @param {boolean} [options.enableAffinity=true] - Enable worker affinity (route same algorithm to same worker)
+   * @param {number} [options.affinityCacheLimit=50] - Max cached function keys per worker
    * @returns {Promise<void>}
    */
   async initialize(options = {}) {
@@ -72,8 +74,10 @@ class WorkerManager {
     const {
       maxWorkers,
       workerScript,
-      taskTimeout = 60000,
-      verbose = false
+      taskTimeout = 300000, // 5 minutes default
+      verbose = false,
+      enableAffinity = true,
+      affinityCacheLimit = 50
     } = options;
 
     // Set logger level based on verbose option
@@ -105,7 +109,9 @@ class WorkerManager {
       maxWorkers: maxWorkers || this._getDefaultWorkerCount(),
       workerScript: workerPath,
       taskTimeout,
-      verbose
+      verbose,
+      enableAffinity,
+      affinityCacheLimit
     });
 
     await this.workerPool.initialize();
@@ -184,6 +190,24 @@ class WorkerManager {
     }
 
     return this.workerPool.getStatus();
+  }
+
+  /**
+   * Get detailed affinity statistics
+   *
+   * @returns {Object|null} Affinity metrics including per-worker cache info or null if not initialized
+   *
+   * @example
+   * const stats = WorkerManager.getAffinityStats();
+   * console.log(`Affinity hit rate: ${(stats.hitRate * 100).toFixed(1)}%`);
+   * console.log(`Hits: ${stats.hits}, Misses: ${stats.misses}`);
+   */
+  getAffinityStats() {
+    if (!this.workerPool) {
+      return null;
+    }
+
+    return this.workerPool.getAffinityStats();
   }
 
   /**
