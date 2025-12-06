@@ -122,6 +122,8 @@
             class="w-full bg-secondary text-primary border border-color px-3 py-2 rounded-md"
           >
             <option value="">{{ t('explorer.dataLoading.chooseCity') }}</option>
+            <option value="karate">{{ t('explorer.dataLoading.karate') }}</option>
+            <option value="miserables">{{ t('explorer.dataLoading.miserables') }}</option>
             <option value="caruaru">{{ t('explorer.dataLoading.caruaru') }}</option>
             <option value="rj">{{ t('explorer.dataLoading.rj') }}</option>
             <option value="niteroi">{{ t('explorer.dataLoading.niteroi') }}</option>
@@ -211,6 +213,23 @@
         </div>
       </div>
 
+      <!-- Network Analysis Section -->
+      <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
+        <h2 class="demo-controls-section-title">{{ t('explorer.networkAnalysis.title') }}</h2>
+
+        <NetworkAnalysis
+          v-model:selected-metrics="selectedFeatures"
+          v-model:size-metric="selectedSizeMetric"
+          v-model:show-clique-edges="showCliqueEdges"
+          :analyzing="analyzing"
+          :disabled="!networkLoaded"
+          :progress="analysisProgress"
+          :show-spectral-metric="true"
+          :has-cliques="hasCliques"
+          @analyze="handleAnalyzeGraph"
+        />
+      </div>
+
       <!-- Network Statistics -->
       <div v-if="networkLoaded" class="demo-controls-section border-t border-[var(--color-border)] pt-4">
         <h2 class="demo-controls-section-title">{{ t('explorer.networkStats.title') }}</h2>
@@ -240,6 +259,35 @@
             <div class="text-xs text-secondary">{{ t('explorer.networkStats.modularity') }}</div>
             <div class="text-xl font-bold text-cyan-600 dark:text-cyan-400">{{ stats.modularity }}</div>
           </div>
+          <!-- Graph-Level Statistics Cards -->
+          <div v-if="graphStats?.density !== undefined" class="metric-card">
+            <div class="text-xs text-secondary">{{ t('explorer.graphStats.density') }}</div>
+            <div class="text-xl font-bold text-indigo-600 dark:text-indigo-400">{{ graphStats.density?.toFixed(4) || '-' }}</div>
+          </div>
+          <div v-if="graphStats?.diameter !== undefined" class="metric-card">
+            <div class="text-xs text-secondary">{{ t('explorer.graphStats.diameter') }}</div>
+            <div class="text-xl font-bold text-violet-600 dark:text-violet-400">
+              {{ graphStats.diameter === Infinity ? '∞' : (graphStats.diameter || '-') }}
+            </div>
+          </div>
+          <div v-if="graphStats?.['average_clustering'] !== undefined" class="metric-card">
+            <div class="text-xs text-secondary">{{ t('explorer.graphStats.avgClustering') }}</div>
+            <div class="text-xl font-bold text-fuchsia-600 dark:text-fuchsia-400">
+              {{ graphStats['average_clustering']?.toFixed(4) || '-' }}
+            </div>
+          </div>
+          <div v-if="graphStats?.['average_shortest_path'] !== undefined" class="metric-card">
+            <div class="text-xs text-secondary">{{ t('explorer.graphStats.avgPathLength') }}</div>
+            <div class="text-xl font-bold text-rose-600 dark:text-rose-400">
+              {{ graphStats['average_shortest_path'] === Infinity ? '∞' : (graphStats['average_shortest_path']?.toFixed(2) || '-') }}
+            </div>
+          </div>
+          <div v-if="graphStats?.['connected_components'] !== undefined" class="metric-card">
+            <div class="text-xs text-secondary">{{ t('explorer.graphStats.connectedComponents') }}</div>
+            <div class="text-xl font-bold text-sky-600 dark:text-sky-400">
+              {{ graphStats['connected_components']?.count ?? '-' }}
+            </div>
+          </div>
         </div>
 
         <div v-if="useWorkers" class="info-box-green text-xs">
@@ -259,21 +307,6 @@
             - {{ t('explorer.networkStats.networkTooSmall') }}
           </span>
         </div>
-      </div>
-
-      <!-- Network Analysis Section -->
-      <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
-        <h2 class="demo-controls-section-title">{{ t('explorer.networkAnalysis.title') }}</h2>
-
-        <NetworkAnalysis
-          v-model:selected-metrics="selectedFeatures"
-          v-model:size-metric="selectedSizeMetric"
-          :analyzing="analyzing"
-          :disabled="!networkLoaded"
-          :progress="analysisProgress"
-          :show-spectral-metric="true"
-          @analyze="handleAnalyzeGraph"
-        />
       </div>
 
       <!-- Layout Algorithm Section -->
@@ -302,51 +335,6 @@
         </div>
       </div>
 
-      <!-- Graph-Level Statistics Results (Persistent) -->
-      <div v-if="hasGraphStats" class="demo-controls-section border-t border-[var(--color-border)] pt-4">
-        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-lg p-4 border-2 border-blue-200 dark:border-blue-700">
-          <h3 class="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-3 flex items-center gap-2">
-            {{ t('explorer.graphStats.title') }}
-          </h3>
-          <div class="space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="text-sm text-blue-800 dark:text-blue-200">{{ t('explorer.graphStats.density') }}</span>
-              <span class="text-sm font-mono text-blue-600 dark:text-blue-400">
-                {{ graphStats?.density?.toFixed(4) || '-' }}
-              </span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-sm text-blue-800 dark:text-blue-200">{{ t('explorer.graphStats.diameter') }}</span>
-              <span class="text-sm font-mono text-blue-600 dark:text-blue-400">
-                {{ graphStats?.diameter === Infinity ? '∞' : (graphStats?.diameter || '-') }}
-              </span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-sm text-blue-800 dark:text-blue-200">{{ t('explorer.graphStats.avgClustering') }}</span>
-              <span class="text-sm font-mono text-blue-600 dark:text-blue-400">
-                {{ graphStats?.['average_clustering']?.toFixed(4) || '-' }}
-              </span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-sm text-blue-800 dark:text-blue-200">{{ t('explorer.graphStats.avgPathLength') }}</span>
-              <span class="text-sm font-mono text-blue-600 dark:text-blue-400">
-                {{ graphStats?.['average_shortest_path'] === Infinity ? '∞' : (graphStats?.['average_shortest_path']?.toFixed(2) || '-') }}
-              </span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-sm text-blue-800 dark:text-blue-200">{{ t('explorer.graphStats.avgDegree') }}</span>
-              <span class="text-sm font-mono text-blue-600 dark:text-blue-400">
-                {{ graphStats?.['average_degree']?.toFixed(2) || '-' }}
-              </span>
-            </div>
-          </div>
-          <div class="mt-3 pt-3 border-t border-blue-200 dark:border-blue-700">
-            <p class="text-xs text-blue-700 dark:text-blue-300">
-              {{ t('explorer.graphStats.calculated') }}
-            </p>
-          </div>
-        </div>
-      </div>
 
       <!-- Community Detection Section -->
       <div class="demo-controls-section border-t border-[var(--color-border)] pt-4">
@@ -480,6 +468,8 @@ const selectedLayout = ref('none');
 const availableLayouts = ref([]);
 const selectedFeatures = ref([]);
 const selectedSizeMetric = ref('');
+const showCliqueEdges = ref(false);
+const hasCliques = ref(false);
 const selectedCommunityAlgorithm = ref('louvain');
 const availableCommunityAlgorithms = ref([]);
 const networkLoaded = ref(false);
@@ -652,6 +642,15 @@ const loadDefaultDataset = () => {
 
   loadData(initialData.nodes, initialData.links);
   networkLoaded.value = true;
+  // Reset analysis-related state for new network
+  selectedFeatures.value = [];
+  selectedSizeMetric.value = '';
+  showCliqueEdges.value = false;
+  hasCliques.value = false;
+  // Disable clique edge coloring on graph instance if it was enabled
+  if (graphInstance.value && typeof graphInstance.value.updateCliqueEdgeColors === 'function') {
+    graphInstance.value.updateCliqueEdgeColors(false);
+  }
   stats.value = {
     nodes: initialData.nodes.length,
     edges: initialData.links.length,
@@ -681,6 +680,15 @@ const handleLoadSampleNetwork = async () => {
       useWorkers.value = result.useWorkers || false;
       // Reset to default layout (simulation running)
       selectedLayout.value = 'none';
+      // Reset analysis-related state for new network
+      selectedFeatures.value = [];
+      selectedSizeMetric.value = '';
+      showCliqueEdges.value = false;
+      hasCliques.value = false;
+      // Disable clique edge coloring on graph instance if it was enabled
+      if (graphInstance.value && typeof graphInstance.value.updateCliqueEdgeColors === 'function') {
+        graphInstance.value.updateCliqueEdgeColors(false);
+      }
       stats.value = {
         nodes: result.nodeCount,
         edges: result.edgeCount,
@@ -730,6 +738,15 @@ const handleLoadUploadedNetwork = async () => {
       useWorkers.value = result.useWorkers || false;
       // Reset to default layout (simulation running)
       selectedLayout.value = 'none';
+      // Reset analysis-related state for new network
+      selectedFeatures.value = [];
+      selectedSizeMetric.value = '';
+      showCliqueEdges.value = false;
+      hasCliques.value = false;
+      // Disable clique edge coloring on graph instance if it was enabled
+      if (graphInstance.value && typeof graphInstance.value.updateCliqueEdgeColors === 'function') {
+        graphInstance.value.updateCliqueEdgeColors(false);
+      }
       stats.value = {
         nodes: result.nodeCount,
         edges: result.edgeCount,
@@ -775,6 +792,9 @@ const handleAnalyzeGraph = async () => {
     stats.value.analysisTime = `${(duration / 1000).toFixed(2)}s`;
 
     if (result.success) {
+      // Check if cliques were calculated
+      hasCliques.value = selectedFeatures.value.includes('cliques');
+      
       if (result.graphStats) {
         graphStats.value = result.graphStats;
         hasGraphStats.value = true;
@@ -905,6 +925,14 @@ const handleRendererSwitch = async (rendererType) => {
             setNodeInfo('default', 'Hover over a node to see details...');
           }
         });
+
+        // Restore clique edge coloring if it was enabled
+        if (showCliqueEdges.value && hasCliques.value && typeof graphInstance.value.updateCliqueEdgeColors === 'function') {
+          // Use setTimeout to ensure graph is fully initialized
+          setTimeout(() => {
+            graphInstance.value.updateCliqueEdgeColors(true);
+          }, 100);
+        }
       }
     } else {
       statusMessage.value = 'Failed to switch renderer';
@@ -917,10 +945,26 @@ const handleRendererSwitch = async (rendererType) => {
   }
 };
 
-// Watch for graph instance to be ready, then initialize
-watch(graphInstance, (newInstance) => {
+// Watch for clique edge coloring toggle
+watch(showCliqueEdges, (enabled) => {
+  if (graphInstance.value && hasCliques.value && typeof graphInstance.value.updateCliqueEdgeColors === 'function') {
+    graphInstance.value.updateCliqueEdgeColors(enabled);
+  }
+});
+
+// Watch for graph instance changes and restore clique edge coloring if needed
+watch(graphInstance, (newInstance, oldInstance) => {
+  // Initialize controller when graph instance is first created
   if (newInstance && !controller) {
     initializeExplorer();
+  }
+  
+  // Restore clique edge coloring when renderer switches
+  if (newInstance && showCliqueEdges.value && hasCliques.value && typeof newInstance.updateCliqueEdgeColors === 'function') {
+    // Use setTimeout to ensure graph is fully initialized
+    setTimeout(() => {
+      newInstance.updateCliqueEdgeColors(true);
+    }, 100);
   }
 }, { immediate: true });
 </script>
@@ -933,15 +977,13 @@ watch(graphInstance, (newInstance) => {
 }
 
 .metrics-grid-row {
-  display: flex;
-  flex-wrap: nowrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
   gap: 0.5rem;
-  overflow-x: auto;
 }
 
 .metrics-grid-row .metric-card {
-  flex: 0 0 auto;
-  min-width: 90px;
+  min-width: 0; /* Allow cards to shrink below min-width if needed */
 }
 
 .metric-card {
