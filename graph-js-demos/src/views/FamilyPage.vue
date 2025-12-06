@@ -305,7 +305,9 @@ import LayoutPicker from '../components/LayoutPicker.vue';
 import NetworkAnalysis from '../components/NetworkAnalysis.vue';
 import { useNetworkGraph } from '../composables/useNetworkGraph';
 import { useI18n } from '../composables/useI18n';
+import { useAnalytics } from '../composables/useAnalytics';
 import { getTranslation } from '../../lib/i18n.js';
+import { FAMILY_EVENTS, ANALYSIS_EVENTS } from '../lib/analytics/AnalyticsEvents.js';
 import { FamilyController, FAMILY_GROUPS, GROUP_COLORS, DIALOG_ACTIONS } from '../lib/FamilyController';
 import { FamilyDialogService } from '../lib/family/FamilyDialogService.js';
 import { createLogger } from '@guinetik/logger';
@@ -317,6 +319,9 @@ const log = createLogger({
 
 // Use i18n for translations
 const { t, lang } = useI18n();
+
+// Analytics tracking
+const { trackFamilyAction, trackAnalysis } = useAnalytics();
 
 // Use the network graph composable with custom color function for family groups
 const graphComposable = useNetworkGraph({
@@ -479,45 +484,69 @@ const showDialogForAction = async (actionType, getDialogConfig) => {
 };
 
 // Dialog handlers - all use the generic showDialogForAction method
-const handleAddParents = () => showDialogForAction(
-  DIALOG_ACTIONS.ADD_PARENTS,
-  () => controller?.getDialogService().getAddParentsDialog()
-);
+const handleAddParents = () => {
+  trackFamilyAction(FAMILY_EVENTS.RELATIVE_ADD, { type: 'parents' });
+  showDialogForAction(
+    DIALOG_ACTIONS.ADD_PARENTS,
+    () => controller?.getDialogService().getAddParentsDialog()
+  );
+};
 
-const handleAddSibling = () => showDialogForAction(
-  DIALOG_ACTIONS.ADD_SIBLING,
-  () => controller?.getDialogService().getAddSiblingDialog()
-);
+const handleAddSibling = () => {
+  trackFamilyAction(FAMILY_EVENTS.RELATIVE_ADD, { type: 'sibling' });
+  showDialogForAction(
+    DIALOG_ACTIONS.ADD_SIBLING,
+    () => controller?.getDialogService().getAddSiblingDialog()
+  );
+};
 
-const handleAddGrandparents = () => showDialogForAction(
-  DIALOG_ACTIONS.ADD_GRANDPARENTS,
-  () => controller?.getDialogService().getAddGrandparentsDialog()
-);
+const handleAddGrandparents = () => {
+  trackFamilyAction(FAMILY_EVENTS.RELATIVE_ADD, { type: 'grandparents' });
+  showDialogForAction(
+    DIALOG_ACTIONS.ADD_GRANDPARENTS,
+    () => controller?.getDialogService().getAddGrandparentsDialog()
+  );
+};
 
-const handleAddUncleAunt = () => showDialogForAction(
-  DIALOG_ACTIONS.ADD_UNCLE_AUNT,
-  () => controller?.getDialogService().getAddUncleAuntDialog()
-);
+const handleAddUncleAunt = () => {
+  trackFamilyAction(FAMILY_EVENTS.RELATIVE_ADD, { type: 'uncle_aunt' });
+  showDialogForAction(
+    DIALOG_ACTIONS.ADD_UNCLE_AUNT,
+    () => controller?.getDialogService().getAddUncleAuntDialog()
+  );
+};
 
-const handleAddCousin = () => showDialogForAction(
-  DIALOG_ACTIONS.ADD_COUSIN,
-  () => controller?.getDialogService().getAddCousinDialog()
-);
+const handleAddCousin = () => {
+  trackFamilyAction(FAMILY_EVENTS.RELATIVE_ADD, { type: 'cousin' });
+  showDialogForAction(
+    DIALOG_ACTIONS.ADD_COUSIN,
+    () => controller?.getDialogService().getAddCousinDialog()
+  );
+};
 
-const handleAddChild = () => showDialogForAction(
-  DIALOG_ACTIONS.ADD_CHILD,
-  () => controller?.getDialogService().getAddChildDialog()
-);
+const handleAddChild = () => {
+  trackFamilyAction(FAMILY_EVENTS.RELATIVE_ADD, { type: 'child' });
+  showDialogForAction(
+    DIALOG_ACTIONS.ADD_CHILD,
+    () => controller?.getDialogService().getAddChildDialog()
+  );
+};
 
-const handleAddNieceNephew = () => showDialogForAction(
-  DIALOG_ACTIONS.ADD_NIECE_NEPHEW,
-  () => controller?.getDialogService().getAddNieceNephewDialog()
-);
+const handleAddNieceNephew = () => {
+  trackFamilyAction(FAMILY_EVENTS.RELATIVE_ADD, { type: 'niece_nephew' });
+  showDialogForAction(
+    DIALOG_ACTIONS.ADD_NIECE_NEPHEW,
+    () => controller?.getDialogService().getAddNieceNephewDialog()
+  );
+};
 
-const handleAddPartner = () => showDialogForAction(
-  DIALOG_ACTIONS.ADD_PARTNER,
-  () => controller?.getDialogService().getAddPartnerDialog()
-);
+const handleAddPartner = () => {
+  trackFamilyAction(FAMILY_EVENTS.RELATIVE_ADD, { type: 'partner' });
+  showDialogForAction(
+    DIALOG_ACTIONS.ADD_PARTNER,
+    () => controller?.getDialogService().getAddPartnerDialog()
+  );
+};
 
 /**
  * Handle dialog confirm
@@ -561,6 +590,7 @@ const handleDialogCancel = () => {
  */
 const handleSaveFamily = () => {
   if (!controller) return;
+  trackFamilyAction(FAMILY_EVENTS.TREE_SAVE);
   controller.saveFamily();
 };
 
@@ -569,6 +599,7 @@ const handleSaveFamily = () => {
  */
 const handleSaveImage = () => {
   if (!controller) return;
+  trackFamilyAction(FAMILY_EVENTS.TREE_EXPORT);
   controller.saveAsPNG('family-tree.png');
 };
 
@@ -577,6 +608,7 @@ const handleSaveImage = () => {
  */
 const handleLockGraph = () => {
   if (!controller) return;
+  trackFamilyAction(FAMILY_EVENTS.GRAPH_LOCK);
   controller.lockGraph();
 };
 
@@ -585,6 +617,7 @@ const handleLockGraph = () => {
  */
 const handleUnlockGraph = () => {
   if (!controller) return;
+  trackFamilyAction(FAMILY_EVENTS.GRAPH_UNLOCK);
   controller.unlockGraph();
 };
 
@@ -594,6 +627,7 @@ const handleUnlockGraph = () => {
 const handleResetTree = () => {
   if (!controller) return;
   if (confirm('Are you sure you want to reset your family tree?')) {
+    trackFamilyAction(FAMILY_EVENTS.TREE_RESET);
     controller.resetFamily();
     updateUndoRedoStates();
   }
@@ -604,6 +638,7 @@ const handleResetTree = () => {
  */
 const handleUndo = () => {
   if (!controller) return;
+  trackFamilyAction(FAMILY_EVENTS.UNDO_ACTION);
   const result = controller.undo();
   if (result.success) {
     handleStatusChange(result.message, 'info');
@@ -618,6 +653,7 @@ const handleUndo = () => {
  */
 const handleRedo = () => {
   if (!controller) return;
+  trackFamilyAction(FAMILY_EVENTS.REDO_ACTION);
   const result = controller.redo();
   if (result.success) {
     handleStatusChange(result.message, 'info');
@@ -632,6 +668,7 @@ const handleRedo = () => {
  */
 const handleAnalyzeGraph = async () => {
   if (!analyzeGraph || selectedFeatures.value.length === 0) return;
+  trackAnalysis(ANALYSIS_EVENTS.ANALYSIS_RUN, { metrics: selectedFeatures.value.join(',') });
 
   try {
     analyzing.value = true;
@@ -665,6 +702,7 @@ const handleAnalyzeGraph = async () => {
  */
 const handleApplyLayout = async () => {
   if (!controller || !selectedLayout.value) return;
+  trackAnalysis(ANALYSIS_EVENTS.LAYOUT_CHANGE, { layout: selectedLayout.value });
 
   try {
     applyingLayout.value = true;
@@ -712,6 +750,7 @@ watch(lang, (newLang) => {
 
 // Watch for render mode changes
 watch(renderMode, (newMode) => {
+  trackFamilyAction(FAMILY_EVENTS.RENDER_MODE_CHANGE, { mode: newMode });
   if (graphInstance.value) {
     switchingRenderMode.value = true;
 

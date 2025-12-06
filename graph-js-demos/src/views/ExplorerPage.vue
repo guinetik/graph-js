@@ -424,7 +424,9 @@ import CommunityPicker from '../components/CommunityPicker.vue';
 import NetworkAnalysis from '../components/NetworkAnalysis.vue';
 import { useNetworkGraph } from '../composables/useNetworkGraph';
 import { useI18n } from '../composables/useI18n';
+import { useAnalytics } from '../composables/useAnalytics';
 import { ExplorerController } from '../lib/ExplorerController';
+import { DATA_EVENTS, ANALYSIS_EVENTS, GRAPH_EVENTS } from '../lib/analytics/AnalyticsEvents.js';
 import { createLogger } from '@guinetik/logger';
 
 const log = createLogger({
@@ -436,6 +438,9 @@ const log = createLogger({
  * Use i18n for translations
  */
 const { t } = useI18n();
+
+// Analytics tracking
+const { trackDataAction, trackAnalysis, trackGraphInteraction } = useAnalytics();
 
 // Use the network graph composable
 const graphComposable = useNetworkGraph();
@@ -667,6 +672,7 @@ const loadDefaultDataset = () => {
  */
 const handleLoadSampleNetwork = async () => {
   if (!controller || !selectedNetwork.value) return;
+  trackDataAction(DATA_EVENTS.SAMPLE_NETWORK_LOAD, { network: selectedNetwork.value });
 
   try {
     loading.value = true;
@@ -720,6 +726,7 @@ const handleLoadSampleNetwork = async () => {
  */
 const handleLoadUploadedNetwork = async () => {
   if (!controller || !canLoadUpload.value) return;
+  trackDataAction(DATA_EVENTS.FILE_UPLOAD, { format: uploadFormat.value });
 
   try {
     loading.value = true;
@@ -778,6 +785,7 @@ const handleLoadUploadedNetwork = async () => {
  */
 const handleAnalyzeGraph = async () => {
   if (!controller || !networkLoaded.value) return;
+  trackAnalysis(ANALYSIS_EVENTS.ANALYSIS_RUN, { metrics: selectedFeatures.value.join(',') });
 
   try {
     analyzing.value = true;
@@ -821,6 +829,7 @@ const handleAnalyzeGraph = async () => {
  */
 const handleApplyLayout = async () => {
   if (!controller || !networkLoaded.value) return;
+  trackAnalysis(ANALYSIS_EVENTS.LAYOUT_CHANGE, { layout: selectedLayout.value });
 
   try {
     loadingMessage.value = `Applying ${selectedLayout.value} layout...`;
@@ -857,6 +866,7 @@ const handleApplyLayout = async () => {
  */
 const handleDetectCommunities = async () => {
   if (!controller || !networkLoaded.value) return;
+  trackAnalysis(ANALYSIS_EVENTS.COMMUNITY_DETECTION, { algorithm: selectedCommunityAlgorithm.value });
 
   try {
     detectingCommunities.value = true;
@@ -888,6 +898,7 @@ const handleDetectCommunities = async () => {
  */
 const handleRendererSwitch = async (rendererType) => {
   if (rendererType === currentRenderer.value) return;
+  trackGraphInteraction(GRAPH_EVENTS.RENDERER_SWITCH, { renderer: rendererType });
 
   try {
     loadingMessage.value = `Switching to ${rendererType === 'd3' ? 'D3.js (SVG)' : 'Sigma.js (WebGL)'} renderer...`;

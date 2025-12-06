@@ -65,6 +65,10 @@ export const FAMILY_EVENTS = {
   RELATIVE_ADD: 'relative_add',
   TREE_SAVE: 'tree_save',
   TREE_EXPORT: 'tree_export',
+  TREE_RESET: 'tree_reset',
+  GRAPH_LOCK: 'graph_lock',
+  GRAPH_UNLOCK: 'graph_unlock',
+  RENDER_MODE_CHANGE: 'render_mode_change',
   UNDO_ACTION: 'undo_action',
   REDO_ACTION: 'redo_action'
 };

@@ -206,7 +206,9 @@ import CommunityPicker from '../components/CommunityPicker.vue';
 import NetworkAnalysis from '../components/NetworkAnalysis.vue';
 import { useNetworkGraph } from '../composables/useNetworkGraph';
 import { useI18n } from '../composables/useI18n';
+import { useAnalytics } from '../composables/useAnalytics';
 import { ShowcaseController } from '../lib/ShowcaseController';
+import { SHOWCASE_EVENTS, DATA_EVENTS, ANALYSIS_EVENTS } from '../lib/analytics/AnalyticsEvents.js';
 import { createLogger } from '@guinetik/logger';
 
 const log = createLogger({
@@ -218,6 +220,9 @@ const log = createLogger({
  * Use i18n for translations
  */
 const { t } = useI18n();
+
+// Analytics tracking
+const { trackShowcaseAction, trackDataAction, trackAnalysis } = useAnalytics();
 
 // Use the network graph composable (must be at top level)
 const graphComposable = useNetworkGraph();
@@ -317,6 +322,7 @@ const initializeShowcase = () => {
  */
 const handleAddRandomNode = () => {
   if (!controller) return;
+  trackShowcaseAction(SHOWCASE_EVENTS.NODE_ADD, { method: 'random' });
   controller.addRandomNode();
 };
 
@@ -325,6 +331,7 @@ const handleAddRandomNode = () => {
  */
 const handleAddToSelected = () => {
   if (!controller) return;
+  trackShowcaseAction(SHOWCASE_EVENTS.NODE_ADD, { method: 'to_selected' });
   controller.addNodeToSelected();
 };
 
@@ -333,6 +340,7 @@ const handleAddToSelected = () => {
  */
 const handleRemoveRandomNode = () => {
   if (!controller) return;
+  trackShowcaseAction(SHOWCASE_EVENTS.NODE_REMOVE, { method: 'random' });
   controller.removeRandomNode();
 };
 
@@ -341,6 +349,7 @@ const handleRemoveRandomNode = () => {
  */
 const handleLoadDataset = async () => {
   if (!controller) return;
+  trackDataAction(DATA_EVENTS.DATASET_SELECT, { dataset: selectedDataset.value });
 
   try {
     loadingMessage.value = t('showcase.messages.loadingDataset').replace('{dataset}', selectedDataset.value);
@@ -361,6 +370,7 @@ const handleLoadDataset = async () => {
  */
 const handleAnalyzeGraph = async () => {
   if (!controller) return;
+  trackAnalysis(ANALYSIS_EVENTS.ANALYSIS_RUN, { metrics: selectedFeatures.value.join(',') });
 
   try {
     loadingMessage.value = t('showcase.messages.analyzing');
@@ -375,6 +385,7 @@ const handleAnalyzeGraph = async () => {
  */
 const handleApplyLayout = async () => {
   if (!controller) return;
+  trackAnalysis(ANALYSIS_EVENTS.LAYOUT_CHANGE, { layout: selectedLayout.value });
 
   try {
     loadingMessage.value = t('showcase.messages.applyingLayout').replace('{layout}', selectedLayout.value);
@@ -389,6 +400,7 @@ const handleApplyLayout = async () => {
  */
 const handleDetectCommunities = async () => {
   if (!controller) return;
+  trackAnalysis(ANALYSIS_EVENTS.COMMUNITY_DETECTION, { algorithm: selectedCommunityAlgorithm.value });
 
   try {
     loadingMessage.value = t('showcase.messages.detectingCommunities').replace('{algorithm}', selectedCommunityAlgorithm.value);
