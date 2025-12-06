@@ -4,14 +4,14 @@
  * Sigma.js is a WebGL-based graph renderer that uses Graphology as its data layer.
  * This adapter converts graph-js GraphData to Graphology format for rendering with Sigma.
  *
- * @module adapters/sigma
+ * @module lib/SigmaAdapter
  *
  * @example
- * import { SigmaAdapter } from '@guinetik/graph-js';
+ * import { SigmaAdapter } from './lib/SigmaAdapter.js';
  * import Sigma from 'sigma';
  *
  * // Convert graph-js data to Graphology for Sigma
- * const { graph, settings } = SigmaAdapter.toGraphology(graphData, {
+ * const { graph, settings } = await SigmaAdapter.toGraphology(graphData, {
  *   positions: layoutPositions,
  *   nodeStats: analysisResults,
  *   sizeBy: 'degree',
@@ -22,9 +22,9 @@
  * const sigma = new Sigma(graph, container, settings);
  */
 
-import Graph from 'graphology';
-import { Adapter } from './adapter.js';
+import { Adapter } from '@guinetik/graph-js';
 import { createLogger } from '@guinetik/logger';
+import Graph from 'graphology';
 
 const log = createLogger({
   prefix: 'SigmaAdapter',
@@ -36,8 +36,16 @@ const log = createLogger({
  */
 const COLOR_SCHEMES = {
   category10: [
-    '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
-    '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'
+    '#3b82f6', // blue
+    '#10b981', // green
+    '#f59e0b', // amber
+    '#ef4444', // red
+    '#6366f1', // indigo
+    '#ec4899', // pink
+    '#06b6d4', // cyan
+    '#f97316', // orange
+    '#14b8a6', // teal
+    '#a855f7'  // vibrant purple
   ],
   pastel: [
     '#a6cee3', '#b2df8a', '#fb9a99', '#fdbf6f', '#cab2d6',
@@ -76,7 +84,7 @@ export class SigmaAdapter extends Adapter {
   /**
    * Convert graph-js GraphData to Graphology format for Sigma.js
    *
-   * @param {import('../models/types.js').GraphData} graphData - Standard graph data
+   * @param {import('@guinetik/graph-js').GraphData} graphData - Standard graph data
    * @param {Object} [options={}] - Conversion options
    * @param {Object} [options.positions] - Node positions { nodeId: { x, y } }
    * @param {Array} [options.nodeStats] - Node statistics from analysis [{ id, degree, ... }]
@@ -86,17 +94,17 @@ export class SigmaAdapter extends Adapter {
    * @param {string} [options.colorBy] - Property to map to node color
    * @param {string} [options.colorScheme='category10'] - Color scheme name
    * @param {Object} [options.sigmaSettings] - Custom Sigma settings to merge
-   * @returns {{ graph: Graph, settings: Object }} Graphology graph and Sigma settings
+   * @returns {Promise<{ graph: Graph, settings: Object }>} Graphology graph and Sigma settings
    *
    * @example
-   * const { graph, settings } = SigmaAdapter.toGraphology(graphData, {
+   * const { graph, settings } = await SigmaAdapter.toGraphology(graphData, {
    *   positions: { 'A': { x: 100, y: 200 } },
    *   nodeStats: [{ id: 'A', degree: 5, eigenvector: 0.45 }],
    *   sizeBy: 'degree',
    *   colorBy: 'community'
    * });
    */
-  static toGraphology(graphData, options = {}) {
+  static async toGraphology(graphData, options = {}) {
     this.validateGraphData(graphData);
 
     const {
@@ -192,7 +200,7 @@ export class SigmaAdapter extends Adapter {
    * Convert Graphology graph back to graph-js GraphData format
    *
    * @param {Graph} graphologyGraph - Graphology graph instance
-   * @returns {import('../models/types.js').GraphData} Standard graph data
+   * @returns {import('@guinetik/graph-js').GraphData} Standard graph data
    *
    * @example
    * const graphData = SigmaAdapter.fromGraphology(sigmaGraph);
@@ -387,3 +395,4 @@ export class SigmaAdapter extends Adapter {
 }
 
 export default SigmaAdapter;
+

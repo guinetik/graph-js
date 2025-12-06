@@ -132,12 +132,15 @@ export class NetworkStats {
    * @param {Object} [options={}] - Configuration options
    * @param {boolean} [options.verbose=true] - Enable detailed logging
    * @param {number} [options.maxWorkers] - Maximum number of workers (default: auto-detect)
-   * @param {number} [options.taskTimeout=60000] - Task timeout in milliseconds
+   * @param {number} [options.taskTimeout=300000] - Task timeout in milliseconds (default: 5 minutes)
    * @param {string} [options.workerScript] - Path to worker script (for bundlers like Vite)
+   * @param {boolean} [options.enableAffinity=true] - Enable worker affinity (route same algorithm to same worker)
+   * @param {number} [options.affinityCacheLimit=50] - Max cached function keys per worker
    * @example
    * const analyzer = new NetworkStats({
    *   verbose: false,
-   *   maxWorkers: 4
+   *   maxWorkers: 4,
+   *   enableAffinity: true
    * });
    */
   constructor(options = {}) {
@@ -145,8 +148,10 @@ export class NetworkStats {
     this.options = {
       verbose: options.verbose !== undefined ? options.verbose : true,
       maxWorkers: options.maxWorkers,
-      taskTimeout: options.taskTimeout || 60000,
+      taskTimeout: options.taskTimeout || 300000, // 5 minutes default
       workerScript: options.workerScript,
+      enableAffinity: options.enableAffinity !== undefined ? options.enableAffinity : true,
+      affinityCacheLimit: options.affinityCacheLimit || 50,
       // Algorithm-specific options
       maxIter: options.maxIter,
       tolerance: options.tolerance,
@@ -164,7 +169,9 @@ export class NetworkStats {
       maxWorkers: this.options.maxWorkers,
       taskTimeout: this.options.taskTimeout,
       verbose: this.options.verbose,
-      workerScript: this.options.workerScript
+      workerScript: this.options.workerScript,
+      enableAffinity: this.options.enableAffinity,
+      affinityCacheLimit: this.options.affinityCacheLimit
     }).catch(err => {
       this.log.error('Failed to initialize workers:', err);
     });
@@ -402,3 +409,4 @@ export { COMMUNITY_REGISTRY } from "./community/index.js";
 export * from "./layouts/index.js";
 export { LAYOUT_REGISTRY } from "./layouts/index.js";
 export * from "./adapters/index.js";
+// Note: SigmaAdapter is visualization-specific and lives in the demo project, not the core library
