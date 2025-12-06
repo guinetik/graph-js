@@ -369,7 +369,11 @@ export class NetworkGraphD3 {
    * Compute size and color scales based on current data
    */
   computeScales() {
-    if (!this.data.nodes || this.data.nodes.length === 0) return;
+    if (!this.data.nodes || this.data.nodes.length === 0) {
+      this.sizeScale = null;
+      this.colorScale = null;
+      return;
+    }
 
     // Compute size scale
     if (this.options.sizeBy) {
@@ -387,11 +391,20 @@ export class NetworkGraphD3 {
           .domain([min, max])
           .range([this.options.minRadius, this.options.maxRadius])
           .clamp(true);
+      } else {
+        this.sizeScale = null;
       }
+    } else {
+      this.sizeScale = null;
     }
 
     // Compute color scale
     const colorProperty = this.options.colorBy;
+    if (!colorProperty) {
+      this.colorScale = null;
+      return;
+    }
+
     const values = this.data.nodes
       .map(n => n[colorProperty])
       .filter(v => v !== undefined && v !== null);
@@ -408,11 +421,31 @@ export class NetworkGraphD3 {
           .domain([min, max]);
       } else {
         // Categorical scale for discrete values
-        const uniqueValues = [...new Set(values)];
+        const uniqueValues = [...new Set(values)].sort((a, b) => {
+          // Sort numbers numerically, strings alphabetically
+          if (typeof a === 'number' && typeof b === 'number') return a - b;
+          return String(a).localeCompare(String(b));
+        });
+        // Custom color palette (replaces D3's schemeCategory10 with better colors)
+        const customColors = [
+          '#3b82f6', // blue
+          '#10b981', // green
+          '#f59e0b', // amber
+          '#ef4444', // red
+          '#6366f1', // indigo (replaces wine purple)
+          '#ec4899', // pink
+          '#06b6d4', // cyan
+          '#f97316', // orange
+          '#14b8a6', // teal
+          '#a855f7'  // vibrant purple
+        ];
         this.colorScale = d3.scaleOrdinal()
           .domain(uniqueValues)
-          .range(d3.schemeCategory10);
+          .range(customColors)
+          .unknown(customColors[0]); // Fallback to first color for unknown values
       }
+    } else {
+      this.colorScale = null;
     }
   }
 
@@ -439,6 +472,15 @@ export class NetworkGraphD3 {
 
     // Recompute scales
     this.computeScales();
+
+    // Ensure SVG remains visible during updates (don't hide it like updateGraph does)
+    // This prevents the graph from disappearing during analysis updates
+    if (this.svg && this.isReady) {
+      // Keep it visible if it was already ready
+      this.svg
+        .style('opacity', 1)
+        .style('visibility', 'visible');
+    }
 
     // Update existing nodes/links without resetting ready state
     if (this.node) {
@@ -505,6 +547,14 @@ export class NetworkGraphD3 {
       return;
     }
 
+    // Ensure SVG remains visible during statistics updates
+    // This prevents the graph from disappearing during analysis
+    if (this.svg && this.isReady) {
+      this.svg
+        .style('opacity', 1)
+        .style('visibility', 'visible');
+    }
+
     // Create a map of enriched nodes by ID for fast lookup
     const enrichedMap = new Map();
     enrichedNodes.forEach(node => {
@@ -556,6 +606,80 @@ export class NetworkGraphD3 {
       nodeCount: enrichedNodes.length,
       sizingBy: hasEigenvector ? sizeBy : 'none'
     });
+  }
+
+  /**
+   * Update edge colors to highlight clique edges (edges that are part of triangles)
+   *
+   * @param {boolean} enabled - Whether to highlight clique edges
+   */
+  updateCliqueEdgeColors(enabled) {
+    if (!this.data || !this.data.nodes || !this.data.links) return;
+
+    const CLIQUE_EDGE_COLOR = '#ef4444'; // Red for clique edges
+    const NORMAL_EDGE_COLOR = 'var(--color-border)';
+
+    // Build adjacency map for efficient lookup using normalized IDs
+    const adjacencyMap = new Map();
+    this.data.nodes.forEach(node => {
+      const nodeId = String(node.id);
+      adjacencyMap.set(nodeId, new Set());
+    });
+    
+    this.data.links.forEach(link => {
+      const sourceId = normalizeLinkId(link.source);
+      const targetId = normalizeLinkId(link.target);
+      if (adjacencyMap.has(sourceId)) {
+        adjacencyMap.get(sourceId).add(targetId);
+      }
+      if (adjacencyMap.has(targetId)) {
+        adjacencyMap.get(targetId).add(sourceId);
+      }
+    });
+
+    // Helper function to check if an edge is part of a triangle
+    const isCliqueEdge = (sourceId, targetId) => {
+      const sourceNeighbors = adjacencyMap.get(sourceId) || new Set();
+      const targetNeighbors = adjacencyMap.get(targetId) || new Set();
+      
+      // Check if source and target share a common neighbor (forming a triangle)
+      for (const neighbor of sourceNeighbors) {
+        if (neighbor !== targetId && targetNeighbors.has(neighbor)) {
+          return true; // Found a triangle: source-target-neighbor
+        }
+      }
+      return false;
+    };
+
+    // Update link colors
+    // In D3, after force simulation runs, d.source and d.target are node objects
+    // We need to handle both cases: when they're objects or IDs
+    if (this.linkGroup) {
+      // Re-select links to ensure we have the current selection
+      const linkSelection = this.linkGroup.selectAll('line');
+      
+      if (linkSelection.size() > 0) {
+        linkSelection.attr('stroke', (d) => {
+          // Handle both node objects (from force simulation) and IDs (from data)
+          const sourceId = normalizeLinkId(d.source);
+          const targetId = normalizeLinkId(d.target);
+          
+          if (!enabled) {
+            return NORMAL_EDGE_COLOR;
+          }
+          
+          return isCliqueEdge(sourceId, targetId) 
+            ? CLIQUE_EDGE_COLOR 
+            : NORMAL_EDGE_COLOR;
+        });
+        
+        this.log.debug('Updated clique edge colors', { enabled, linkCount: linkSelection.size() });
+      } else {
+        this.log.warn('No links found to update colors', { linkGroupExists: !!this.linkGroup });
+      }
+    } else {
+      this.log.warn('Link group not initialized, cannot update clique edge colors');
+    }
   }
 
   /**
@@ -1291,10 +1415,12 @@ export class NetworkGraphD3 {
       '#10b981', // green
       '#f59e0b', // amber
       '#ef4444', // red
-      '#8b5cf6', // purple
+      '#6366f1', // indigo (replaces wine purple)
       '#ec4899', // pink
       '#06b6d4', // cyan
-      '#f97316'  // orange
+      '#f97316', // orange
+      '#14b8a6', // teal
+      '#a855f7'  // vibrant purple
     ];
     return colors[(group - 1) % colors.length];
   }

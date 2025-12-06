@@ -54,8 +54,16 @@ const DEFAULTS = {
  */
 const COLOR_SCHEMES = {
   category10: [
-    '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
-    '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'
+    '#3b82f6', // blue
+    '#10b981', // green
+    '#f59e0b', // amber
+    '#ef4444', // red
+    '#6366f1', // indigo
+    '#ec4899', // pink
+    '#06b6d4', // cyan
+    '#f97316', // orange
+    '#14b8a6', // teal
+    '#a855f7'  // vibrant purple
   ],
   pastel: [
     '#a6cee3', '#b2df8a', '#fb9a99', '#fdbf6f', '#cab2d6',
@@ -207,17 +215,22 @@ export class NetworkGraphSigma {
       ]
     });
 
+    // Performance optimization: disable labels for large graphs
+    const nodeCount = this.graph.order;
+    const isLargeGraph = nodeCount > 5000;
+    const shouldRenderLabels = this.options.showLabels && !isLargeGraph;
+
     // Create Sigma instance with improved visual settings
     this.sigma = new Sigma(this.graph, this.container, {
       allowInvalidContainer: true,
-      renderLabels: this.options.showLabels,
-      labelRenderedSizeThreshold: 4,      // Show labels at lower zoom
+      renderLabels: shouldRenderLabels,
+      labelRenderedSizeThreshold: isLargeGraph ? 20 : 4,  // Higher threshold for large graphs
       labelFont: 'Inter, system-ui, Arial, sans-serif',
       labelSize: 11,
       labelWeight: '500',
       labelColor: { color: '#333' },
       defaultNodeColor: DEFAULTS.NODE_COLOR,
-      defaultEdgeColor: '#99999966',       // Semi-transparent edges
+      defaultEdgeColor: isLargeGraph ? '#99999933' : '#99999966',  // More transparent for large graphs
       defaultNodeType: 'bordered',         // Use bordered nodes
       nodeProgramClasses: {
         bordered: NodeBorderProgram
@@ -226,10 +239,23 @@ export class NetworkGraphSigma {
       minCameraRatio: 0.1,
       maxCameraRatio: 10,
       stagePadding: 50,
-      // Rendering quality
+      // Rendering quality - optimize for large graphs
       renderEdgeLabels: false,
       enableEdgeEvents: false,            // Better performance
-      zIndex: true                        // Enable z-ordering
+      zIndex: true,                       // Enable z-ordering
+      // Performance optimizations for large graphs
+      allowInvalidContainer: true,
+      ...(isLargeGraph && {
+        // Reduce rendering quality for very large graphs
+        nodeReducer: (node, data) => {
+          // Simplify node data for rendering
+          return {
+            ...data,
+            // Remove expensive properties if not needed
+            label: shouldRenderLabels ? data.label : undefined
+          };
+        }
+      })
     });
 
     // Set up event handlers
@@ -429,16 +455,37 @@ export class NetworkGraphSigma {
     // Disable interactivity during simulation for better performance
     this.interactionDisabled = true;
 
-    // Scale settings based on graph size - larger graphs need more spread
+    // Scale settings based on graph size - larger graphs need MORE spread, not less
     const nodeCount = this.graph.order;
-    const scaleFactor = Math.log10(Math.max(nodeCount, 10)); // log scale for large graphs
-
+    const edgeCount = this.graph.size;
+    const isLargeGraph = nodeCount > 5000;
+    const isVeryLargeGraph = nodeCount > 10000;
+    
+    // For large graphs, we want MAXIMUM spread - use aggressive scaling
+    // The graph will naturally spread out, then we'll zoom out to fit it
+    const scaleFactor = Math.sqrt(nodeCount) * 2; // More aggressive scaling for large graphs
+    
     // Update settings for this graph size
-    // Key insight: near-zero gravity lets nodes spread in "infinite space"
-    // Strong repulsion pushes nodes apart, edges pull connected nodes together
-    // Result: natural clustering without being constrained to viewport
-    this.simulationSettings.settings.scalingRatio = 50 * scaleFactor; // Very strong repulsion
-    this.simulationSettings.settings.gravity = 0.01;                   // Near-zero gravity - infinite space
+    // Key insight: VERY LOW gravity + STRONG repulsion = maximum spread
+    // This lets the graph take as much space as it needs, then we zoom out
+    this.simulationSettings.settings.scalingRatio = Math.max(100, scaleFactor); // Very strong repulsion for spread
+    
+    // Performance optimization: adjust settings for large graphs
+    // But keep gravity VERY LOW so graph can spread out naturally
+    if (isVeryLargeGraph) {
+      // For very large graphs: very low gravity (let it spread) but optimize performance
+      this.simulationSettings.settings.gravity = 0.001; // Very low - let it spread
+      // Increase slowDown to reduce computation per frame
+      this.simulationSettings.settings.slowDown = Math.max(this.simulationSettings.settings.slowDown, 10);
+      // Use Barnes-Hut optimization more aggressively
+      this.simulationSettings.settings.barnesHutTheta = 0.8;
+    } else if (isLargeGraph) {
+      this.simulationSettings.settings.gravity = 0.005; // Low gravity for spread
+      this.simulationSettings.settings.slowDown = Math.max(this.simulationSettings.settings.slowDown, 5);
+      this.simulationSettings.settings.barnesHutTheta = 0.6;
+    } else {
+      this.simulationSettings.settings.gravity = 0.01;  // Near-zero gravity - infinite space
+    }
 
     this.log.info('Starting ForceAtlas2 simulation', {
       nodeCount,
@@ -459,8 +506,12 @@ export class NetworkGraphSigma {
         // Re-enable interactivity
         this.interactionDisabled = false;
 
-        // Fit view to show entire graph, like D3 does
-        this.fitView();
+        // Fit view to show entire graph after a short delay
+        // This ensures nodes have settled into their final positions
+        setTimeout(() => {
+          this.fitView();
+        }, 100);
+        
         this.emit('simulationEnd');
         return;
       }
@@ -479,8 +530,14 @@ export class NetworkGraphSigma {
         // Run one iteration of ForceAtlas2
         forceAtlas2.assign(this.graph, settings);
 
-        // Decay alpha (cool down)
-        this.simulationAlpha -= this.simulationAlpha * this.simulationAlphaDecay;
+        // Decay alpha (cool down) - faster decay for large graphs
+        const nodeCount = this.graph.order;
+        const alphaDecay = nodeCount > 10000 
+          ? this.simulationAlphaDecay * 1.5  // Faster decay for very large graphs
+          : nodeCount > 5000
+          ? this.simulationAlphaDecay * 1.2  // Slightly faster for large graphs
+          : this.simulationAlphaDecay;        // Normal decay for smaller graphs
+        this.simulationAlpha -= this.simulationAlpha * alphaDecay;
       }
 
       // If a node is being dragged, restore its fixed position
@@ -589,14 +646,12 @@ export class NetworkGraphSigma {
     // Mark as ready
     this.isReady = true;
 
-    // Start ForceAtlas2 simulation by default (like D3's force simulation)
+    // Always start ForceAtlas2 simulation - it's needed to spread out nodes properly
+    // Performance optimizations are applied in startSimulation() for large graphs
     this.startSimulation();
 
-    // Fit view after short delay
-    setTimeout(() => {
-      this.fitView();
-      this.emit('ready');
-    }, 100);
+    // Emit ready event - fitView will be called when simulation ends
+    this.emit('ready');
   }
 
   /**
@@ -611,9 +666,10 @@ export class NetworkGraphSigma {
     this._computeScales();
 
     // Add nodes with random initial positions (spread out)
-    // Scale spread aggressively for large graphs
+    // Scale spread VERY aggressively for large graphs - let them spread naturally
     const nodeCount = this.data.nodes.length;
-    const spread = Math.sqrt(nodeCount) * 100; // Larger spread for more room
+    // Much larger initial spread for large graphs - they'll spread even more during simulation
+    const spread = Math.sqrt(nodeCount) * 200; // Much larger spread for more room
 
     for (let i = 0; i < this.data.nodes.length; i++) {
       const node = this.data.nodes[i];
@@ -757,6 +813,46 @@ export class NetworkGraphSigma {
   }
 
   /**
+   * Update edge colors to highlight clique edges (edges that are part of triangles)
+   *
+   * @param {boolean} enabled - Whether to highlight clique edges
+   */
+  updateCliqueEdgeColors(enabled) {
+    if (!this.graph) return;
+
+    const CLIQUE_EDGE_COLOR = '#ef4444'; // Red for clique edges
+    const NORMAL_EDGE_COLOR = DEFAULTS.EDGE_COLOR;
+
+    // Helper function to check if an edge is part of a triangle
+    const isCliqueEdge = (sourceId, targetId) => {
+      const sourceNeighbors = this.graph.neighbors(sourceId);
+      const targetNeighbors = this.graph.neighbors(targetId);
+      
+      // Check if source and target share a common neighbor (forming a triangle)
+      for (const neighbor of sourceNeighbors) {
+        if (neighbor !== targetId && targetNeighbors.includes(neighbor)) {
+          return true; // Found a triangle: source-target-neighbor
+        }
+      }
+      return false;
+    };
+
+    // Update all edge colors
+    this.graph.forEachEdge((edgeId, attrs, sourceId, targetId) => {
+      const color = enabled && isCliqueEdge(sourceId, targetId) 
+        ? CLIQUE_EDGE_COLOR 
+        : NORMAL_EDGE_COLOR;
+      this.graph.setEdgeAttribute(edgeId, 'color', color);
+    });
+
+    if (this.sigma) {
+      this.sigma.refresh();
+    }
+
+    this.log.debug('Updated clique edge colors', { enabled });
+  }
+
+  /**
    * Update node statistics from analysis
    *
    * @param {Array} enrichedNodes - Nodes with computed statistics
@@ -894,6 +990,8 @@ export class NetworkGraphSigma {
   fitView() {
     if (!this.sigma) return;
 
+    // Use Sigma's built-in animatedReset which automatically fits the graph
+    // This is more reliable than manual calculations
     const camera = this.sigma.getCamera();
     camera.animatedReset({ duration: 300 });
   }
