@@ -1,0 +1,195 @@
+/**
+ * Analytics Composable for Vue
+ * Provides Google Analytics 4 tracking functionality
+ *
+ * @example
+ * import { useAnalytics } from '@/composables/useAnalytics';
+ * const { trackEvent } = useAnalytics();
+ * trackEvent('button_click', { button_name: 'submit' });
+ */
+
+import { createLogger } from '@guinetik/logger';
+import { ANALYTICS_CATEGORIES } from '../lib/analytics/AnalyticsEvents.js';
+
+const log = createLogger({
+  prefix: 'Analytics',
+  level: import.meta.env.DEV ? 'debug' : 'warn'
+});
+
+// Analytics state
+let isInitialized = false;
+let isEnabled = false;
+let measurementId = null;
+
+/**
+ * Check if analytics should be enabled
+ * @returns {boolean}
+ */
+const shouldEnableAnalytics = () => {
+  // In production: always enable if measurement ID exists
+  if (!import.meta.env.DEV) {
+    return !!import.meta.env.VITE_GA_MEASUREMENT_ID;
+  }
+  // In development: only enable if debug mode is explicitly set
+  return import.meta.env.VITE_GA_DEBUG === 'true';
+};
+
+/**
+ * Initialize Google Analytics 4
+ * Should be called once at app startup (in main.js)
+ */
+export const initializeAnalytics = () => {
+  if (isInitialized) {
+    log.warn('Analytics already initialized');
+    return;
+  }
+
+  measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
+
+  if (!measurementId) {
+    log.warn('GA Measurement ID not configured (VITE_GA_MEASUREMENT_ID)');
+    isInitialized = true;
+    isEnabled = false;
+    return;
+  }
+
+  isEnabled = shouldEnableAnalytics();
+
+  if (!isEnabled) {
+    log.info('Analytics disabled in development mode (set VITE_GA_DEBUG=true to enable)');
+    isInitialized = true;
+    return;
+  }
+
+  // Dynamically load gtag.js
+  const script = document.createElement('script');
+  script.async = true;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+  document.head.appendChild(script);
+
+  // Initialize gtag
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () {
+    window.dataLayer.push(arguments);
+  };
+  window.gtag('js', new Date());
+  window.gtag('config', measurementId, {
+    // Disable automatic page_view on config (we handle it via router)
+    send_page_view: false
+  });
+
+  isInitialized = true;
+  log.info('Google Analytics initialized', { measurementId });
+};
+
+/**
+ * Track a custom event
+ * @param {string} eventName - The event name (snake_case)
+ * @param {Object} [params={}] - Event parameters
+ */
+const trackEvent = (eventName, params = {}) => {
+  if (!isInitialized) {
+    log.warn('Analytics not initialized, call initializeAnalytics() first');
+    return;
+  }
+
+  // Always log in dev mode for debugging
+  if (import.meta.env.DEV) {
+    log.info('Event:', { eventName, params });
+  }
+
+  if (!isEnabled) {
+    return;
+  }
+
+  try {
+    window.gtag('event', eventName, params);
+  } catch (error) {
+    log.error('Failed to track event', { eventName, error: error.message });
+  }
+};
+
+/**
+ * Track a page view
+ * @param {string} pagePath - The page path (e.g., '/explorer')
+ * @param {string} pageTitle - The page title
+ */
+const trackPageView = (pagePath, pageTitle) => {
+  if (!isInitialized) {
+    log.warn('Analytics not initialized');
+    return;
+  }
+
+  if (import.meta.env.DEV) {
+    log.info('Page view:', { pagePath, pageTitle });
+  }
+
+  if (!isEnabled) {
+    return;
+  }
+
+  try {
+    window.gtag('event', 'page_view', {
+      page_path: pagePath,
+      page_title: pageTitle,
+      page_location: window.location.href
+    });
+  } catch (error) {
+    log.error('Failed to track page view', { pagePath, error: error.message });
+  }
+};
+
+/**
+ * Composable for using analytics in Vue components
+ * @returns {Object} Analytics methods
+ */
+export function useAnalytics() {
+  return {
+    trackEvent,
+    trackPageView,
+    isEnabled: () => isEnabled,
+
+    // Category-specific helpers
+    trackNavigation: (action, details = {}) => {
+      trackEvent(action, {
+        event_category: ANALYTICS_CATEGORIES.NAVIGATION,
+        ...details
+      });
+    },
+
+    trackDataAction: (action, details = {}) => {
+      trackEvent(action, {
+        event_category: ANALYTICS_CATEGORIES.DATA_MANAGEMENT,
+        ...details
+      });
+    },
+
+    trackAnalysis: (action, details = {}) => {
+      trackEvent(action, {
+        event_category: ANALYTICS_CATEGORIES.ANALYSIS,
+        ...details
+      });
+    },
+
+    trackGraphInteraction: (action, details = {}) => {
+      trackEvent(action, {
+        event_category: ANALYTICS_CATEGORIES.GRAPH_INTERACTION,
+        ...details
+      });
+    },
+
+    trackFamilyAction: (action, details = {}) => {
+      trackEvent(action, {
+        event_category: ANALYTICS_CATEGORIES.FAMILY_TREE,
+        ...details
+      });
+    },
+
+    trackShowcaseAction: (action, details = {}) => {
+      trackEvent(action, {
+        event_category: ANALYTICS_CATEGORIES.SHOWCASE,
+        ...details
+      });
+    }
+  };
+}

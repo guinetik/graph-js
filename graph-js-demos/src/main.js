@@ -8,6 +8,7 @@ import App from './App.vue';
 import router from './router';
 import { createLogger } from '@guinetik/logger';
 import { WorkerManager } from '@guinetik/graph-js';
+import { initializeAnalytics } from './composables/useAnalytics';
 
 // Import styles
 import '../styles/main.css';
@@ -17,6 +18,9 @@ const log = createLogger({
   prefix: 'App',
   level: import.meta.env.DEV ? 'debug' : 'info'
 });
+
+// Initialize Google Analytics
+initializeAnalytics();
 
 // Expose WorkerManager to window for console debugging (dev only)
 if (import.meta.env.DEV) {
