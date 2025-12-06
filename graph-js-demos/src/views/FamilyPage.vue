@@ -685,7 +685,7 @@ const handleAnalyzeGraph = async () => {
       updateVisualEncoding({
         sizeBy: sizeByMetric,
         minRadius: 5,
-        maxRadius: 30,
+        maxRadius: 25,
         preserveZoom: true
       });
       handleStatusChange(`✅ Analysis complete - sizing by ${sizeByMetric}`, 'success');
@@ -773,7 +773,7 @@ watch(selectedSizeMetric, (newMetric) => {
     updateVisualEncoding({
       sizeBy: newMetric,
       minRadius: 5,
-      maxRadius: 30
+      maxRadius: 20
     });
   }
 });

@@ -4,20 +4,13 @@
       <label class="block text-sm font-medium text-secondary">
         {{ t('showcase.layoutPicker.chooseLayout') }}
       </label>
-      <select
-        :value="modelValue"
-        @input="$emit('update:modelValue', $event.target.value)"
+      <CustomDropdown
+        :model-value="modelValue"
+        @update:model-value="$emit('update:modelValue', $event)"
+        :options="availableLayouts.map(layout => ({ value: layout.id, label: layout.name }))"
         :disabled="disabled"
-        class="w-full bg-secondary text-primary border border-color px-3 py-2 rounded-md disabled:opacity-50"
-      >
-        <option
-          v-for="layout in availableLayouts"
-          :key="layout.id"
-          :value="layout.id"
-        >
-          {{ layout.name }}
-        </option>
-      </select>
+        :placeholder="t('showcase.layoutPicker.chooseLayout')"
+      />
     </div>
 
     <button
@@ -41,6 +34,7 @@
 <script setup>
 import { computed } from 'vue';
 import { useI18n } from '../composables/useI18n';
+import CustomDropdown from './CustomDropdown.vue';
 
 /**
  * Use i18n for translations

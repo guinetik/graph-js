@@ -422,7 +422,7 @@ watch(selectedSizeMetric, (newMetric) => {
     updateVisualEncoding({
       sizeBy: newMetric,
       minRadius: 5,
-      maxRadius: 30
+      maxRadius: 20
     });
   }
 });

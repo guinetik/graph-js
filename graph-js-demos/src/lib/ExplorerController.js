@@ -351,7 +351,7 @@ export class ExplorerController {
           this.graphManager.updateVisualEncoding({
             sizeBy: sizeMetric,
             minRadius: 5,
-            maxRadius: 30
+            maxRadius: 20
           });
         }
 

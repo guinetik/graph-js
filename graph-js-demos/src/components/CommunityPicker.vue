@@ -4,20 +4,13 @@
       <label class="block text-sm font-medium text-secondary">
         {{ label || t('showcase.communityPicker.chooseAlgorithm') }}
       </label>
-      <select
-        :value="modelValue"
-        @input="$emit('update:modelValue', $event.target.value)"
+      <CustomDropdown
+        :model-value="modelValue"
+        @update:model-value="$emit('update:modelValue', $event)"
+        :options="availableAlgorithms.map(algo => ({ value: algo.id, label: algo.name }))"
         :disabled="disabled"
-        class="w-full bg-secondary text-primary border border-color px-3 py-2 rounded-md disabled:opacity-50"
-      >
-        <option
-          v-for="algo in availableAlgorithms"
-          :key="algo.id"
-          :value="algo.id"
-        >
-          {{ algo.name }}
-        </option>
-      </select>
+        :placeholder="label || t('showcase.communityPicker.chooseAlgorithm')"
+      />
     </div>
 
     <button
@@ -36,6 +29,7 @@
 
 <script setup>
 import { useI18n } from '../composables/useI18n';
+import CustomDropdown from './CustomDropdown.vue';
 
 /**
  * Use i18n for translations

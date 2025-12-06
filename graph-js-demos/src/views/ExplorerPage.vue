@@ -117,17 +117,17 @@
           <label class="block text-sm font-medium text-secondary">
             {{ t('explorer.dataLoading.chooseNetwork') }}
           </label>
-          <select
+          <CustomDropdown
             v-model="selectedNetwork"
-            class="w-full bg-secondary text-primary border border-color px-3 py-2 rounded-md"
-          >
-            <option value="">{{ t('explorer.dataLoading.chooseCity') }}</option>
-            <option value="karate">{{ t('explorer.dataLoading.karate') }}</option>
-            <option value="miserables">{{ t('explorer.dataLoading.miserables') }}</option>
-            <option value="caruaru">{{ t('explorer.dataLoading.caruaru') }}</option>
-            <option value="rj">{{ t('explorer.dataLoading.rj') }}</option>
-            <option value="niteroi">{{ t('explorer.dataLoading.niteroi') }}</option>
-          </select>
+            :options="[
+              { value: 'karate', label: t('explorer.dataLoading.karate') },
+              { value: 'miserables', label: t('explorer.dataLoading.miserables') },
+              { value: 'caruaru', label: t('explorer.dataLoading.caruaru') },
+              { value: 'rj', label: t('explorer.dataLoading.rj') },
+              { value: 'niteroi', label: t('explorer.dataLoading.niteroi') }
+            ]"
+            :placeholder="t('explorer.dataLoading.chooseCity')"
+          />
 
           <button
             @click="handleLoadSampleNetwork"
@@ -145,14 +145,14 @@
             <label class="block text-sm font-medium text-secondary">
               {{ t('explorer.dataLoading.fileFormat') }}
             </label>
-            <select
+            <CustomDropdown
               v-model="uploadFormat"
-              class="w-full bg-secondary text-primary border border-color px-3 py-2 rounded-md"
-            >
-              <option value="json">{{ t('explorer.dataLoading.formatJSON') }}</option>
-              <option value="csv">{{ t('explorer.dataLoading.formatCSV') }}</option>
-              <option value="networkx">{{ t('explorer.dataLoading.formatNetworkX') }}</option>
-            </select>
+              :options="[
+                { value: 'json', label: t('explorer.dataLoading.formatJSON') },
+                { value: 'csv', label: t('explorer.dataLoading.formatCSV') },
+                { value: 'networkx', label: t('explorer.dataLoading.formatNetworkX') }
+              ]"
+            />
           </div>
 
           <!-- CSV requires edges file + optional nodes file -->
@@ -422,6 +422,7 @@ import DemoLayout from '../components/DemoLayout.vue';
 import LayoutPicker from '../components/LayoutPicker.vue';
 import CommunityPicker from '../components/CommunityPicker.vue';
 import NetworkAnalysis from '../components/NetworkAnalysis.vue';
+import CustomDropdown from '../components/CustomDropdown.vue';
 import { useNetworkGraph } from '../composables/useNetworkGraph';
 import { useI18n } from '../composables/useI18n';
 import { useAnalytics } from '../composables/useAnalytics';
@@ -970,7 +971,7 @@ watch(selectedSizeMetric, (newMetric) => {
     updateVisualEncoding({
       sizeBy: newMetric,
       minRadius: 5,
-      maxRadius: 30
+      maxRadius: 20
     });
   }
 });

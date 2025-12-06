@@ -149,22 +149,13 @@
       <label class="block text-sm font-medium text-secondary">
         {{ t('showcase.networkAnalysis.nodeSizeLabel') }}
       </label>
-      <select
-        :value="sizeMetric"
-        @input="$emit('update:sizeMetric', $event.target.value)"
+      <CustomDropdown
+        :model-value="sizeMetric"
+        @update:model-value="$emit('update:sizeMetric', $event)"
+        :options="sizeMetricOptions"
         :disabled="disabled || selectedMetrics.length === 0"
-        class="w-full bg-secondary text-primary border border-color px-3 py-2 rounded-md disabled:opacity-50"
-      >
-        <option value="">{{ t('showcase.networkAnalysis.selectMetric') }}</option>
-        <option v-if="selectedMetrics.includes('degree')" value="degree">{{ t('showcase.networkAnalysis.degreeName') }}</option>
-        <option v-if="selectedMetrics.includes('betweenness')" value="betweenness">{{ t('showcase.networkAnalysis.betweennessName') }}</option>
-        <option v-if="selectedMetrics.includes('clustering')" value="clustering">{{ t('showcase.networkAnalysis.clusteringName') }}</option>
-        <option v-if="selectedMetrics.includes('eigenvector')" value="eigenvector">{{ t('showcase.networkAnalysis.eigenvectorName') }}</option>
-        <option v-if="selectedMetrics.includes('pagerank')" value="pagerank">{{ t('showcase.networkAnalysis.pageRankName') }}</option>
-        <option v-if="selectedMetrics.includes('cliques')" value="cliques">{{ t('showcase.networkAnalysis.cliquesName') }}</option>
-        <option v-if="selectedMetrics.includes('closeness')" value="closeness">{{ t('showcase.networkAnalysis.closenessName') }}</option>
-        <option v-if="selectedMetrics.includes('ego-density')" value="ego-density">{{ t('showcase.networkAnalysis.egoDensityName') }}</option>
-      </select>
+        :placeholder="t('showcase.networkAnalysis.selectMetric')"
+      />
     </div>
 
     <!-- Analyze Button -->
@@ -210,6 +201,7 @@
 import { computed } from 'vue';
 import { useI18n } from '../composables/useI18n';
 import { useTooltip } from '../composables/useTooltip';
+import CustomDropdown from './CustomDropdown.vue';
 
 /**
  * Use i18n for translations
@@ -286,6 +278,32 @@ const toggleSelectAll = () => {
     emit('update:selectedMetrics', [...allMetrics.value]);
   }
 };
+
+/**
+ * Available size metric options based on selected metrics
+ */
+const sizeMetricOptions = computed(() => {
+  const options = [];
+  const metricMap = {
+    'degree': t('showcase.networkAnalysis.degreeName'),
+    'betweenness': t('showcase.networkAnalysis.betweennessName'),
+    'clustering': t('showcase.networkAnalysis.clusteringName'),
+    'eigenvector': t('showcase.networkAnalysis.eigenvectorName'),
+    'pagerank': t('showcase.networkAnalysis.pageRankName'),
+    'cliques': t('showcase.networkAnalysis.cliquesName'),
+    'closeness': t('showcase.networkAnalysis.closenessName'),
+    'ego-density': t('showcase.networkAnalysis.egoDensityName')
+  };
+
+  // Only include metrics that are selected
+  Object.keys(metricMap).forEach(key => {
+    if (props.selectedMetrics.includes(key)) {
+      options.push({ value: key, label: metricMap[key] });
+    }
+  });
+
+  return options;
+});
 
 /**
  * Update a single metric

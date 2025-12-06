@@ -40,9 +40,10 @@ const log = createLogger({
 const DEFAULTS = {
   WIDTH: 800,
   HEIGHT: 600,
-  NODE_SIZE: 5,
-  MIN_SIZE: 3,
-  MAX_SIZE: 12,
+  NODE_SIZE: 8,
+  MIN_SIZE: 5,
+  MAX_SIZE: 20,
+  SIZE_EXPONENT: 0.4, // Power exponent for size scaling (matches D3)
   EDGE_COLOR: '#aaa',
   NODE_COLOR: '#6366f1',   // Nice indigo color
   HOVER_COLOR: '#ef4444',  // Red for hover
@@ -105,6 +106,7 @@ export class NetworkGraphSigma {
       nodeSize: options.nodeRadius || DEFAULTS.NODE_SIZE,
       minSize: options.minRadius || DEFAULTS.MIN_SIZE,
       maxSize: options.maxRadius || DEFAULTS.MAX_SIZE,
+      sizeExponent: options.sizeExponent || DEFAULTS.SIZE_EXPONENT,
       sizeBy: options.sizeBy || null,
       colorBy: options.colorBy || 'group',
       colorScheme: options.colorScheme || 'category10',
@@ -739,20 +741,29 @@ export class NetworkGraphSigma {
   _computeScales() {
     if (!this.data.nodes || this.data.nodes.length === 0) return;
 
-    // Size scale
+    // Size scale - uses power scale matching D3's scalePow for consistency
     if (this.options.sizeBy) {
       const values = this.data.nodes
         .map(n => n[this.options.sizeBy])
         .filter(v => v !== undefined && v !== null && !isNaN(v));
 
       if (values.length > 0) {
-        const min = Math.min(...values);
-        const max = Math.max(...values);
-        const range = max - min || 1;
+        let min = Math.min(...values);
+        let max = Math.max(...values);
 
+        // Handle edge case where all values are the same
+        if (min === max) {
+          max = min + 1;
+        }
+
+        const range = max - min;
+        const exponent = this.options.sizeExponent || DEFAULTS.SIZE_EXPONENT;
+
+        // Power scale: normalize to 0-1, apply exponent, map to size range
         this.sizeScale = (value) => {
           const normalized = (value - min) / range;
-          return this.options.minSize + Math.sqrt(normalized) * (this.options.maxSize - this.options.minSize);
+          const powered = Math.pow(normalized, exponent);
+          return this.options.minSize + powered * (this.options.maxSize - this.options.minSize);
         };
       }
     }
@@ -783,8 +794,12 @@ export class NetworkGraphSigma {
    */
   updateVisualEncoding(options = {}) {
     if (options.sizeBy !== undefined) this.options.sizeBy = options.sizeBy;
+    // Accept both minRadius/maxRadius (D3 API) and minSize/maxSize (Sigma internal)
+    if (options.minRadius !== undefined) this.options.minSize = options.minRadius;
+    if (options.maxRadius !== undefined) this.options.maxSize = options.maxRadius;
     if (options.minSize !== undefined) this.options.minSize = options.minSize;
     if (options.maxSize !== undefined) this.options.maxSize = options.maxSize;
+    if (options.sizeExponent !== undefined) this.options.sizeExponent = options.sizeExponent;
     if (options.colorBy !== undefined) this.options.colorBy = options.colorBy;
     if (options.colorScheme !== undefined) this.options.colorScheme = options.colorScheme;
 

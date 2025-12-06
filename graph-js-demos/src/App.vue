@@ -61,14 +61,17 @@
         <!-- Controls (Desktop) -->
         <div class="hidden md:flex items-center space-x-4">
           <!-- Language Switcher -->
-          <select
-            v-model="lang"
-            @change="changeLanguage(lang)"
-            class="px-3 py-1 rounded-md bg-secondary text-primary border border-color text-sm"
-          >
-            <option value="en">EN</option>
-            <option value="pt">PT</option>
-          </select>
+          <div class="w-20">
+            <CustomDropdown
+              :model-value="lang"
+              @update:model-value="(val) => { lang = val; changeLanguage(val); }"
+              :options="[
+                { value: 'en', label: 'EN' },
+                { value: 'pt', label: 'PT' }
+              ]"
+              :compact="true"
+            />
+          </div>
 
           <!-- Dark Mode Toggle -->
           <button
@@ -162,14 +165,14 @@
               <!-- Language Switcher -->
               <div>
                 <label class="block text-sm font-medium mb-2">{{ t('common.language') }}</label>
-                <select
-                  v-model="lang"
-                  @change="changeLanguage(lang)"
-                  class="w-full px-3 py-2 rounded-md bg-secondary text-primary border border-color"
-                >
-                  <option value="en">English</option>
-                  <option value="pt">Português</option>
-                </select>
+                <CustomDropdown
+                  :model-value="lang"
+                  @update:model-value="(val) => { lang = val; changeLanguage(val); }"
+                  :options="[
+                    { value: 'en', label: 'English' },
+                    { value: 'pt', label: 'Português' }
+                  ]"
+                />
               </div>
 
               <!-- Dark Mode Toggle -->
@@ -234,6 +237,7 @@ import { useI18n } from './composables/useI18n';
 import { useDarkMode } from './composables/useDarkMode';
 import { initParticles } from '../lib/particles.js';
 import GlobalTooltip from './components/GlobalTooltip.vue';
+import CustomDropdown from './components/CustomDropdown.vue';
 
 const route = useRoute();
 const { lang, t, changeLanguage } = useI18n();

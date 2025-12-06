@@ -45,7 +45,7 @@ const DEFAULTS = {
   LINK_DISTANCE: 100,
   CHARGE_STRENGTH: -300,
   MIN_RADIUS: 5,
-  MAX_RADIUS: 30,
+  MAX_RADIUS: 20,
   COLLISION_PADDING: 2,
   COLLISION_STRENGTH: 0.7,
   LINK_STRENGTH: 0.5,
@@ -116,7 +116,7 @@ function debounce(func, wait) {
  * @param {number} [options.chargeStrength=-300] - Charge force strength
  * @param {string|null} [options.sizeBy=null] - Property to size nodes by
  * @param {number} [options.minRadius=5] - Minimum node radius
- * @param {number} [options.maxRadius=30] - Maximum node radius
+ * @param {number} [options.maxRadius=20] - Maximum node radius
  * @param {number} [options.sizeExponent=0.4] - Power exponent for size scaling (lower = more spread)
  * @param {string} [options.colorBy='group'] - Property to color nodes by
  * @param {string} [options.colorScheme='categorical'] - Color scheme ('categorical' or 'sequential')

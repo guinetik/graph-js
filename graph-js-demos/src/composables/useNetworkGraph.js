@@ -357,7 +357,7 @@ export function useNetworkGraph(options = {}) {
         graphInstance.value.updateVisualEncoding({
           sizeBy: 'eigenvector',
           minRadius: 5,
-          maxRadius: 30
+          maxRadius: 20
         });
       } else {
         // Just trigger a D3 update to re-render with new properties
