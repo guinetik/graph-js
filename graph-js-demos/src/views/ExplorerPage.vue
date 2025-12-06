@@ -402,7 +402,7 @@
       <!-- Loading Overlay -->
       <div
         v-if="loading"
-        class="absolute inset-0 flex items-center justify-center bg-white/90 dark:bg-gray-900/90 z-10"
+        class="absolute inset-0 flex items-center justify-center bg-white/90 dark:bg-gray-900/90 backdrop-blur-md z-10"
       >
         <div class="text-center">
           <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-purple-600 border-t-transparent mb-4"></div>
