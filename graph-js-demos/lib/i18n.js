@@ -510,6 +510,7 @@ console.log(results);
         betweennessCentrality: 'Betweenness Centrality',
         clusteringCoefficient: 'Clustering Coefficient',
         eigenvectorCentrality: 'Eigenvector Centrality',
+        pageRankCentrality: 'PageRank Centrality',
         eigenvectorLaplacian: 'Eigenvector (Laplacian) - for Spectral layout',
         nodeSizeLabel: 'Node Size Based On:',
         selectMetric: '-- Select a metric --',
@@ -518,7 +519,8 @@ console.log(results);
         degreeName: 'Degree',
         betweennessName: 'Betweenness',
         clusteringName: 'Clustering',
-        eigenvectorName: 'Eigenvector'
+        eigenvectorName: 'Eigenvector',
+        pageRankName: 'PageRank'
       },
       layoutAlgorithm: {
         title: 'Layout Algorithm'
@@ -586,6 +588,13 @@ console.log(results);
       header: {
         title: '🔍 Network Explorer',
         subtitle: 'Explore sample networks and upload your own files. Supports CSV, JSON, and NetworkX formats.'
+      },
+      renderer: {
+        title: 'Graph Renderer',
+        d3: 'D3.js (SVG)',
+        sigma: 'Sigma.js (WebGL)',
+        d3Description: 'SVG-based rendering. Best for small-medium graphs (<1000 nodes). Supports rich interactions.',
+        sigmaDescription: 'WebGL-based rendering. Optimized for large graphs (10k+ nodes). Hardware-accelerated.'
       },
       parallelComputation: {
         title: '🚀 Parallel Computation Demo',
@@ -957,6 +966,7 @@ console.log(results);
         betweennessCentrality: 'Centralidade de Intermediação',
         clusteringCoefficient: 'Coeficiente de Agrupamento',
         eigenvectorCentrality: 'Centralidade de Eigenvector',
+        pageRankCentrality: 'Centralidade PageRank',
         eigenvectorLaplacian: 'Eigenvector (Laplaciano) - para layout Espectral',
         nodeSizeLabel: 'Tamanho do Nó Baseado Em:',
         selectMetric: '-- Selecione uma métrica --',
@@ -965,7 +975,8 @@ console.log(results);
         degreeName: 'Grau',
         betweennessName: 'Intermediação',
         clusteringName: 'Agrupamento',
-        eigenvectorName: 'Eigenvector'
+        eigenvectorName: 'Eigenvector',
+        pageRankName: 'PageRank'
       },
       layoutAlgorithm: {
         title: 'Algoritmo de Layout'
@@ -1466,6 +1477,13 @@ console.log(results);
       header: {
         title: '🔍 Explorador de Redes',
         subtitle: 'Explore redes de exemplo e carregue seus próprios arquivos. Suporta formatos CSV, JSON e NetworkX.'
+      },
+      renderer: {
+        title: 'Renderizador de Grafo',
+        d3: 'D3.js (SVG)',
+        sigma: 'Sigma.js (WebGL)',
+        d3Description: 'Renderização baseada em SVG. Melhor para grafos pequenos-médios (<1000 nós). Suporta interações ricas.',
+        sigmaDescription: 'Renderização baseada em WebGL. Otimizado para grafos grandes (10k+ nós). Aceleração por hardware.'
       },
       parallelComputation: {
         title: '🚀 Demonstração de Computação Paralela',

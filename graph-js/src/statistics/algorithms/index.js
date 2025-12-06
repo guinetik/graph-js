@@ -10,7 +10,8 @@ export {
   ClusteringStatistic,
   EigenvectorStatistic,
   EigenvectorLaplacianStatistic,
-  CliquesStatistic
+  CliquesStatistic,
+  PageRankStatistic
 } from './node-stats.js';
 
 // Graph-level statistics

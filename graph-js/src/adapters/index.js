@@ -22,12 +22,14 @@ import { Adapter } from './adapter.js';
 import { CSVAdapter } from './csv.js';
 import { JSONAdapter } from './json.js';
 import { NetworkXAdapter } from './networkx.js';
+import { SigmaAdapter } from './sigma.js';
 
-export { Adapter, CSVAdapter, JSONAdapter, NetworkXAdapter };
+export { Adapter, CSVAdapter, JSONAdapter, NetworkXAdapter, SigmaAdapter };
 
 export default {
   Adapter,
   CSVAdapter,
   JSONAdapter,
-  NetworkXAdapter
+  NetworkXAdapter,
+  SigmaAdapter
 };

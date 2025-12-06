@@ -29,6 +29,40 @@
         </div>
       </div>
 
+      <!-- Renderer Selection -->
+      <div class="demo-controls-section mb-4">
+        <h2 class="demo-controls-section-title">{{ t('explorer.renderer.title') }}</h2>
+        <div class="flex gap-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+          <button
+            @click="handleRendererSwitch('d3')"
+            :disabled="loading"
+            :class="[
+              'flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+              currentRenderer === 'd3'
+                ? 'bg-white dark:bg-gray-700 shadow text-purple-700 dark:text-purple-300'
+                : 'hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+            ]"
+          >
+            {{ t('explorer.renderer.d3') }}
+          </button>
+          <button
+            @click="handleRendererSwitch('sigma')"
+            :disabled="loading"
+            :class="[
+              'flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+              currentRenderer === 'sigma'
+                ? 'bg-white dark:bg-gray-700 shadow text-purple-700 dark:text-purple-300'
+                : 'hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+            ]"
+          >
+            {{ t('explorer.renderer.sigma') }}
+          </button>
+        </div>
+        <p class="text-xs text-secondary mt-2">
+          {{ currentRenderer === 'd3' ? t('explorer.renderer.d3Description') : t('explorer.renderer.sigmaDescription') }}
+        </p>
+      </div>
+
       <!-- Status Section - Fixed at top when scrolling -->
       <div class="sticky top-0 z-20 bg-white/98 dark:bg-gray-800/98 backdrop-blur-md border-b border-[var(--color-border)] pb-4 mb-4 -mx-6 px-6 pt-4 -mt-2 shadow-sm">
         <h2 class="demo-controls-section-title mb-3">{{ t('explorer.status.title') }}</h2>
@@ -300,12 +334,6 @@
               </span>
             </div>
             <div class="flex justify-between items-center">
-              <span class="text-sm text-blue-800 dark:text-blue-200">{{ t('explorer.graphStats.components') }}</span>
-              <span class="text-sm font-mono text-blue-600 dark:text-blue-400">
-                {{ graphStats?.['connected_components'] || '-' }}
-              </span>
-            </div>
-            <div class="flex justify-between items-center">
               <span class="text-sm text-blue-800 dark:text-blue-200">{{ t('explorer.graphStats.avgDegree') }}</span>
               <span class="text-sm font-mono text-blue-600 dark:text-blue-400">
                 {{ graphStats?.['average_degree']?.toFixed(2) || '-' }}
@@ -436,7 +464,9 @@ const {
   getAvailableCommunityAlgorithms,
   updateVisualEncoding,
   getNodeIds,
-  unlockPositions
+  unlockPositions,
+  currentRenderer,
+  switchRenderer
 } = graphComposable;
 
 // Local state
@@ -649,6 +679,8 @@ const handleLoadSampleNetwork = async () => {
     if (result.success) {
       networkLoaded.value = true;
       useWorkers.value = result.useWorkers || false;
+      // Reset to default layout (simulation running)
+      selectedLayout.value = 'none';
       stats.value = {
         nodes: result.nodeCount,
         edges: result.edgeCount,
@@ -696,6 +728,8 @@ const handleLoadUploadedNetwork = async () => {
     if (result.success) {
       networkLoaded.value = true;
       useWorkers.value = result.useWorkers || false;
+      // Reset to default layout (simulation running)
+      selectedLayout.value = 'none';
       stats.value = {
         nodes: result.nodeCount,
         edges: result.edgeCount,
@@ -826,6 +860,60 @@ const handleDetectCommunities = async () => {
     setNodeInfo('error', `Community detection failed: ${err.message}`);
   } finally {
     detectingCommunities.value = false;
+  }
+};
+
+/**
+ * Switch between D3 and Sigma renderers
+ */
+const handleRendererSwitch = async (rendererType) => {
+  if (rendererType === currentRenderer.value) return;
+
+  try {
+    loadingMessage.value = `Switching to ${rendererType === 'd3' ? 'D3.js (SVG)' : 'Sigma.js (WebGL)'} renderer...`;
+    statusMessage.value = loadingMessage.value;
+    statusType.value = 'info';
+
+    const success = await switchRenderer(rendererType);
+
+    if (success) {
+      statusMessage.value = `Switched to ${rendererType === 'd3' ? 'D3.js (SVG)' : 'Sigma.js (WebGL)'} renderer`;
+      statusType.value = 'success';
+
+      // Re-setup event handlers after renderer switch
+      if (graphInstance.value) {
+        graphInstance.value.on('nodeHover', (node) => {
+          setNodeInfo('node-hover', `Node: ${node.id}`, {
+            id: node.id,
+            group: node.group || 1,
+            community: hasCommunities.value ? node.community : null,
+            centrality: node.centrality?.toFixed(4) || 'N/A',
+            degree: node.degree || 'N/A',
+            betweenness: node.betweenness?.toFixed(4),
+            clustering: node.clustering?.toFixed(3),
+            eigenvector: node.eigenvector?.toFixed(4),
+            closeness: node.closeness?.toFixed(4),
+            egoDensity: node['ego-density']?.toFixed(3),
+            cliques: node.cliques
+          });
+        });
+
+        graphInstance.value.on('nodeLeave', () => {
+          if (!networkLoaded.value) {
+            setNodeInfo('default', 'Select a network to begin...');
+          } else {
+            setNodeInfo('default', 'Hover over a node to see details...');
+          }
+        });
+      }
+    } else {
+      statusMessage.value = 'Failed to switch renderer';
+      statusType.value = 'error';
+    }
+  } catch (err) {
+    log.error('Renderer switch error', { error: err.message, stack: err.stack });
+    statusMessage.value = `Failed to switch renderer: ${err.message}`;
+    statusType.value = 'error';
   }
 };
 

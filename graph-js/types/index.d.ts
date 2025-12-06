@@ -74,6 +74,8 @@ export interface NodeStats {
   modularity?: number;
   /** Legacy alias for clustering */
   transitivity?: number;
+  /** PageRank score (random surfer model importance) */
+  pagerank?: number;
 }
 
 /**
@@ -395,6 +397,8 @@ export interface NetworkStatsFeatures {
   CLIQUES: 'cliques';
   /** Degree centrality (connection count) */
   DEGREE: 'degree';
+  /** PageRank centrality (random surfer model importance) */
+  PAGERANK: 'pagerank';
   /** All available features */
   ALL: string[];
 }
@@ -520,6 +524,100 @@ export class NetworkXAdapter extends Adapter {
     nodes: Array<{ id: NodeId; [key: string]: any }>;
     links: Array<{ source: NodeId; target: NodeId; [key: string]: any }>;
   }): GraphData;
+}
+
+/**
+ * Options for SigmaAdapter.toGraphology()
+ */
+export interface SigmaAdapterOptions {
+  /** Node positions mapping { nodeId: { x, y } } */
+  positions?: Record<NodeId, { x: number; y: number }>;
+  /** Node statistics from analysis */
+  nodeStats?: NodeStats[];
+  /** Property to map to node size */
+  sizeBy?: string;
+  /** Minimum node size (default: 3) */
+  minSize?: number;
+  /** Maximum node size (default: 15) */
+  maxSize?: number;
+  /** Property to map to node color */
+  colorBy?: string;
+  /** Color scheme name: 'category10', 'pastel', 'viridis' */
+  colorScheme?: 'category10' | 'pastel' | 'viridis';
+  /** Custom Sigma.js settings to merge */
+  sigmaSettings?: Record<string, any>;
+}
+
+/**
+ * Result from SigmaAdapter.toGraphology()
+ */
+export interface SigmaGraphologyResult {
+  /** Graphology graph instance */
+  graph: any; // Graphology Graph type
+  /** Sigma.js settings */
+  settings: Record<string, any>;
+}
+
+/**
+ * Sigma.js adapter for WebGL-based graph rendering.
+ * Converts graph-js data to Graphology format for use with Sigma.js.
+ */
+export class SigmaAdapter extends Adapter {
+  /**
+   * Convert graph-js GraphData to Graphology format for Sigma.js
+   * @param graphData - Standard graph data
+   * @param options - Conversion options
+   * @returns Graphology graph and Sigma settings
+   */
+  static toGraphology(graphData: GraphData, options?: SigmaAdapterOptions): SigmaGraphologyResult;
+
+  /**
+   * Convert Graphology graph back to graph-js GraphData format
+   * @param graphologyGraph - Graphology graph instance
+   * @returns Standard graph data
+   */
+  static fromGraphology(graphologyGraph: any): GraphData;
+
+  /**
+   * Update node attributes in a Graphology graph
+   * @param graph - Graphology graph instance
+   * @param updates - Node updates { nodeId: { x, y, size, color, ... } }
+   */
+  static updateNodes(graph: any, updates: Record<NodeId, Record<string, any>>): void;
+
+  /**
+   * Apply layout positions to a Graphology graph
+   * @param graph - Graphology graph instance
+   * @param positions - Positions { nodeId: { x, y } }
+   * @param animate - Whether to smoothly transition
+   */
+  static applyLayout(graph: any, positions: Record<NodeId, { x: number; y: number }>, animate?: boolean): void;
+
+  /**
+   * Update visual encoding (size/color) based on node statistics
+   * @param graph - Graphology graph instance
+   * @param nodeStats - Node statistics array
+   * @param options - Encoding options
+   */
+  static updateVisualEncoding(graph: any, nodeStats: NodeStats[], options?: {
+    sizeBy?: string;
+    colorBy?: string;
+    colorScheme?: string;
+    minSize?: number;
+    maxSize?: number;
+  }): void;
+
+  /**
+   * Get available color schemes
+   * @returns Array of color scheme names
+   */
+  static getColorSchemes(): string[];
+
+  /**
+   * Get default Sigma settings
+   * @returns Default settings object
+   */
+  static getDefaultSettings(): Record<string, any>;
 }
 
 // ============================================================================

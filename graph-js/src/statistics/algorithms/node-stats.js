@@ -143,6 +143,32 @@ export class EigenvectorStatistic extends StatisticAlgorithm {
 }
 
 /**
+ * PageRank statistic.
+ * Measures node importance based on link structure using the random surfer model.
+ * Unlike eigenvector centrality, PageRank uses a damping factor and handles dangling nodes.
+ *
+ * **Formula**: PR(v) = (1-d)/N + d × Σ(PR(u)/out_degree(u))
+ * **Complexity**: O(k × E) where k is iterations
+ * **Use case**: Web page ranking, influence in directed/undirected networks
+ *
+ * @extends StatisticAlgorithm
+ */
+export class PageRankStatistic extends StatisticAlgorithm {
+  constructor(options = {}) {
+    super('pagerank', 'PageRank importance score with damping', 'node', {
+      module: '../statistics/algorithms/node-stats.js',
+      functionName: 'pageRankCompute'
+    });
+    this.options = {
+      dampingFactor: options.dampingFactor ?? 0.85,
+      maxIter: options.maxIter ?? 100,
+      tolerance: options.tolerance ?? 1e-6
+    };
+  }
+  // calculate() inherited from base class - delegates to worker!
+}
+
+/**
  * Laplacian eigenvector statistic.
  * Computes the 2nd and 3rd smallest eigenvectors of the graph Laplacian.
  * Used for spectral layout visualization.
@@ -374,6 +400,105 @@ export async function eigenvectorCompute(graphData, nodeIds, options, progressCa
     if (diff < tolerance) {
       break;
     }
+  }
+
+  reportProgress(progressCallback, 1.0);
+  return scores;
+}
+
+/**
+ * Compute PageRank centrality
+ *
+ * PageRank models a "random surfer" who follows links with probability d
+ * and jumps to a random page with probability (1-d). This makes it more
+ * robust than eigenvector centrality for real-world networks.
+ *
+ * @param {Object} graphData - Serialized graph data
+ * @param {Array} nodeIds - Not used (always computes all nodes)
+ * @param {Object} options - Algorithm options
+ * @param {number} options.dampingFactor - Probability of following links (default: 0.85)
+ * @param {number} options.maxIter - Maximum iterations (default: 100)
+ * @param {number} options.tolerance - Convergence tolerance (default: 1e-6)
+ * @param {Function} progressCallback - Progress reporting callback
+ * @returns {Object} Node ID -> PageRank score
+ */
+export async function pageRankCompute(graphData, nodeIds, options, progressCallback) {
+  const graph = reconstructGraph(graphData);
+  const { dampingFactor = 0.85, maxIter = 100, tolerance = 1e-6 } = options || {};
+  const nodes = Array.from(graph.nodes);
+  const n = nodes.length;
+
+  if (n === 0) {
+    reportProgress(progressCallback, 1.0);
+    return {};
+  }
+
+  // Initialize PageRank scores uniformly
+  let scores = {};
+  nodes.forEach(node => {
+    scores[node] = 1 / n;
+  });
+
+  // Calculate out-degree for each node
+  const outDegree = {};
+  nodes.forEach(node => {
+    outDegree[node] = graph.getNeighbors(node).length;
+  });
+
+  // Identify dangling nodes (nodes with no outgoing edges)
+  const danglingNodes = nodes.filter(node => outDegree[node] === 0);
+
+  // Precompute teleport value
+  const teleport = (1 - dampingFactor) / n;
+
+  // Power iteration
+  for (let iter = 0; iter < maxIter; iter++) {
+    const newScores = {};
+
+    // Calculate dangling node contribution (distributed to all nodes)
+    let danglingSum = 0;
+    danglingNodes.forEach(node => {
+      danglingSum += scores[node];
+    });
+    const danglingContribution = dampingFactor * danglingSum / n;
+
+    // Initialize with teleport probability + dangling contribution
+    nodes.forEach(node => {
+      newScores[node] = teleport + danglingContribution;
+    });
+
+    // Add contributions from incoming edges
+    // In undirected graph, neighbors are both incoming and outgoing
+    nodes.forEach(node => {
+      const neighbors = graph.getNeighbors(node);
+      if (neighbors.length > 0) {
+        const contribution = dampingFactor * scores[node] / neighbors.length;
+        neighbors.forEach(neighbor => {
+          newScores[neighbor] += contribution;
+        });
+      }
+    });
+
+    // Check convergence using L1 distance
+    const diff = l1Distance(newScores, scores);
+    scores = newScores;
+
+    // Report progress
+    if (iter % 10 === 0) {
+      reportProgress(progressCallback, iter / maxIter);
+    }
+
+    if (diff < tolerance) {
+      break;
+    }
+  }
+
+  // Normalize to sum to 1 (L1 normalization for probability distribution)
+  const sum = Object.values(scores).reduce((acc, val) => acc + val, 0);
+  if (sum > 0) {
+    nodes.forEach(node => {
+      scores[node] /= sum;
+    });
   }
 
   reportProgress(progressCallback, 1.0);

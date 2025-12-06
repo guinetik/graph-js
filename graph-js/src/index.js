@@ -21,7 +21,8 @@ import {
   EigenvectorLaplacianStatistic,
   CliquesStatistic,
   ClosenessStatistic,
-  EgoDensityStatistic
+  EgoDensityStatistic,
+  PageRankStatistic
 } from "./statistics/index.js";
 import {
   DensityStatistic,
@@ -77,6 +78,7 @@ export class NetworkStats {
     DEGREE: "degree",
     CLOSENESS: "closeness",
     EGO_DENSITY: "ego-density",
+    PAGERANK: "pagerank",
     ALL: [
       "degree",
       "betweenness",
@@ -85,7 +87,8 @@ export class NetworkStats {
       "eigenvector-laplacian",
       "cliques",
       "closeness",
-      "ego-density"
+      "ego-density",
+      "pagerank"
     ],
   };
 
@@ -176,6 +179,7 @@ export class NetworkStats {
       [NetworkStats.FEATURES.CLIQUES]: CliquesStatistic,
       [NetworkStats.FEATURES.CLOSENESS]: ClosenessStatistic,
       [NetworkStats.FEATURES.EGO_DENSITY]: EgoDensityStatistic,
+      [NetworkStats.FEATURES.PAGERANK]: PageRankStatistic,
       [NetworkStats.FEATURES.MODULARITY]: 'modularity' // Special case
     };
 

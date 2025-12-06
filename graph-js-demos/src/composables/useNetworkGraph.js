@@ -19,6 +19,7 @@
 
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import { NetworkGraphD3 } from '../lib/NetworkGraphD3';
+import { NetworkGraphSigma } from '../lib/NetworkGraphSigma';
 import { NetworkAnalyzer } from '../lib/NetworkAnalyzer';
 import { createLogger } from '@guinetik/logger';
 
@@ -35,7 +36,8 @@ export function useNetworkGraph(options = {}) {
   const error = ref(null);
   const nodeInfo = ref(null);
   const analysisProgress = ref(0);
-  
+  const currentRenderer = ref(options.renderer || 'd3'); // 'd3' or 'sigma'
+
   // Auto-compute eigenvector centrality when graph changes
   const autoComputeCentrality = options.autoComputeCentrality !== false; // Default to true
 
@@ -62,12 +64,14 @@ export function useNetworkGraph(options = {}) {
       const width = rect.width || options.width || 800;
       const height = rect.height || options.height || 600;
 
-      // Create graph instance
-      graphInstance.value = new NetworkGraphD3(graphContainer.value, {
+      // Create graph instance based on renderer type
+      const RendererClass = currentRenderer.value === 'sigma' ? NetworkGraphSigma : NetworkGraphD3;
+      graphInstance.value = new RendererClass(graphContainer.value, {
         width,
         height,
         ...options
       });
+      log.debug('Created renderer instance', { renderer: currentRenderer.value });
 
       // Create analyzer instance
       analyzer.value = new NetworkAnalyzer();
@@ -389,6 +393,31 @@ export function useNetworkGraph(options = {}) {
       analysisProgress.value = 0;
       log.debug('Applying layout', { layoutId });
 
+      // Special handling for "none" - restart physics simulation
+      if (layoutId === 'none') {
+        // Restart simulation - Sigma has startSimulation(), D3 has unlockPositions()
+        if (typeof graphInstance.value.startSimulation === 'function') {
+          // Sigma: unfix positions and start ForceAtlas2
+          const currentData = graphInstance.value.data;
+          currentData.nodes.forEach(node => {
+            node.fx = null;
+            node.fy = null;
+          });
+          graphInstance.value.startSimulation();
+        } else if (typeof graphInstance.value.unlockPositions === 'function') {
+          // D3: unlockPositions clears fx/fy and restarts simulation
+          graphInstance.value.unlockPositions();
+        } else {
+          // Fallback: just update
+          graphInstance.value.updateGraph();
+        }
+
+        loading.value = false;
+        analysisProgress.value = 0;
+        log.info('Simulation restarted (none layout)');
+        return true;
+      }
+
       const currentData = graphInstance.value.data;
       const rect = graphContainer.value.getBoundingClientRect();
 
@@ -423,7 +452,7 @@ export function useNetworkGraph(options = {}) {
         graphInstance.value.off('ready', readyHandler);
         log.info('Layout applied successfully', { layoutId });
       };
-      
+
       graphInstance.value.on('ready', readyHandler);
 
       // Update visualization - this will trigger ready event when stable
@@ -604,6 +633,94 @@ export function useNetworkGraph(options = {}) {
     }
   };
 
+  /**
+   * Switch between renderers (d3 or sigma)
+   * Preserves current graph data during the switch
+   * @param {string} rendererType - 'd3' or 'sigma'
+   * @returns {Promise<boolean>} True if switch was successful
+   */
+  const switchRenderer = async (rendererType) => {
+    if (rendererType === currentRenderer.value) {
+      log.debug('Already using renderer', { rendererType });
+      return true;
+    }
+
+    if (!['d3', 'sigma'].includes(rendererType)) {
+      log.error('Invalid renderer type', { rendererType });
+      return false;
+    }
+
+    try {
+      loading.value = true;
+      log.info('Switching renderer', { from: currentRenderer.value, to: rendererType });
+
+      // Save current data if available
+      // Clone nodes without position data - let new renderer do its own layout
+      // This is necessary because Sigma and D3 use different coordinate systems
+      const savedData = graphInstance.value?.data ? {
+        nodes: graphInstance.value.data.nodes.map(node => {
+          // Clone node but remove position properties
+          const { x, y, fx, fy, vx, vy, index, ...rest } = node;
+          return rest;
+        }),
+        links: [...graphInstance.value.data.links]
+      } : null;
+
+      // Destroy current graph (but keep analyzer)
+      if (graphInstance.value) {
+        graphInstance.value.destroy();
+        graphInstance.value = null;
+      }
+
+      // Update renderer type
+      currentRenderer.value = rendererType;
+
+      // Wait for DOM to update
+      await nextTick();
+
+      // Reinitialize with new renderer
+      if (graphContainer.value) {
+        const rect = graphContainer.value.getBoundingClientRect();
+        const width = rect.width || options.width || 800;
+        const height = rect.height || options.height || 600;
+
+        const RendererClass = rendererType === 'sigma' ? NetworkGraphSigma : NetworkGraphD3;
+        graphInstance.value = new RendererClass(graphContainer.value, {
+          width,
+          height,
+          ...options
+        });
+
+        // Setup event handlers
+        graphInstance.value.on('nodeHover', (node) => {
+          nodeInfo.value = node;
+        });
+
+        graphInstance.value.on('nodeLeave', () => {
+          nodeInfo.value = null;
+        });
+
+        // Restore data if we had any
+        if (savedData && savedData.nodes.length > 0) {
+          loadData(savedData.nodes, savedData.links);
+        } else {
+          loading.value = false;
+        }
+
+        log.info('Renderer switched successfully', { renderer: rendererType });
+        return true;
+      }
+
+      loading.value = false;
+      return false;
+    } catch (err) {
+      log.error('Failed to switch renderer', { error: err.message, stack: err.stack });
+      error.value = err.message;
+      loading.value = false;
+      return false;
+    }
+  };
+
   // Lifecycle hooks
   onMounted(async () => {
     // Use Vue's nextTick to ensure DOM is ready
@@ -625,6 +742,7 @@ export function useNetworkGraph(options = {}) {
     error,
     nodeInfo,
     analysisProgress,
+    currentRenderer,
 
     // Methods
     initGraph,
@@ -644,7 +762,8 @@ export function useNetworkGraph(options = {}) {
     lockPositions,
     unlockPositions,
     saveAsPNG,
-    getSelectedNode
+    getSelectedNode,
+    switchRenderer
   };
 }
 

@@ -42,6 +42,15 @@
           >
           <span class="text-secondary">{{ t('showcase.networkAnalysis.eigenvectorCentrality') }}</span>
         </label>
+        <label class="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            :checked="selectedMetrics.includes('pagerank')"
+            @change="updateMetrics('pagerank', $event.target.checked)"
+            class="rounded"
+          >
+          <span class="text-secondary">{{ t('showcase.networkAnalysis.pageRankCentrality') }}</span>
+        </label>
         <label v-if="showSpectralMetric" class="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
@@ -70,6 +79,7 @@
         <option v-if="selectedMetrics.includes('betweenness')" value="betweenness">{{ t('showcase.networkAnalysis.betweennessName') }}</option>
         <option v-if="selectedMetrics.includes('clustering')" value="clustering">{{ t('showcase.networkAnalysis.clusteringName') }}</option>
         <option v-if="selectedMetrics.includes('eigenvector')" value="eigenvector">{{ t('showcase.networkAnalysis.eigenvectorName') }}</option>
+        <option v-if="selectedMetrics.includes('pagerank')" value="pagerank">{{ t('showcase.networkAnalysis.pageRankName') }}</option>
       </select>
     </div>
 
