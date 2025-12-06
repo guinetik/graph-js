@@ -60,6 +60,74 @@ Handles communication between main thread and workers:
 - **Error Handling**: Catches and reports worker errors
 - **Progress Forwarding**: Forwards progress updates to callbacks
 
+## Worker Affinity System
+
+graph-js includes an intelligent **worker affinity system** that routes repeated algorithm calls to the same worker, leveraging JavaScript's JIT (Just-In-Time) compilation for better performance.
+
+### How It Works
+
+```
+Task: eigenvector          Task: eigenvector (again)
+      │                          │
+      ▼                          ▼
+┌─────────────┐            ┌─────────────┐
+│ Select      │            │ Affinity    │
+│ least-loaded│            │ Match! 🎯   │
+│ Worker 2    │            │ Worker 2    │
+└─────────────┘            └─────────────┘
+      │                          │
+      ▼                          ▼
+   Worker 2                   Worker 2
+   (cold start)               (JIT optimized)
+```
+
+When a worker executes an algorithm:
+1. The function code is JIT-compiled by the JavaScript engine
+2. The worker's cached functions are tracked
+3. Future calls for the same algorithm are routed to that worker
+4. The "hot" JIT-optimized code path is reused (10-30% faster)
+
+### Selection Algorithm
+
+The affinity-aware worker selection follows this priority:
+
+1. **Affinity Match**: Find available worker that previously ran the same algorithm
+2. **Least Loaded**: If no affinity match, select worker with fewest tasks executed
+3. **FIFO Fallback**: If affinity disabled, use simple first-available selection
+
+### Configuration
+
+```javascript
+const analyzer = new NetworkStats({
+  enableAffinity: true,       // Enable worker affinity (default: true)
+  affinityCacheLimit: 50,     // Max cached functions per worker (default: 50)
+  verbose: true               // See affinity logs: 🎯 hits, 📦 cache updates
+});
+```
+
+### Monitoring Affinity
+
+```javascript
+import WorkerManager from '@guinetik/graph-js';
+
+// Get affinity statistics
+const stats = WorkerManager.getAffinityStats();
+console.log(`Hit rate: ${(stats.hitRate * 100).toFixed(1)}%`);
+console.log(`Hits: ${stats.hits}, Misses: ${stats.misses}`);
+
+// Per-worker cache info
+stats.workerCaches.forEach(w => {
+  console.log(`Worker ${w.workerId}: ${w.cachedFunctions.length} cached functions`);
+});
+```
+
+### Cache Eviction
+
+When a worker's cache exceeds `affinityCacheLimit`:
+- Half of the oldest entries are evicted
+- This prevents unbounded memory growth
+- Frequently-used algorithms remain cached
+
 ## Benefits
 
 ### Performance
@@ -67,6 +135,7 @@ Handles communication between main thread and workers:
 - **Parallel Processing**: Multiple workers process independent tasks simultaneously
 - **CPU Utilization**: Automatically uses all available CPU cores
 - **2-3x Speedup**: Measured performance improvement on large graphs
+- **JIT Optimization**: Affinity system leverages JavaScript engine optimization
 
 ### User Experience
 
