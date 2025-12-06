@@ -411,9 +411,13 @@ export class NetworkGraphD3 {
 
     if (values.length > 0) {
       // Check if values are numeric or categorical
+      // Treat 'group' and 'community' as categorical even if numeric
       const isNumeric = values.every(v => typeof v === 'number');
+      const isCategoricalProperty = ['group', 'community'].includes(colorProperty);
+      const useSequential = this.options.colorScheme === 'sequential' ||
+                           (isNumeric && !isCategoricalProperty);
 
-      if (this.options.colorScheme === 'sequential' || isNumeric) {
+      if (useSequential) {
         // Sequential scale for continuous values
         const min = Math.min(...values);
         const max = Math.max(...values);
