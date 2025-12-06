@@ -18,6 +18,10 @@
           <span class="docs-toc-icon">🧱</span>
           <span>{{ t('docs.sections.coreClasses') }}</span>
         </a>
+        <a href="#workers" class="docs-toc-link">
+          <span class="docs-toc-icon">⚡</span>
+          <span>{{ t('docs.sections.workers') }}</span>
+        </a>
         <a href="#adapters" class="docs-toc-link">
           <span class="docs-toc-icon">🔄</span>
           <span>{{ t('docs.sections.adapters') }}</span>
@@ -167,6 +171,76 @@
             <span class="docs-feature-description">{{ t('docs.networkStats.features.modularity') }}</span>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- Worker Architecture -->
+    <section id="workers" class="docs-section">
+      <h2 class="docs-section-header">
+        <span class="docs-section-header-icon">⚡</span>
+        <span>{{ t('docs.workers.title') }}</span>
+      </h2>
+      <p class="docs-section-intro">{{ t('docs.workers.description') }}</p>
+
+      <!-- Components -->
+      <div class="docs-card">
+        <h3 class="docs-card-title">{{ t('docs.workers.components.title') }}</h3>
+
+        <div class="docs-method-list">
+          <div class="docs-method-item">
+            <code class="docs-method-name">{{ t('docs.workers.components.workerManager.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.workers.components.workerManager.description') }}</p>
+          </div>
+          <div class="docs-method-item">
+            <code class="docs-method-name">{{ t('docs.workers.components.workerPool.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.workers.components.workerPool.description') }}</p>
+          </div>
+          <div class="docs-method-item">
+            <code class="docs-method-name">{{ t('docs.workers.components.workerAdapter.name') }}</code>
+            <p class="docs-method-description">{{ t('docs.workers.components.workerAdapter.description') }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Affinity System -->
+      <div class="docs-card">
+        <h3 class="docs-card-title-purple">{{ t('docs.workers.affinity.title') }}</h3>
+        <p class="docs-card-description">{{ t('docs.workers.affinity.description') }}</p>
+
+        <h4 class="docs-subsection-title">{{ t('docs.workers.affinity.howItWorks') }}</h4>
+        <ul class="list-disc pl-6 space-y-2 text-secondary mb-6">
+          <li v-for="(step, index) in t('docs.workers.affinity.howItWorksSteps')" :key="'how-'+index">{{ step }}</li>
+        </ul>
+
+        <h4 class="docs-subsection-title">{{ t('docs.workers.affinity.selectionTitle') }}</h4>
+        <ul class="list-decimal pl-6 space-y-2 text-secondary mb-6">
+          <li v-for="(step, index) in t('docs.workers.affinity.selectionSteps')" :key="'sel-'+index">{{ step }}</li>
+        </ul>
+      </div>
+
+      <!-- Configuration -->
+      <div class="docs-card">
+        <h3 class="docs-card-title-green">{{ t('docs.workers.config.title') }}</h3>
+
+        <CodeBlock :code="workerConfigCode" language="javascript" />
+
+        <div class="docs-options-box mt-4">
+          <h5 class="docs-options-title">Options:</h5>
+          <ul class="docs-options-list">
+            <li><code class="docs-options-code">maxWorkers:</code> {{ t('docs.workers.config.options.maxWorkers') }}</li>
+            <li><code class="docs-options-code">enableAffinity:</code> {{ t('docs.workers.config.options.enableAffinity') }}</li>
+            <li><code class="docs-options-code">affinityCacheLimit:</code> {{ t('docs.workers.config.options.affinityCacheLimit') }}</li>
+            <li><code class="docs-options-code">taskTimeout:</code> {{ t('docs.workers.config.options.taskTimeout') }}</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Monitoring -->
+      <div class="docs-card">
+        <h3 class="docs-card-title-blue">{{ t('docs.workers.monitoring.title') }}</h3>
+        <p class="docs-card-description">{{ t('docs.workers.monitoring.description') }}</p>
+
+        <CodeBlock :code="workerMonitoringCode" language="javascript" />
       </div>
     </section>
 
@@ -585,6 +659,41 @@ graph.addEdge('B', 'C', 2);
 console.log(graph.getNeighbors('B')); // ['A', 'C']
 console.log(graph.numberOfNodes());    // 3
 console.log(graph.numberOfEdges());    // 2`;
+
+// Worker configuration code
+const workerConfigCode = `import NetworkStats from '@guinetik/graph-js';
+
+const analyzer = new NetworkStats({
+  maxWorkers: 4,              // Max workers (default: auto-detect)
+  enableAffinity: true,       // Enable worker affinity (default: true)
+  affinityCacheLimit: 50,     // Max cached functions per worker
+  taskTimeout: 300000,        // 5 minute timeout
+  verbose: true               // See affinity logs: 🎯 hits, 📦 updates
+});
+
+// Run analysis - affinity routing happens automatically
+const results = await analyzer.analyze(network, ['degree', 'eigenvector']);
+
+// Cleanup when done
+await analyzer.dispose();`;
+
+// Worker monitoring code
+const workerMonitoringCode = `import WorkerManager from '@guinetik/graph-js';
+
+// Get pool status
+const status = WorkerManager.getStatus();
+console.log(\`Workers: \${status.availableWorkers}/\${status.totalWorkers}\`);
+console.log(\`Affinity hit rate: \${(status.affinity.hitRate * 100).toFixed(1)}%\`);
+
+// Get detailed affinity stats
+const stats = WorkerManager.getAffinityStats();
+console.log(\`Hits: \${stats.hits}, Misses: \${stats.misses}\`);
+
+// Per-worker cache info
+stats.workerCaches.forEach(w => {
+  console.log(\`Worker \${w.workerId}: \${w.cachedFunctions.length} cached\`);
+  console.log(\`  Functions: \${w.cachedFunctions.join(', ')}\`);
+});`;
 
 const csvAdapterCode = `import { CSVAdapter } from '@guinetik/graph-js';
 

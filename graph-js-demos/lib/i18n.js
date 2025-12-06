@@ -180,6 +180,55 @@ console.log(results);
           modularity: 'Community assignment (Louvain algorithm)'
         }
       },
+      workers: {
+        title: 'Worker Architecture',
+        description: 'All computation runs in Web Workers for non-blocking UI and optimal performance. The worker system includes intelligent affinity routing for JIT optimization, inspired by samsantosb/BeeThreads.',
+        components: {
+          title: 'Components',
+          workerManager: {
+            name: 'WorkerManager',
+            description: 'Singleton manager that initializes and routes tasks to workers'
+          },
+          workerPool: {
+            name: 'WorkerPool',
+            description: 'Pool of workers that execute tasks with automatic load balancing'
+          },
+          workerAdapter: {
+            name: 'WorkerAdapter',
+            description: 'Cross-platform adapter for Web Workers (browser) and Worker Threads (Node.js)'
+          }
+        },
+        affinity: {
+          title: 'Worker Affinity System',
+          description: 'Routes repeated algorithm calls to the same worker, leveraging JavaScript JIT compilation for 10-30% faster repeated operations.',
+          howItWorks: 'How It Works',
+          howItWorksSteps: [
+            'When a worker executes an algorithm, the function is JIT-compiled',
+            'The worker tracks which functions it has cached',
+            'Future calls for the same algorithm are routed to that worker',
+            'The "hot" JIT-optimized code path is reused'
+          ],
+          selectionTitle: 'Selection Priority',
+          selectionSteps: [
+            'Affinity Match: Find worker that previously ran the same algorithm',
+            'Least Loaded: Select worker with fewest tasks executed',
+            'FIFO Fallback: If affinity disabled, use first-available'
+          ]
+        },
+        config: {
+          title: 'Configuration',
+          options: {
+            maxWorkers: 'Maximum workers (default: auto-detect CPU cores)',
+            enableAffinity: 'Enable worker affinity routing (default: true)',
+            affinityCacheLimit: 'Max cached functions per worker (default: 50)',
+            taskTimeout: 'Task timeout in milliseconds (default: 300000)'
+          }
+        },
+        monitoring: {
+          title: 'Monitoring',
+          description: 'Get real-time statistics about worker pool and affinity performance'
+        }
+      },
       adapters: {
         title: 'Data Adapters',
         description: 'Convert between various graph formats and the standard GraphData format. All adapters use static methods.',
@@ -1148,6 +1197,7 @@ console.log(results);
       sections: {
         quickStart: 'Início Rápido',
         coreClasses: 'Classes Principais',
+        workers: 'Arquitetura de Workers',
         adapters: 'Adaptadores de Dados',
         layouts: 'Layouts de Grafos',
         community: 'Detecção de Comunidades',
@@ -1220,6 +1270,55 @@ console.log(results);
           cliques: 'Número de subgrafos completos contendo o nó',
           egoDensity: 'Densidade da vizinhança imediata do nó',
           modularity: 'Atribuição de comunidade (algoritmo Louvain)'
+        }
+      },
+      workers: {
+        title: 'Arquitetura de Workers',
+        description: 'Todo o processamento roda em Web Workers para UI não-bloqueante e performance otimizada. O sistema inclui roteamento inteligente de afinidade para otimização JIT, inspirado pelo BeeThreads.',
+        components: {
+          title: 'Componentes',
+          workerManager: {
+            name: 'WorkerManager',
+            description: 'Gerenciador singleton que inicializa e roteia tarefas para workers'
+          },
+          workerPool: {
+            name: 'WorkerPool',
+            description: 'Pool de workers que executam tarefas com balanceamento automático de carga'
+          },
+          workerAdapter: {
+            name: 'WorkerAdapter',
+            description: 'Adaptador cross-platform para Web Workers (browser) e Worker Threads (Node.js)'
+          }
+        },
+        affinity: {
+          title: 'Sistema de Afinidade de Workers',
+          description: 'Roteia chamadas repetidas do mesmo algoritmo para o mesmo worker, aproveitando compilação JIT do JavaScript para operações 10-30% mais rápidas.',
+          howItWorks: 'Como Funciona',
+          howItWorksSteps: [
+            'Quando um worker executa um algoritmo, a função é compilada JIT',
+            'O worker rastreia quais funções ele tem em cache',
+            'Chamadas futuras do mesmo algoritmo são roteadas para esse worker',
+            'O caminho de código otimizado JIT "quente" é reutilizado'
+          ],
+          selectionTitle: 'Prioridade de Seleção',
+          selectionSteps: [
+            'Match de Afinidade: Encontrar worker que já executou o mesmo algoritmo',
+            'Menos Carregado: Selecionar worker com menos tarefas executadas',
+            'Fallback FIFO: Se afinidade desabilitada, usar primeiro disponível'
+          ]
+        },
+        config: {
+          title: 'Configuração',
+          options: {
+            maxWorkers: 'Máximo de workers (padrão: auto-detectar núcleos CPU)',
+            enableAffinity: 'Habilitar roteamento de afinidade (padrão: true)',
+            affinityCacheLimit: 'Máximo de funções em cache por worker (padrão: 50)',
+            taskTimeout: 'Timeout de tarefa em milissegundos (padrão: 300000)'
+          }
+        },
+        monitoring: {
+          title: 'Monitoramento',
+          description: 'Obtenha estatísticas em tempo real sobre pool de workers e performance de afinidade'
         }
       },
       adapters: {

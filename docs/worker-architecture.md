@@ -62,7 +62,7 @@ Handles communication between main thread and workers:
 
 ## Worker Affinity System
 
-graph-js includes an intelligent **worker affinity system** that routes repeated algorithm calls to the same worker, leveraging JavaScript's JIT (Just-In-Time) compilation for better performance.
+graph-js includes an intelligent **worker affinity system** (inspired by [BeeThreads](https://github.com/samsantosb/BeeThreads)) that routes repeated algorithm calls to the same worker, leveraging JavaScript's JIT (Just-In-Time) compilation for better performance.
 
 ### How It Works
 

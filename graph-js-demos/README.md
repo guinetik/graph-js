@@ -16,7 +16,7 @@ npm install
 npm run dev
 ```
 
-Visit `http://localhost:5173` to explore the demos.
+Visit `http://localhost:3001` to explore the demos.
 
 ## Examples
 
