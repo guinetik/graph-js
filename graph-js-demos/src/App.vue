@@ -221,6 +221,9 @@
         <p class="text-sm">{{ t('footer.license') }}</p>
       </div>
     </footer>
+
+    <!-- Global Tooltip -->
+    <GlobalTooltip />
   </div>
 </template>
 
@@ -230,6 +233,7 @@ import { useRoute } from 'vue-router';
 import { useI18n } from './composables/useI18n';
 import { useDarkMode } from './composables/useDarkMode';
 import { initParticles } from '../lib/particles.js';
+import GlobalTooltip from './components/GlobalTooltip.vue';
 
 const route = useRoute();
 const { lang, t, changeLanguage } = useI18n();
