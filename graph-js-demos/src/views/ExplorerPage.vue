@@ -963,6 +963,18 @@ watch(showCliqueEdges, (enabled) => {
   }
 });
 
+// Watch for size metric changes to update visualization without re-analyzing
+watch(selectedSizeMetric, (newMetric) => {
+  if (newMetric && graphInstance.value) {
+    log.debug('Size metric changed', { metric: newMetric });
+    updateVisualEncoding({
+      sizeBy: newMetric,
+      minRadius: 5,
+      maxRadius: 30
+    });
+  }
+});
+
 // Watch for graph instance changes and restore clique edge coloring if needed
 watch(graphInstance, (newInstance, oldInstance) => {
   // Initialize controller when graph instance is first created

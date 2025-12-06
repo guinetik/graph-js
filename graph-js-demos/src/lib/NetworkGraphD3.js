@@ -44,8 +44,8 @@ const DEFAULTS = {
   NODE_RADIUS: 8,
   LINK_DISTANCE: 100,
   CHARGE_STRENGTH: -300,
-  MIN_RADIUS: 4,
-  MAX_RADIUS: 20,
+  MIN_RADIUS: 5,
+  MAX_RADIUS: 30,
   COLLISION_PADDING: 2,
   COLLISION_STRENGTH: 0.7,
   LINK_STRENGTH: 0.5,
@@ -115,8 +115,9 @@ function debounce(func, wait) {
  * @param {number} [options.linkDistance=100] - Default link distance
  * @param {number} [options.chargeStrength=-300] - Charge force strength
  * @param {string|null} [options.sizeBy=null] - Property to size nodes by
- * @param {number} [options.minRadius=4] - Minimum node radius
- * @param {number} [options.maxRadius=20] - Maximum node radius
+ * @param {number} [options.minRadius=5] - Minimum node radius
+ * @param {number} [options.maxRadius=30] - Maximum node radius
+ * @param {number} [options.sizeExponent=0.4] - Power exponent for size scaling (lower = more spread)
  * @param {string} [options.colorBy='group'] - Property to color nodes by
  * @param {string} [options.colorScheme='categorical'] - Color scheme ('categorical' or 'sequential')
  * @param {boolean} [options.showLabels=true] - Whether to show node labels
@@ -382,12 +383,20 @@ export class NetworkGraphD3 {
         .filter(v => v !== undefined && v !== null);
 
       if (values.length > 0) {
-        const min = Math.min(...values);
-        const max = Math.max(...values);
+        let min = Math.min(...values);
+        let max = Math.max(...values);
 
-        // Square root scale for more balanced size differences
-        // This prevents leaf nodes from being too tiny compared to central nodes
-        this.sizeScale = d3.scaleSqrt()
+        // Handle edge case where all values are the same
+        if (min === max) {
+          max = min + 1;
+        }
+
+        // Power scale with configurable exponent for visual differentiation
+        // Lower exponent = more spread (0.4 spreads more than sqrt's 0.5)
+        // This makes size differences more visually apparent for centrality metrics
+        const exponent = this.options.sizeExponent || 0.4;
+        this.sizeScale = d3.scalePow()
+          .exponent(exponent)
           .domain([min, max])
           .range([this.options.minRadius, this.options.maxRadius])
           .clamp(true);

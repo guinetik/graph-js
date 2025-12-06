@@ -349,7 +349,8 @@ const {
   applyLayout,
   getAvailableLayouts,
   analyzeGraph,
-  analysisProgress
+  analysisProgress,
+  updateVisualEncoding
 } = graphComposable;
 
 // Local state
@@ -681,12 +682,12 @@ const handleAnalyzeGraph = async () => {
     if (result) {
       // Update visual encoding to size by selected metric
       const sizeByMetric = selectedSizeMetric.value || selectedFeatures.value[0];
-      if (graphInstance.value?.updateVisualEncoding) {
-        graphInstance.value.updateVisualEncoding({
-          sizeBy: sizeByMetric,
-          preserveZoom: true
-        });
-      }
+      updateVisualEncoding({
+        sizeBy: sizeByMetric,
+        minRadius: 5,
+        maxRadius: 30,
+        preserveZoom: true
+      });
       handleStatusChange(`✅ Analysis complete - sizing by ${sizeByMetric}`, 'success');
     }
   } catch (err) {
@@ -762,6 +763,18 @@ watch(renderMode, (newMode) => {
 
     graphInstance.value.on('ready', onRenderComplete);
     graphInstance.value.setRenderMode(newMode);
+  }
+});
+
+// Watch for size metric changes to update visualization without re-analyzing
+watch(selectedSizeMetric, (newMetric) => {
+  if (newMetric && graphInstance.value) {
+    log.debug('Size metric changed', { metric: newMetric });
+    updateVisualEncoding({
+      sizeBy: newMetric,
+      minRadius: 5,
+      maxRadius: 30
+    });
   }
 });
 

@@ -356,8 +356,8 @@ export function useNetworkGraph(options = {}) {
         log.debug('Sizing nodes by eigenvector centrality');
         graphInstance.value.updateVisualEncoding({
           sizeBy: 'eigenvector',
-          minRadius: 4,
-          maxRadius: 20
+          minRadius: 5,
+          maxRadius: 30
         });
       } else {
         // Just trigger a D3 update to re-render with new properties

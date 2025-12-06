@@ -350,8 +350,8 @@ export class ExplorerController {
         if (sizeMetric && results.nodes.some(n => n[sizeMetric] !== undefined)) {
           this.graphManager.updateVisualEncoding({
             sizeBy: sizeMetric,
-            minRadius: 4,
-            maxRadius: 20
+            minRadius: 5,
+            maxRadius: 30
           });
         }
 

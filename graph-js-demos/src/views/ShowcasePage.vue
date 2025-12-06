@@ -242,7 +242,8 @@ const {
   detectCommunities,
   getAvailableCommunityAlgorithms,
   getSelectedNode,
-  unlockPositions
+  unlockPositions,
+  updateVisualEncoding
 } = graphComposable;
 
 // Local state (Vue-specific reactive data)
@@ -413,6 +414,18 @@ const handleDetectCommunities = async () => {
     log.error('Community detection error', { error: err.message, stack: err.stack });
   }
 };
+
+// Watch for size metric changes to update visualization without re-analyzing
+watch(selectedSizeMetric, (newMetric) => {
+  if (newMetric && graphInstance.value) {
+    log.debug('Size metric changed', { metric: newMetric });
+    updateVisualEncoding({
+      sizeBy: newMetric,
+      minRadius: 5,
+      maxRadius: 30
+    });
+  }
+});
 
 // Watch for graph instance to be ready, then initialize
 watch(graphInstance, (newInstance) => {
