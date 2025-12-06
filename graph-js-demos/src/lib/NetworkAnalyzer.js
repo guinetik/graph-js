@@ -27,6 +27,7 @@
 import { 
   NetworkStats, 
   Graph, 
+  WorkerManager,
   LAYOUT_REGISTRY,
   COMMUNITY_REGISTRY,
   CommunityDetection,
@@ -474,6 +475,30 @@ export class NetworkAnalyzer {
     });
 
     return result;
+  }
+
+  /**
+   * Get worker affinity statistics
+   * Useful for debugging and monitoring worker performance
+   *
+   * @returns {Object|null} Affinity stats or null if not initialized
+   *
+   * @example
+   * const stats = analyzer.getAffinityStats();
+   * console.log(`Hit rate: ${(stats.hitRate * 100).toFixed(1)}%`);
+   * console.log(`Hits: ${stats.hits}, Misses: ${stats.misses}`);
+   */
+  getAffinityStats() {
+    return WorkerManager.getAffinityStats();
+  }
+
+  /**
+   * Get worker pool status
+   *
+   * @returns {Object|null} Worker pool status or null if not initialized
+   */
+  getWorkerStatus() {
+    return WorkerManager.getStatus();
   }
 
   /**
