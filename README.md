@@ -3,6 +3,9 @@
 > **Modern Network Analysis for JavaScript**
 > A high-performance graph theory library with interactive demos and worker-first architecture.
 
+![graph-js logo](./home.png)
+
+
 <div align="center">
 
 [![npm version](https://img.shields.io/npm/v/@guinetik/graph-js.svg)](https://www.npmjs.com/package/@guinetik/graph-js)
