@@ -440,6 +440,26 @@
   max-width: 100%;
 }
 
+/* Sigma.js container - ensure canvas fills parent and clips properly */
+.demo-graph .sigma-container,
+.demo-graph > div {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden;
+}
+
+/* Ensure Sigma's canvas layers are properly sized */
+.demo-graph canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 /* Mobile Toggle Button */
 .demo-controls-toggle {
   @apply fixed bottom-4 right-4 z-50;

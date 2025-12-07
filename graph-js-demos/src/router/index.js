@@ -8,6 +8,7 @@ import HomePage from '../views/HomePage.vue';
 import ShowcasePage from '../views/ShowcasePage.vue';
 import ExplorerPage from '../views/ExplorerPage.vue';
 import FamilyPage from '../views/FamilyPage.vue';
+import DegreesPage from '../views/DegreesPage.vue';
 import DocsPage from '../views/DocsPage.vue';
 import { useAnalytics } from '../composables/useAnalytics';
 import { ROUTE_TITLES } from '../lib/analytics/AnalyticsEvents.js';
@@ -34,6 +35,11 @@ const routes = [
     component: FamilyPage
   },
   {
+    path: '/degrees',
+    name: 'degrees',
+    component: DegreesPage
+  },
+  {
     path: '/docs',
     name: 'docs',
     component: DocsPage
@@ -43,6 +49,15 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes
+});
+
+// Handle GitHub Pages SPA redirects from 404.html
+router.isReady().then(() => {
+  const redirectPath = sessionStorage.getItem('redirectPath');
+  if (redirectPath) {
+    sessionStorage.removeItem('redirectPath');
+    router.replace(redirectPath);
+  }
 });
 
 // Track page views on navigation

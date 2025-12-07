@@ -29,7 +29,7 @@ export default defineConfig({
   plugins: [vue(), copyWorkerPlugin()],
   root: './',
   server: {
-    port: 3001,
+    port: 9000,
     open: true,
     fs: {
       // Allow serving files from the monorepo root

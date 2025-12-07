@@ -17,6 +17,7 @@ export const translations = {
       home: 'Home',
       showcase: 'Features Showcase',
       explorer: 'Network Explorer',
+      degrees: 'Degrees',
       family: 'Family Tree',
       docs: 'Documentation'
     },
@@ -549,6 +550,7 @@ console.log(results);
         default: 'Default Inline (15 nodes)',
         karate: 'Karate Club JSON (34 nodes)',
         miserables: 'Les Misérables CSV (77 nodes)',
+        kevinbacon: 'Kevin Bacon CSV (128 nodes)',
         loadButton: '📊 Load Dataset',
         loading: '⏳ Loading...'
       },
@@ -688,6 +690,8 @@ console.log(results);
         niteroi: 'Niterói (~18,500 edges, large)',
         karate: 'Karate Club (34 nodes, 78 edges)',
         miserables: 'Les Misérables (77 nodes, 254 edges)',
+        kevinbacon: 'Kevin Bacon (128 nodes, 128 edges)',
+        sixdegrees: '6 Degrees of Kevin Bacon (3,610 nodes, 5,514 edges)',
         loadNetwork: '📊 Load Network',
         loading: '⏳ Loading...',
         fileFormat: 'File Format:',
@@ -967,6 +971,62 @@ console.log(results);
         uncleAuntChildTemplate: '{name}\'s child',
         siblingChildTemplate: '{name}\'s child'
       }
+    },
+
+    // Degrees Page (Six Degrees of Kevin Bacon)
+    degrees: {
+      header: {
+        title: '6 Degrees of Kevin Bacon',
+        subtitle: 'Explore the famous "small world" network connecting Hollywood actors through their movie collaborations'
+      },
+      whatIs: {
+        title: 'What is this?',
+        description: 'The <strong>Six Degrees of Kevin Bacon</strong> is a parlor game based on the "six degrees of separation" concept. It posits that any actor can be linked to Kevin Bacon through their film roles in six steps or fewer. This visualization shows <strong>2 degrees of separation</strong> - Kevin Bacon\'s co-stars and their co-stars.'
+      },
+      status: {
+        title: 'Status',
+        ready: 'Network loaded and ready'
+      },
+      stats: {
+        title: 'Network Statistics',
+        nodes: 'Total Nodes',
+        edges: 'Total Edges',
+        movies: 'Movies',
+        actors: 'Actors'
+      },
+      legend: {
+        title: 'Legend',
+        movies: 'Movies',
+        actors: 'Actors',
+        kevinBacon: 'Kevin Bacon',
+        center: 'Center of the network (0 degrees)',
+        degree1: '1 Degree',
+        degree1Desc: 'Direct co-stars of Kevin Bacon',
+        degree2: '2 Degrees',
+        degree2Desc: 'Co-stars of Kevin Bacon\'s co-stars'
+      },
+      baconFinder: {
+        title: 'Find Bacon Number',
+        placeholder: 'Search actor or movie...'
+      },
+      filter: {
+        title: 'Filter Nodes',
+        all: 'All',
+        actors: 'Actors Only',
+        movies: 'Movies Only'
+      },
+      layout: {
+        title: 'Layout Algorithm'
+      },
+      analysis: {
+        title: 'Network Analysis'
+      },
+      instructions: {
+        title: 'How to use',
+        hover: '<strong>Hover</strong> over nodes to see actor/movie details',
+        drag: '<strong>Drag</strong> nodes to rearrange the network',
+        zoom: '<strong>Scroll</strong> to zoom in/out'
+      }
     }
   },
 
@@ -976,6 +1036,7 @@ console.log(results);
       home: 'Início',
       showcase: 'Demonstração',
       explorer: 'Explorador de Redes',
+      degrees: 'Graus',
       family: 'Árvore Genealógica',
       docs: 'Documentação'
     },
@@ -1026,6 +1087,7 @@ console.log(results);
         default: 'Padrão Embutido (15 nós)',
         karate: 'Karate Club JSON (34 nós)',
         miserables: 'Os Miseráveis CSV (77 nós)',
+        kevinbacon: 'Kevin Bacon CSV (128 nós)',
         loadButton: '📊 Carregar Conjunto de Dados',
         loading: '⏳ Carregando...'
       },
@@ -1648,6 +1710,8 @@ console.log(results);
         niteroi: 'Niterói (~18.500 arestas, grande)',
         karate: 'Karate Club (34 nós, 78 arestas)',
         miserables: 'Les Misérables (77 nós, 254 arestas)',
+        kevinbacon: 'Kevin Bacon (128 nós, 128 arestas)',
+        sixdegrees: '6 Graus de Kevin Bacon (3.610 nós, 5.514 arestas)',
         loadNetwork: '📊 Carregar Rede',
         loading: '⏳ Carregando...',
         fileFormat: 'Formato do Arquivo:',
@@ -1926,6 +1990,62 @@ console.log(results);
         parentSideTemplate: 'Irmã(o) de {name}',
         uncleAuntChildTemplate: 'Filho(a) de {name}',
         siblingChildTemplate: 'Filho(a) de {name}'
+      }
+    },
+
+    // Degrees Page (Six Degrees of Kevin Bacon)
+    degrees: {
+      header: {
+        title: '6 Graus de Kevin Bacon',
+        subtitle: 'Explore a famosa rede "mundo pequeno" conectando atores de Hollywood através de suas colaborações em filmes'
+      },
+      whatIs: {
+        title: 'O que é isso?',
+        description: 'Os <strong>Seis Graus de Kevin Bacon</strong> é um jogo baseado no conceito de "seis graus de separação". Ele postula que qualquer ator pode ser ligado a Kevin Bacon através de seus papéis em filmes em seis passos ou menos. Esta visualização mostra <strong>2 graus de separação</strong> - os co-estrelas de Kevin Bacon e seus co-estrelas.'
+      },
+      status: {
+        title: 'Status',
+        ready: 'Rede carregada e pronta'
+      },
+      stats: {
+        title: 'Estatísticas da Rede',
+        nodes: 'Total de Nós',
+        edges: 'Total de Arestas',
+        movies: 'Filmes',
+        actors: 'Atores'
+      },
+      legend: {
+        title: 'Legenda',
+        movies: 'Filmes',
+        actors: 'Atores',
+        kevinBacon: 'Kevin Bacon',
+        center: 'Centro da rede (0 graus)',
+        degree1: '1 Grau',
+        degree1Desc: 'Co-estrelas diretos de Kevin Bacon',
+        degree2: '2 Graus',
+        degree2Desc: 'Co-estrelas dos co-estrelas de Kevin Bacon'
+      },
+      baconFinder: {
+        title: 'Encontrar Número Bacon',
+        placeholder: 'Buscar ator ou filme...'
+      },
+      filter: {
+        title: 'Filtrar Nós',
+        all: 'Todos',
+        actors: 'Apenas Atores',
+        movies: 'Apenas Filmes'
+      },
+      layout: {
+        title: 'Algoritmo de Layout'
+      },
+      analysis: {
+        title: 'Análise de Rede'
+      },
+      instructions: {
+        title: 'Como usar',
+        hover: '<strong>Passe o mouse</strong> sobre os nós para ver detalhes do ator/filme',
+        drag: '<strong>Arraste</strong> os nós para reorganizar a rede',
+        zoom: '<strong>Role</strong> para ampliar/reduzir'
       }
     }
   }
