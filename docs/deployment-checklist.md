@@ -188,3 +188,4 @@ If after following all steps and waiting 48 hours you still see issues:
 4. Consider reaching out to GA4 support if data stream configuration seems incorrect
 
 
+
