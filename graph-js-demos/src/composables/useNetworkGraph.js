@@ -98,8 +98,11 @@ export function useNetworkGraph(options = {}) {
    * Load data into the graph
    * @param {Array} nodes - Array of node objects
    * @param {Array} links - Array of link objects
+   * @param {Object} loadOptions - Optional settings
+   * @param {boolean} loadOptions.skipSimulation - Skip starting physics simulation (useful when applying layout immediately after)
+   * @param {boolean} loadOptions.keepLoading - Keep loading state true (caller will manage it, e.g., when applying layout immediately)
    */
-  const loadData = (nodes, links) => {
+  const loadData = (nodes, links, loadOptions = {}) => {
     if (!graphInstance.value) {
       log.warn('Graph not initialized yet');
       return;
@@ -110,10 +113,13 @@ export function useNetworkGraph(options = {}) {
       log.debug('Loading data into graph', { nodeCount: nodes.length, linkCount: links.length });
 
       // Listen for ready event - this will hide spinner and zoom to fit
+      // Unless keepLoading is true (caller will manage loading state)
       const readyHandler = () => {
-        loading.value = false;
+        if (!loadOptions.keepLoading) {
+          loading.value = false;
+        }
         graphInstance.value.off('ready', readyHandler);
-        log.info('Graph ready and fitted to view');
+        log.info('Graph ready and fitted to view', { keepLoading: loadOptions.keepLoading });
 
         // Auto-compute eigenvector centrality after data is loaded
         // This happens automatically when loading from localStorage or initial data
@@ -126,7 +132,7 @@ export function useNetworkGraph(options = {}) {
       };
 
       graphInstance.value.on('ready', readyHandler);
-      graphInstance.value.setData(nodes, links);
+      graphInstance.value.setData(nodes, links, loadOptions);
 
       // If ready event doesn't fire (shouldn't happen), set timeout as fallback
       // But user said no setTimeout... so we rely on the event
@@ -380,9 +386,10 @@ export function useNetworkGraph(options = {}) {
   /**
    * Apply a layout algorithm to the graph
    * @param {String} layoutId - Layout algorithm ID
+   * @param {Object} layoutOptions - Optional layout-specific options (e.g., centerNode for radial)
    * @returns {Promise<Boolean>} True if successful
    */
-  const applyLayout = async (layoutId) => {
+  const applyLayout = async (layoutId, layoutOptions = {}) => {
     if (!graphInstance.value || !analyzer.value) {
       log.warn('Graph or analyzer not initialized');
       return false;
@@ -391,19 +398,16 @@ export function useNetworkGraph(options = {}) {
     try {
       loading.value = true;
       analysisProgress.value = 0;
-      log.debug('Applying layout', { layoutId });
+      log.debug('Applying layout', { layoutId, layoutOptions });
 
       // Special handling for "none" - restart physics simulation
       if (layoutId === 'none') {
-        // Restart simulation - Sigma has startSimulation(), D3 has unlockPositions()
-        if (typeof graphInstance.value.startSimulation === 'function') {
-          // Sigma: unfix positions and start ForceAtlas2
-          const currentData = graphInstance.value.data;
-          currentData.nodes.forEach(node => {
-            node.fx = null;
-            node.fy = null;
-          });
-          graphInstance.value.startSimulation();
+        // Restart simulation properly
+        // Sigma: use restartSimulation() which unlocks AND re-spreads nodes
+        // D3: use unlockPositions() which clears fx/fy
+        if (typeof graphInstance.value.restartSimulation === 'function') {
+          // Sigma: full restart - unlocks positions, re-spreads nodes, starts ForceAtlas2
+          graphInstance.value.restartSimulation();
         } else if (typeof graphInstance.value.unlockPositions === 'function') {
           // D3: unlockPositions clears fx/fy and restarts simulation
           graphInstance.value.unlockPositions();
@@ -430,7 +434,8 @@ export function useNetworkGraph(options = {}) {
           height: rect.height || 600,
           onProgress: (progress) => {
             analysisProgress.value = progress;
-          }
+          },
+          ...layoutOptions  // Pass through layout-specific options (e.g., centerNode)
         }
       );
 
@@ -456,7 +461,11 @@ export function useNetworkGraph(options = {}) {
       graphInstance.value.on('ready', readyHandler);
 
       // Update visualization - this will trigger ready event when stable
-      graphInstance.value.updateGraph();
+      // Pass through zoom options if specified
+      graphInstance.value.updateGraph({
+        skipFit: layoutOptions.skipFit,
+        zoomRatio: layoutOptions.zoomRatio
+      });
 
       return true;
     } catch (err) {

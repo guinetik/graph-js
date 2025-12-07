@@ -88,6 +88,7 @@ export const ROUTE_TITLES = {
   home: 'Home',
   showcase: 'Showcase',
   explorer: 'Network Explorer',
+  degrees: 'Degrees',
   family: 'Family Tree',
   docs: 'Documentation'
 };

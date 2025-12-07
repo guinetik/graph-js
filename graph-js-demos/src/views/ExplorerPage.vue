@@ -122,6 +122,7 @@
             :options="[
               { value: 'karate', label: t('explorer.dataLoading.karate') },
               { value: 'miserables', label: t('explorer.dataLoading.miserables') },
+              { value: 'kevinbacon', label: t('explorer.dataLoading.kevinbacon') },
               { value: 'caruaru', label: t('explorer.dataLoading.caruaru') },
               { value: 'rj', label: t('explorer.dataLoading.rj') },
               { value: 'niteroi', label: t('explorer.dataLoading.niteroi') }
@@ -943,6 +944,16 @@ const handleRendererSwitch = async (rendererType) => {
           // Use setTimeout to ensure graph is fully initialized
           setTimeout(() => {
             graphInstance.value.updateCliqueEdgeColors(true);
+          }, 100);
+        }
+
+        // Restore visual encoding for bipartite datasets (color by category)
+        if (selectedNetwork.value === 'kevinbacon') {
+          setTimeout(() => {
+            updateVisualEncoding({
+              colorBy: 'category',
+              colorScheme: 'categorical'
+            });
           }, 100);
         }
       }

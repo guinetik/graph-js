@@ -93,6 +93,7 @@
             <option value="default">{{ t('showcase.dataLoading.default') }}</option>
             <option value="karate">{{ t('showcase.dataLoading.karate') }}</option>
             <option value="miserables">{{ t('showcase.dataLoading.miserables') }}</option>
+            <option value="kevinbacon">{{ t('showcase.dataLoading.kevinbacon') }}</option>
           </select>
         </div>
 
@@ -293,7 +294,8 @@ const initializeShowcase = () => {
     detectCommunities,
     getAvailableCommunityAlgorithms,
     getSelectedNode,
-    unlockPositions
+    unlockPositions,
+    updateVisualEncoding
   };
 
   controller = new ShowcaseController({

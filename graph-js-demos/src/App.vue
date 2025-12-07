@@ -43,6 +43,13 @@
             {{ t('nav.explorer') }}
           </router-link>
           <router-link
+            to="/degrees"
+            class="nav-link"
+            active-class="nav-link-active"
+          >
+            {{ t('nav.degrees') }}
+          </router-link>
+          <router-link
             to="/family"
             class="nav-link"
             active-class="nav-link-active"
@@ -141,6 +148,14 @@
                 @click="closeMobileMenu"
               >
                 {{ t('nav.explorer') }}
+              </router-link>
+              <router-link
+                to="/degrees"
+                class="nav-link text-lg py-3 px-4 rounded-md hover:bg-[var(--color-bg-secondary)] transition-colors"
+                active-class="bg-[var(--color-bg-secondary)] text-accent"
+                @click="closeMobileMenu"
+              >
+                {{ t('nav.degrees') }}
               </router-link>
               <router-link
                 to="/family"
@@ -255,7 +270,7 @@ const closeMobileMenu = () => {
 };
 
 const isDemoPage = computed(() => {
-  const demoPages = ['showcase', 'explorer', 'family'];
+  const demoPages = ['showcase', 'explorer', 'degrees', 'family'];
   return demoPages.includes(route.name);
 });
 

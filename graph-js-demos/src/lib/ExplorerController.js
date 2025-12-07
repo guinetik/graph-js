@@ -61,6 +61,13 @@ export class ExplorerController {
         file: '/data/les_miserables.csv',
         description: 'Character co-occurrence network (77 nodes, 254 edges)',
         type: 'csv'
+      },
+      kevinbacon: {
+        name: 'Kevin Bacon',
+        file: '/data/kevin_bacon_edges.csv',
+        nodeFile: '/data/kevin_bacon_nodes.csv',
+        description: 'Kevin Bacon network (128 nodes, 128 edges)',
+        type: 'csv'
       }
     };
 
@@ -93,15 +100,18 @@ export class ExplorerController {
       
       // Handle different file types
       if (network.type === 'csv') {
-        // Load CSV using CSVAdapter (for Les Misérables)
-        const graphData = await CSVAdapter.loadFromURL(network.file);
-        
-        // Add default group if not present
+        // Load CSV using CSVAdapter (supports optional node metadata file)
+        const graphData = await CSVAdapter.loadFromURL(
+          network.file,
+          network.nodeFile || null
+        );
+
+        // Add default group if not present, or use category field for bipartite graphs
         const nodes = graphData.nodes.map(n => ({
           ...n,
-          group: n.group || 1
+          group: n.group || (n.category === 'movie' ? 1 : n.category === 'actor' ? 2 : 1)
         }));
-        
+
         d3Data = {
           nodes,
           links: graphData.edges
@@ -163,6 +173,15 @@ export class ExplorerController {
 
       // Load data into graph
       this.graphManager.loadData(d3Data.nodes, d3Data.links);
+
+      // Apply dataset-specific visual encoding for bipartite graphs
+      if (networkKey === 'kevinbacon') {
+        // Color by category (movie vs actor) for bipartite graph
+        this.graphManager.updateVisualEncoding({
+          colorBy: 'category',
+          colorScheme: 'categorical'
+        });
+      }
 
       const message = this.translate('explorer.messages.loadedNetwork', {
         name: network.name,

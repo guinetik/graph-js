@@ -43,6 +43,10 @@ export class ShowcaseController {
       miserables: {
         name: 'Les Misérables',
         loader: () => this._loadMiserablesDataset()
+      },
+      kevinbacon: {
+        name: 'Kevin Bacon',
+        loader: () => this._loadKevinBaconDataset()
       }
     };
   }
@@ -154,6 +158,30 @@ export class ShowcaseController {
   }
 
   /**
+   * Loads Kevin Bacon dataset from CSV files (edges + nodes with metadata)
+   *
+   * @returns {Promise<Object>} Graph data in D3 format
+   * @private
+   */
+  async _loadKevinBaconDataset() {
+    const graphData = await CSVAdapter.loadFromURL(
+      '/data/kevin_bacon_edges.csv',
+      '/data/kevin_bacon_nodes.csv'
+    );
+
+    // Assign groups based on category (movies vs actors)
+    graphData.nodes = graphData.nodes.map(n => ({
+      ...n,
+      group: n.category === 'movie' ? 1 : 2
+    }));
+
+    return {
+      nodes: graphData.nodes,
+      links: graphData.edges
+    };
+  }
+
+  /**
    * Loads a dataset by key
    * 
    * @param {string} datasetKey - Key of the dataset to load ('default', 'karate', 'miserables')
@@ -177,6 +205,15 @@ export class ShowcaseController {
       
       // Load data into graph
       this.graphManager.loadData(d3Data.nodes, d3Data.links);
+
+      // Apply dataset-specific visual encoding
+      if (datasetKey === 'kevinbacon') {
+        // Color by category (movie vs actor) for bipartite graph
+        this.graphManager.updateVisualEncoding({
+          colorBy: 'category',
+          colorScheme: 'categorical'
+        });
+      }
 
       const message = this.translate('showcase.messages.loadedDataset', {
         name: dataset.name,

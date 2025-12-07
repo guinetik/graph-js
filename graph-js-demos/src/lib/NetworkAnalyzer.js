@@ -43,7 +43,8 @@ import {
   KamadaKawaiLayout,
   BipartiteLayout,
   MultipartiteLayout,
-  BFSLayout
+  BFSLayout,
+  RadialLayout
 } from '@guinetik/graph-js';
 
 import { createLogger } from '@guinetik/logger';
@@ -218,7 +219,9 @@ export class NetworkAnalyzer {
     // IMPORTANT: Mutate existing node objects instead of creating new ones
     // D3's force simulation stores references to these objects in links
     nodes.forEach(node => {
-      const stats = nodeResults.find(r => r.id === node.id);
+      // Use string comparison to handle numeric IDs (e.g., movie "54", "1900", "1917")
+      const nodeIdStr = String(node.id);
+      const stats = nodeResults.find(r => String(r.id) === nodeIdStr);
       if (!stats) {
         this.log.warn('No stats found for node', { nodeId: node.id });
         node.centrality = 0.5;
@@ -268,10 +271,12 @@ export class NetworkAnalyzer {
 
     const width = options.width || 800;
     const height = options.height || 600;
-    // Use more of the available space for fluid-sized layouts
-    // Changed from /2.5 to /1.2 to spread nodes better
-    const scale = Math.min(width, height) / 1.2;
-    const center = { x: width / 2, y: height / 2 };
+    // Use provided scale, or compute from viewport
+    // Larger scale = more spread out
+    const scale = options.scale || Math.min(width, height) / 1.2;
+    const center = options.center || { x: width / 2, y: height / 2 };
+
+    this.log.info('Layout scale', { providedScale: options.scale, computedScale: scale, width, height });
 
     // Build graph
     const graph = this._buildGraph(nodes, links);
@@ -297,16 +302,19 @@ export class NetworkAnalyzer {
         break;
 
       case 'shell':
-        // Build nodeProperties map from nodes if they have degree
-        const nodeProps = new Map();
+        // Build nodeProperties object from nodes if they have degree
+        // Use plain Object instead of Map for safer worker transfer
+        const nodeProps = {};
+        let hasNodeProps = false;
         nodes.forEach(node => {
           if (node.degree !== undefined) {
-            nodeProps.set(node.id, { degree: node.degree });
+            nodeProps[node.id] = { degree: node.degree };
+            hasNodeProps = true;
           }
         });
         layout = new ShellLayout(graph, {
           ...layoutConfig,
-          nodeProperties: nodeProps.size > 0 ? nodeProps : null
+          nodeProperties: hasNodeProps ? nodeProps : null
         });
         break;
 
@@ -315,8 +323,8 @@ export class NetworkAnalyzer {
         // The stat is stored as node['eigenvector-laplacian'] = {laplacian_x, laplacian_y}
         const hasLaplacianData = nodes.some(n => {
           const laplacian = n['eigenvector-laplacian'];
-          return laplacian && typeof laplacian === 'object' && 
-                 laplacian.laplacian_x !== undefined && 
+          return laplacian && typeof laplacian === 'object' &&
+                 laplacian.laplacian_x !== undefined &&
                  laplacian.laplacian_y !== undefined;
         });
 
@@ -324,17 +332,25 @@ export class NetworkAnalyzer {
           throw new Error('Spectral layout requires eigenvector-laplacian analysis. Please run analysis with ["eigenvector-laplacian"] first.');
         }
 
-        const spectralProps = new Map();
+        // Use plain Object instead of Map for safer worker transfer
+        // (Maps can lose their prototype during structured cloning in some environments)
+        const spectralProps = {};
         nodes.forEach(node => {
           const laplacian = node['eigenvector-laplacian'];
-          if (laplacian && typeof laplacian === 'object' && 
-              laplacian.laplacian_x !== undefined && 
+          if (laplacian && typeof laplacian === 'object' &&
+              laplacian.laplacian_x !== undefined &&
               laplacian.laplacian_y !== undefined) {
-            spectralProps.set(node.id, {
+            spectralProps[node.id] = {
               laplacian_x: laplacian.laplacian_x,
               laplacian_y: laplacian.laplacian_y
-            });
+            };
           }
+        });
+
+        this.log.debug('Spectral layout nodeProperties:', {
+          propCount: Object.keys(spectralProps).length,
+          sampleKey: Object.keys(spectralProps)[0],
+          sampleValue: spectralProps[Object.keys(spectralProps)[0]]
         });
 
         layout = new SpectralLayout(graph, {
@@ -384,6 +400,34 @@ export class NetworkAnalyzer {
         layout = new BFSLayout(graph, {
           startNode,
           align: 'vertical',
+          ...layoutConfig
+        });
+        break;
+
+      case 'radial':
+        // Find center node - use 'centerNode' from options, or find highest degree node
+        let radialCenter = options.centerNode;
+        if (!radialCenter) {
+          // Find node with highest degree
+          let maxDegree = -1;
+          nodes.forEach(node => {
+            // Count connections to this node
+            const degree = links.filter(
+              l => String(l.source) === String(node.id) || String(l.target) === String(node.id)
+            ).length;
+            if (degree > maxDegree) {
+              maxDegree = degree;
+              radialCenter = node.id;
+            }
+          });
+        }
+        // Extract size-aware spacing options
+        const { nodeSizes, defaultNodeSize, nodePadding } = options;
+        layout = new RadialLayout(graph, {
+          centerNode: radialCenter,
+          nodeSizes,           // Node ID -> size mapping for size-aware spacing
+          defaultNodeSize,     // Default size for nodes not in nodeSizes
+          nodePadding,         // Extra padding between nodes
           ...layoutConfig
         });
         break;

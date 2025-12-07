@@ -25,7 +25,8 @@
 import Sigma from 'sigma';
 import Graph from 'graphology';
 import { createNodeBorderProgram } from '@sigma/node-border';
-import forceAtlas2 from 'graphology-layout-forceatlas2';
+import EdgeCurveProgram from '@sigma/edge-curve';
+import * as d3 from 'd3';
 import { createLogger } from '@guinetik/logger';
 import { GraphTooltip } from './GraphTooltip.js';
 
@@ -44,7 +45,7 @@ const DEFAULTS = {
   MIN_SIZE: 5,
   MAX_SIZE: 20,
   SIZE_EXPONENT: 0.4, // Power exponent for size scaling (matches D3)
-  EDGE_COLOR: '#aaa',
+  EDGE_COLOR: '#d0d0d0',  // Light gray (Sigma WebGL doesn't support edge transparency)
   NODE_COLOR: '#6366f1',   // Nice indigo color
   HOVER_COLOR: '#ef4444',  // Red for hover
   SELECTED_COLOR: '#f97316' // Orange for selected
@@ -111,6 +112,16 @@ export class NetworkGraphSigma {
       colorBy: options.colorBy || 'group',
       colorScheme: options.colorScheme || 'category10',
       showLabels: options.showLabels !== false,
+      // D3 Force simulation options - customize for different graph types
+      chargeStrength: options.chargeStrength || -300,      // More negative = more repulsion
+      linkDistance: options.linkDistance || 100,           // Higher = longer links
+      linkStrength: options.linkStrength || 0.5,           // Lower = weaker edge pull
+      collisionPadding: options.collisionPadding || 2,     // Extra space around nodes
+      collisionStrength: options.collisionStrength || 0.7, // How hard nodes push apart
+      centerStrength: options.centerStrength || 1,         // Pull toward center (0-1)
+      // Edge rendering options
+      curvedEdges: options.curvedEdges || false,           // Use curved edges (Bézier curves)
+      edgeCurvature: options.edgeCurvature || 0.25,        // Curvature amount (0-1)
       ...options
     };
 
@@ -139,26 +150,15 @@ export class NetworkGraphSigma {
     });
     this.lastMouseEvent = null;
 
-    // ForceAtlas2 simulation state
+    // D3 force simulation (calculates positions, Sigma renders)
+    this.simulation = null;
     this.simulationRunning = false;
-    this.simulationFrame = null;
-    this.simulationAlpha = 1;        // Like D3's alpha - starts at 1, decays to 0
-    this.simulationAlphaDecay = 0.02; // How fast it cools down
-    this.simulationAlphaMin = 0.001;  // Stop when below this
-    this.simulationSettings = {
-      iterations: 1,
-      settings: {
-        gravity: 0.5,          // Moderate gravity
-        scalingRatio: 20,      // Strong repulsion
-        slowDown: 1,           // Fast movement
-        barnesHutOptimize: true,
-        barnesHutTheta: 0.5,
-        adjustSizes: false,
-        strongGravityMode: false,
-        outboundAttractionDistribution: false,
-        linLogMode: false
-      }
-    };
+    this.simulationNodes = [];  // D3 needs mutable node array
+    this.simulationLinks = [];  // D3 needs mutable link array
+
+    // Resize observer for fluid canvas
+    this.resizeObserver = null;
+    this._resizeTimeout = null;
 
     // Logger
     this.log = log;
@@ -186,6 +186,52 @@ export class NetworkGraphSigma {
       this.container.style.height = `${this.options.height}px`;
     }
     this.container.style.position = 'relative';
+
+    // Setup resize observer for fluid canvas sizing
+    this._setupResizeObserver();
+  }
+
+  /**
+   * Setup ResizeObserver for fluid canvas resizing
+   * @private
+   */
+  _setupResizeObserver() {
+    if (typeof ResizeObserver === 'undefined') {
+      this.log.warn('ResizeObserver not supported, canvas will not auto-resize');
+      return;
+    }
+
+    this.resizeObserver = new ResizeObserver((entries) => {
+      // Debounce resize events
+      if (this._resizeTimeout) {
+        clearTimeout(this._resizeTimeout);
+      }
+
+      this._resizeTimeout = setTimeout(() => {
+        if (this.isDestroyed || !this.sigma) return;
+
+        const entry = entries[0];
+        if (!entry) return;
+
+        const { width, height } = entry.contentRect;
+
+        // Only resize if dimensions actually changed significantly
+        if (Math.abs(width - this.options.width) > 1 ||
+            Math.abs(height - this.options.height) > 1) {
+          this.log.debug('Container resized', { width, height });
+          this.options.width = width;
+          this.options.height = height;
+
+          // Sigma's resize method updates the WebGL canvas
+          this.sigma.resize();
+          this.sigma.refresh();
+
+          this.emit('resize', { width, height });
+        }
+      }, 100); // 100ms debounce
+    });
+
+    this.resizeObserver.observe(this.container);
   }
 
   /**
@@ -232,12 +278,16 @@ export class NetworkGraphSigma {
       labelWeight: '500',
       labelColor: { color: '#333' },
       defaultNodeColor: DEFAULTS.NODE_COLOR,
-      defaultEdgeColor: isLargeGraph ? '#99999933' : '#99999966',  // More transparent for large graphs
+      defaultEdgeColor: '#d0d0d0',  // Light gray (WebGL doesn't support edge alpha)
       defaultNodeType: 'bordered',         // Use bordered nodes
       nodeProgramClasses: {
         bordered: NodeBorderProgram
       },
-      defaultEdgeType: 'line',
+      // Edge programs: line (default) and curved (Bézier curves)
+      edgeProgramClasses: {
+        curved: EdgeCurveProgram
+      },
+      defaultEdgeType: this.options.curvedEdges ? 'curved' : 'line',
       minCameraRatio: 0.1,
       maxCameraRatio: 10,
       stagePadding: 50,
@@ -246,7 +296,6 @@ export class NetworkGraphSigma {
       enableEdgeEvents: false,            // Better performance
       zIndex: true,                       // Enable z-ordering
       // Performance optimizations for large graphs
-      allowInvalidContainer: true,
       ...(isLargeGraph && {
         // Reduce rendering quality for very large graphs
         nodeReducer: (node, data) => {
@@ -259,6 +308,15 @@ export class NetworkGraphSigma {
         }
       })
     });
+
+    // Immediately resize to current container dimensions
+    // This handles cases where container was resized before Sigma was created
+    const rect = this.container.getBoundingClientRect();
+    if (rect.width > 0 && rect.height > 0) {
+      this.options.width = rect.width;
+      this.options.height = rect.height;
+      this.sigma.resize();
+    }
 
     // Set up event handlers
     this._setupEventHandlers();
@@ -443,141 +501,167 @@ export class NetworkGraphSigma {
   }
 
   /**
-   * Start the ForceAtlas2 simulation
-   * Runs with alpha decay like D3 - starts fast, slows down, stops at equilibrium
+   * Start the D3 force simulation (calculates positions, Sigma renders)
+   * Uses the same forces as NetworkGraphD3 for consistent behavior
    */
   startSimulation() {
     if (this.simulationRunning || !this.graph || this.graph.order === 0) {
+      this.log.debug('Simulation not started', {
+        running: this.simulationRunning,
+        hasGraph: !!this.graph,
+        order: this.graph?.order
+      });
       return;
     }
 
-    this.simulationRunning = true;
-    this.simulationAlpha = 1; // Reset alpha to full strength
-
-    // Disable interactivity during simulation for better performance
-    this.interactionDisabled = true;
-
-    // Scale settings based on graph size - larger graphs need MORE spread, not less
-    const nodeCount = this.graph.order;
-    const edgeCount = this.graph.size;
-    const isLargeGraph = nodeCount > 5000;
-    const isVeryLargeGraph = nodeCount > 10000;
-    
-    // For large graphs, we want MAXIMUM spread - use aggressive scaling
-    // The graph will naturally spread out, then we'll zoom out to fit it
-    const scaleFactor = Math.sqrt(nodeCount) * 2; // More aggressive scaling for large graphs
-    
-    // Update settings for this graph size
-    // Key insight: VERY LOW gravity + STRONG repulsion = maximum spread
-    // This lets the graph take as much space as it needs, then we zoom out
-    this.simulationSettings.settings.scalingRatio = Math.max(100, scaleFactor); // Very strong repulsion for spread
-    
-    // Performance optimization: adjust settings for large graphs
-    // But keep gravity VERY LOW so graph can spread out naturally
-    if (isVeryLargeGraph) {
-      // For very large graphs: very low gravity (let it spread) but optimize performance
-      this.simulationSettings.settings.gravity = 0.001; // Very low - let it spread
-      // Increase slowDown to reduce computation per frame
-      this.simulationSettings.settings.slowDown = Math.max(this.simulationSettings.settings.slowDown, 10);
-      // Use Barnes-Hut optimization more aggressively
-      this.simulationSettings.settings.barnesHutTheta = 0.8;
-    } else if (isLargeGraph) {
-      this.simulationSettings.settings.gravity = 0.005; // Low gravity for spread
-      this.simulationSettings.settings.slowDown = Math.max(this.simulationSettings.settings.slowDown, 5);
-      this.simulationSettings.settings.barnesHutTheta = 0.6;
-    } else {
-      this.simulationSettings.settings.gravity = 0.01;  // Near-zero gravity - infinite space
+    // Stop any existing simulation
+    if (this.simulation) {
+      this.simulation.stop();
     }
 
-    this.log.info('Starting ForceAtlas2 simulation', {
-      nodeCount,
-      scaleFactor,
-      scalingRatio: this.simulationSettings.settings.scalingRatio
+    // Build node and link arrays for D3
+    // D3 mutates these arrays directly
+    this.simulationNodes = [];
+    this.simulationLinks = [];
+    const nodeIndex = {};
+
+    this.graph.forEachNode((nodeId, attrs) => {
+      const node = {
+        id: nodeId,
+        x: attrs.x,
+        y: attrs.y,
+        size: attrs.size || 8,
+        ...attrs
+      };
+      nodeIndex[nodeId] = node;
+      this.simulationNodes.push(node);
     });
 
-    const runSimulationStep = () => {
-      if (!this.simulationRunning || this.isDestroyed || !this.graph) {
-        return;
-      }
+    this.graph.forEachEdge((edgeId, attrs, source, target) => {
+      this.simulationLinks.push({
+        source: nodeIndex[source],
+        target: nodeIndex[target],
+        ...attrs
+      });
+    });
 
-      // Check if simulation should stop (reached equilibrium)
-      if (this.simulationAlpha < this.simulationAlphaMin) {
-        this.log.info('Simulation reached equilibrium');
-        this.simulationRunning = false;
+    const nodeCount = this.simulationNodes.length;
 
-        // Re-enable interactivity
-        this.interactionDisabled = false;
+    this.log.info('Starting D3 force simulation', { nodeCount });
 
-        // Fit view to show entire graph after a short delay
-        // This ensures nodes have settled into their final positions
-        setTimeout(() => {
-          this.fitView();
-        }, 100);
-        
-        this.emit('simulationEnd');
-        return;
-      }
+    // Create D3 force simulation with customizable settings
+    const opts = this.options;
 
-      // Skip simulation step if dragging a node
-      if (!this.isDragging) {
-        // Apply alpha to slowDown - as alpha decreases, movement slows
-        const settings = {
-          ...this.simulationSettings,
-          settings: {
-            ...this.simulationSettings.settings,
-            slowDown: this.simulationSettings.settings.slowDown / this.simulationAlpha
-          }
-        };
+    this.simulation = d3.forceSimulation(this.simulationNodes)
+      .force('link', d3.forceLink(this.simulationLinks)
+        .id(d => d.id)
+        .distance(opts.linkDistance)
+        .strength(opts.linkStrength))
+      .force('charge', d3.forceManyBody()
+        .strength(opts.chargeStrength))
+      .force('center', d3.forceCenter(0, 0)
+        .strength(opts.centerStrength))
+      .force('collision', d3.forceCollide()
+        .radius(d => (d.size || 8) + opts.collisionPadding)
+        .strength(opts.collisionStrength))
+      .on('tick', () => this._onSimulationTick())
+      .on('end', () => this._onSimulationEnd());
 
-        // Run one iteration of ForceAtlas2
-        forceAtlas2.assign(this.graph, settings);
+    this.log.debug('Force settings', {
+      chargeStrength: opts.chargeStrength,
+      linkDistance: opts.linkDistance,
+      linkStrength: opts.linkStrength,
+      collisionPadding: opts.collisionPadding
+    });
 
-        // Decay alpha (cool down) - faster decay for large graphs
-        const nodeCount = this.graph.order;
-        const alphaDecay = nodeCount > 10000 
-          ? this.simulationAlphaDecay * 1.5  // Faster decay for very large graphs
-          : nodeCount > 5000
-          ? this.simulationAlphaDecay * 1.2  // Slightly faster for large graphs
-          : this.simulationAlphaDecay;        // Normal decay for smaller graphs
-        this.simulationAlpha -= this.simulationAlpha * alphaDecay;
-      }
-
-      // If a node is being dragged, restore its fixed position
-      if (this.draggedNode && this.graph.hasNode(this.draggedNode)) {
-        const attrs = this.graph.getNodeAttributes(this.draggedNode);
-        if (attrs.fx !== undefined) {
-          this.graph.setNodeAttribute(this.draggedNode, 'x', attrs.fx);
-          this.graph.setNodeAttribute(this.draggedNode, 'y', attrs.fy);
-        }
-      }
-
-      // Schedule next frame
-      this.simulationFrame = requestAnimationFrame(runSimulationStep);
-    };
-
-    // Start the simulation loop
-    this.simulationFrame = requestAnimationFrame(runSimulationStep);
+    this.simulationRunning = true;
+    this.emit('simulationStart');
   }
 
   /**
-   * Stop the ForceAtlas2 simulation
+   * Called on each D3 simulation tick - sync positions to Graphology
+   * @private
+   */
+  _onSimulationTick() {
+    // Update Graphology node positions from D3 simulation
+    for (const node of this.simulationNodes) {
+      if (node.x !== undefined && node.y !== undefined) {
+        this.graph.setNodeAttribute(node.id, 'x', node.x);
+        this.graph.setNodeAttribute(node.id, 'y', node.y);
+      }
+    }
+    // Sigma auto-refreshes when graph attributes change
+  }
+
+  /**
+   * Called when D3 simulation ends
+   * @private
+   */
+  _onSimulationEnd() {
+    this.simulationRunning = false;
+    this.fitView();
+    this.log.info('D3 simulation ended');
+    this.emit('simulationEnd');
+  }
+
+  /**
+   * Stop the D3 force simulation
    */
   stopSimulation() {
-    if (!this.simulationRunning) {
+    this._stopSimulationInternal(false);
+  }
+
+  /**
+   * Internal stop simulation with skipFit option
+   * @private
+   */
+  _stopSimulationInternal(skipFit = false) {
+    if (!this.simulation) {
       return;
     }
 
+    this.simulation.stop();
     this.simulationRunning = false;
 
-    if (this.simulationFrame) {
-      cancelAnimationFrame(this.simulationFrame);
-      this.simulationFrame = null;
+    // Fit view after stopping (unless skipFit is true)
+    if (!skipFit) {
+      this.fitView();
     }
 
-    // Re-enable interactivity
-    this.interactionDisabled = false;
+    this.log.info('Stopped D3 simulation', { skipFit });
+    this.emit('simulationEnd');
+  }
 
-    this.log.info('Stopped ForceAtlas2 simulation');
+  /**
+   * Restart the simulation from scratch
+   * Unlocks all node positions, spreads them out, and restarts D3 simulation
+   */
+  restartSimulation() {
+    // Stop any existing simulation
+    this.stopSimulation();
+
+    // Calculate spread based on node count
+    const nodeCount = this.graph.order;
+    const spread = Math.sqrt(nodeCount) * 300;
+
+    // Unlock all nodes and re-spread them randomly
+    this.graph.forEachNode((nodeId) => {
+      this.graph.removeNodeAttribute(nodeId, 'fx');
+      this.graph.removeNodeAttribute(nodeId, 'fy');
+      this.graph.setNodeAttribute(nodeId, 'x', (Math.random() - 0.5) * spread);
+      this.graph.setNodeAttribute(nodeId, 'y', (Math.random() - 0.5) * spread);
+    });
+
+    // Clear fixed positions in data array
+    this.data.nodes.forEach(node => {
+      node.fx = null;
+      node.fy = null;
+    });
+
+    this.log.info('Restarting simulation with spread', { nodeCount, spread });
+
+    // Start fresh simulation
+    this.startSimulation();
   }
 
   /**
@@ -606,8 +690,10 @@ export class NetworkGraphSigma {
    *
    * @param {Array} nodes - Array of node objects with id property
    * @param {Array} links - Array of link objects with source/target
+   * @param {Object} options - Optional settings
+   * @param {boolean} options.skipSimulation - Skip starting the physics simulation (useful when applying layout immediately)
    */
-  setData(nodes, links) {
+  setData(nodes, links, options = {}) {
     if (this.isDestroyed) {
       this.log.warn('Cannot set data on destroyed instance');
       return;
@@ -648,9 +734,11 @@ export class NetworkGraphSigma {
     // Mark as ready
     this.isReady = true;
 
-    // Always start ForceAtlas2 simulation - it's needed to spread out nodes properly
-    // Performance optimizations are applied in startSimulation() for large graphs
-    this.startSimulation();
+    // Start simulation unless skipSimulation option is set
+    // (useful when applying a static layout immediately after load)
+    if (!options?.skipSimulation) {
+      this.startSimulation();
+    }
 
     // Emit ready event - fitView will be called when simulation ends
     this.emit('ready');
@@ -670,8 +758,9 @@ export class NetworkGraphSigma {
     // Add nodes with random initial positions (spread out)
     // Scale spread VERY aggressively for large graphs - let them spread naturally
     const nodeCount = this.data.nodes.length;
-    // Much larger initial spread for large graphs - they'll spread even more during simulation
-    const spread = Math.sqrt(nodeCount) * 200; // Much larger spread for more room
+    // VERY large initial spread - start nodes far apart so ForceAtlas2 can organize them
+    // Without this, FA2's edge attraction clusters everything before repulsion can spread it
+    const spread = Math.sqrt(nodeCount) * 500;
 
     for (let i = 0; i < this.data.nodes.length; i++) {
       const node = this.data.nodes[i];
@@ -718,11 +807,19 @@ export class NetworkGraphSigma {
       if (this.graph.hasEdge(sourceId, targetId)) continue;
 
       try {
-        this.graph.addEdge(sourceId, targetId, {
+        const edgeAttrs = {
           weight: link.weight || 1,
-          size: Math.max(1, Math.log(link.weight || 1) + 1),
+          size: 0.5,  // Thin edges - reduces visual clutter since we can't use transparency
           color: DEFAULTS.EDGE_COLOR
-        });
+        };
+
+        // Add curved edge attributes if enabled
+        if (this.options.curvedEdges) {
+          edgeAttrs.type = 'curved';
+          edgeAttrs.curvature = this.options.edgeCurvature;
+        }
+
+        this.graph.addEdge(sourceId, targetId, edgeAttrs);
       } catch (e) {
         // Edge already exists
       }
@@ -811,13 +908,13 @@ export class NetworkGraphSigma {
       const originalNode = this.data.nodes.find(n => String(n.id) === nodeId);
       if (!originalNode) return;
 
-      // Update size
-      if (this.sizeScale && originalNode[this.options.sizeBy] !== undefined) {
+      // Update size (unless size is locked)
+      if (this.sizeScale && originalNode[this.options.sizeBy] !== undefined && !attrs.lockedSize) {
         this.graph.setNodeAttribute(nodeId, 'size', this.sizeScale(originalNode[this.options.sizeBy]));
       }
 
-      // Update color
-      if (this.colorMap && originalNode[this.options.colorBy] !== undefined) {
+      // Update color (unless color is locked - e.g., for highlighted nodes like Kevin Bacon)
+      if (this.colorMap && originalNode[this.options.colorBy] !== undefined && !attrs.lockedColor) {
         this.graph.setNodeAttribute(nodeId, 'color', this.colorMap(originalNode[this.options.colorBy]));
       }
     });
@@ -868,6 +965,35 @@ export class NetworkGraphSigma {
   }
 
   /**
+   * Toggle curved edges on/off
+   * @param {boolean} enabled - Whether to use curved edges
+   * @param {number} curvature - Optional curvature amount (0-1, default 0.25)
+   */
+  setCurvedEdges(enabled, curvature = 0.25) {
+    if (!this.graph) return;
+
+    this.options.curvedEdges = enabled;
+    this.options.edgeCurvature = curvature;
+
+    // Update all edges
+    this.graph.forEachEdge((edgeId) => {
+      if (enabled) {
+        this.graph.setEdgeAttribute(edgeId, 'type', 'curved');
+        this.graph.setEdgeAttribute(edgeId, 'curvature', curvature);
+      } else {
+        this.graph.setEdgeAttribute(edgeId, 'type', 'line');
+        this.graph.removeEdgeAttribute(edgeId, 'curvature');
+      }
+    });
+
+    if (this.sigma) {
+      this.sigma.refresh();
+    }
+
+    this.log.debug('Curved edges toggled', { enabled, curvature });
+  }
+
+  /**
    * Update node statistics from analysis
    *
    * @param {Array} enrichedNodes - Nodes with computed statistics
@@ -903,12 +1029,17 @@ export class NetworkGraphSigma {
    * Update the graph visualization
    * Refreshes Sigma to reflect any data changes
    * Stops the simulation since a layout was applied
+   *
+   * @param {Object} options - Update options
+   * @param {boolean} options.skipFit - Don't auto-fit to view (keeps current zoom)
+   * @param {number} options.zoomRatio - Set specific zoom ratio (e.g., 0.5 = zoomed in 2x)
    */
-  updateGraph() {
+  updateGraph(options = {}) {
     if (!this.graph || !this.sigma) return;
 
     // Stop simulation when layout is applied (positions are now fixed)
-    this.stopSimulation();
+    // Pass skipFit through to stopSimulation
+    this._stopSimulationInternal(options.skipFit);
 
     // Sync node positions from data back to graph
     for (const node of this.data.nodes) {
@@ -923,6 +1054,14 @@ export class NetworkGraphSigma {
 
     // Refresh Sigma renderer
     this.sigma.refresh();
+
+    // Set specific zoom if requested, otherwise fit to view
+    if (options.zoomRatio !== undefined) {
+      const camera = this.sigma.getCamera();
+      camera.animate({ ratio: options.zoomRatio }, { duration: 300 });
+    } else if (!options.skipFit) {
+      this.fitView();
+    }
 
     // Emit ready event (Sigma doesn't have a simulation to wait for)
     this.emit('ready');
@@ -1019,6 +1158,14 @@ export class NetworkGraphSigma {
   }
 
   /**
+   * Get the underlying Graphology graph for direct manipulation
+   * @returns {Graph} The Graphology graph instance
+   */
+  getGraph() {
+    return this.graph;
+  }
+
+  /**
    * Register event handler
    *
    * @param {string} eventName - Event name
@@ -1069,8 +1216,22 @@ export class NetworkGraphSigma {
 
     this.log.info('Destroying NetworkGraphSigma instance');
 
-    // Stop simulation
-    this.stopSimulation();
+    // Stop D3 simulation
+    if (this.simulation) {
+      this.simulation.stop();
+      this.simulation = null;
+    }
+    this.simulationRunning = false;
+
+    // Clean up resize observer
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
+    if (this._resizeTimeout) {
+      clearTimeout(this._resizeTimeout);
+      this._resizeTimeout = null;
+    }
 
     // Remove mouse move listener
     if (this._mouseMoveHandler && this.container) {
