@@ -4,8 +4,8 @@ const D = {
   INFO: 3,
   DEBUG: 4,
   TRACE: 5
-}, Oe = "info", pe = "sandbox_logging_filters", be = ["themeswitcher", "codemirroreditor", "editoradapter"];
-class qe {
+}, Ut = "info", pt = "sandbox_logging_filters", bt = ["themeswitcher", "codemirroreditor", "editoradapter"];
+class qt {
   /**
    * Creates a new Logger instance
    * @param {object} options - Logger configuration options
@@ -16,45 +16,45 @@ class qe {
    * @param {object} [options.loggingManager] - LoggingManager instance for component filtering
    * @param {object} [options.console=console] - Console object to use
    */
-  constructor(e = {}) {
-    this.enabled = e.enabled !== !1, this.level = e.level || Oe, this.prefix = e.prefix || "", this.component = this.prefix, this.redactSecrets = e.redactSecrets || !1, this.currentLevel = D[this.level.toUpperCase()] ?? D.INFO, this.loggingManager = e.loggingManager, this.console = e.console || console, this.component && this.loggingManager && this.loggingManager.registerComponent(this.component);
+  constructor(t = {}) {
+    this.enabled = t.enabled !== !1, this.level = t.level || Ut, this.prefix = t.prefix || "", this.component = this.prefix, this.redactSecrets = t.redactSecrets || !1, this.currentLevel = D[this.level.toUpperCase()] ?? D.INFO, this.loggingManager = t.loggingManager, this.console = t.console || console, this.component && this.loggingManager && this.loggingManager.registerComponent(this.component);
   }
   /**
    * Checks if a message should be logged based on current level, enabled state, and component filter
    * @param {string} level - The log level to check
    * @returns {boolean} True if the message should be logged
    */
-  shouldLog(e) {
-    if (e.toUpperCase() === "ERROR")
-      return this.enabled && D[e.toUpperCase()] <= this.currentLevel;
-    const t = !this.component || !this.loggingManager || this.loggingManager.isComponentEnabled(this.component);
-    return this.enabled && t && D[e.toUpperCase()] <= this.currentLevel;
+  shouldLog(t) {
+    if (t.toUpperCase() === "ERROR")
+      return this.enabled && D[t.toUpperCase()] <= this.currentLevel;
+    const e = !this.component || !this.loggingManager || this.loggingManager.isComponentEnabled(this.component);
+    return this.enabled && e && D[t.toUpperCase()] <= this.currentLevel;
   }
   /**
    * Redacts potential secrets from arguments
    * @param {Array} args - Arguments to redact
    * @returns {Array} Redacted arguments
    */
-  redactArgs(e) {
-    return this.redactSecrets ? e.map((t) => this.redactValue(t)) : e;
+  redactArgs(t) {
+    return this.redactSecrets ? t.map((e) => this.redactValue(e)) : t;
   }
   /**
    * Recursively redacts secrets from a value
    * @param {any} value - Value to redact
    * @returns {any} Redacted value
    */
-  redactValue(e) {
-    if (typeof e == "string")
-      return e.replace(/\b[a-zA-Z0-9_-]{20,}\b/g, "[REDACTED]");
-    if (Array.isArray(e))
-      return e.map((t) => this.redactValue(t));
-    if (e && typeof e == "object" && e.constructor === Object) {
-      const t = {};
-      for (const s in e)
-        Object.prototype.hasOwnProperty.call(e, s) && (t[s] = this.redactValue(e[s]));
-      return t;
+  redactValue(t) {
+    if (typeof t == "string")
+      return t.replace(/\b[a-zA-Z0-9_-]{20,}\b/g, "[REDACTED]");
+    if (Array.isArray(t))
+      return t.map((e) => this.redactValue(e));
+    if (t && typeof t == "object" && t.constructor === Object) {
+      const e = {};
+      for (const s in t)
+        Object.prototype.hasOwnProperty.call(t, s) && (e[s] = this.redactValue(t[s]));
+      return e;
     }
-    return e;
+    return t;
   }
   /**
    * Formats a message with prefix
@@ -62,60 +62,60 @@ class qe {
    * @param {...any} args - Additional arguments
    * @returns {Array} Formatted message array
    */
-  formatMessage(e, ...t) {
-    const s = this.prefix ? `[${this.prefix}] ` : "", o = this.redactArgs(t);
-    return [s + e, ...o];
+  formatMessage(t, ...e) {
+    const s = this.prefix ? `[${this.prefix}] ` : "", o = this.redactArgs(e);
+    return [s + t, ...o];
   }
   /**
    * Logs an error message
    * @param {string} message - The error message
    * @param {...any} args - Additional arguments
    */
-  error(e, ...t) {
-    this.shouldLog("error") && this.console.error(...this.formatMessage(e, ...t));
+  error(t, ...e) {
+    this.shouldLog("error") && this.console.error(...this.formatMessage(t, ...e));
   }
   /**
    * Logs a warning message
    * @param {string} message - The warning message
    * @param {...any} args - Additional arguments
    */
-  warn(e, ...t) {
-    this.shouldLog("warn") && this.console.warn(...this.formatMessage(e, ...t));
+  warn(t, ...e) {
+    this.shouldLog("warn") && this.console.warn(...this.formatMessage(t, ...e));
   }
   /**
    * Logs an info message
    * @param {string} message - The info message
    * @param {...any} args - Additional arguments
    */
-  info(e, ...t) {
-    this.shouldLog("info") && this.console.info(...this.formatMessage(e, ...t));
+  info(t, ...e) {
+    this.shouldLog("info") && this.console.info(...this.formatMessage(t, ...e));
   }
   /**
    * Logs a general message
    * @param {string} message - The message
    * @param {...any} args - Additional arguments
    */
-  log(e, ...t) {
-    this.shouldLog("info") && this.console.log(...this.formatMessage(e, ...t));
+  log(t, ...e) {
+    this.shouldLog("info") && this.console.log(...this.formatMessage(t, ...e));
   }
   /**
    * Logs a debug message
    * @param {string} message - The debug message
    * @param {...any} args - Additional arguments
    */
-  debug(e, ...t) {
-    this.shouldLog("debug") && this.console.debug(...this.formatMessage(e, ...t));
+  debug(t, ...e) {
+    this.shouldLog("debug") && this.console.debug(...this.formatMessage(t, ...e));
   }
   /**
    * Logs a trace message (with secret redaction by default)
    * @param {string} message - The trace message
    * @param {...any} args - Additional arguments
    */
-  trace(e, ...t) {
+  trace(t, ...e) {
     if (this.shouldLog("trace")) {
       const s = this.redactSecrets;
       this.redactSecrets = !0;
-      const o = this.formatMessage(e, ...t);
+      const o = this.formatMessage(t, ...e);
       this.redactSecrets = s, this.console.trace(...o);
     }
   }
@@ -124,25 +124,25 @@ class qe {
    * @param {any} data - The data to display in table format
    * @param {Array} [columns] - Optional column names
    */
-  table(e, t) {
+  table(t, e) {
     if (this.shouldLog("info")) {
       const s = this.prefix ? `[${this.prefix}]` : "";
-      s && this.console.log(s), this.console.table(e, t);
+      s && this.console.log(s), this.console.table(t, e);
     }
   }
   /**
    * Creates a new group in the console
    * @param {string} label - The group label
    */
-  group(e) {
-    this.shouldLog("info") && this.console.group(...this.formatMessage(e));
+  group(t) {
+    this.shouldLog("info") && this.console.group(...this.formatMessage(t));
   }
   /**
    * Creates a new collapsed group in the console
    * @param {string} label - The group label
    */
-  groupCollapsed(e) {
-    this.shouldLog("info") && this.console.groupCollapsed(...this.formatMessage(e));
+  groupCollapsed(t) {
+    this.shouldLog("info") && this.console.groupCollapsed(...this.formatMessage(t));
   }
   /**
    * Ends the current console group
@@ -154,22 +154,22 @@ class qe {
    * Starts a timer with the given label
    * @param {string} label - The timer label
    */
-  time(e) {
-    this.shouldLog("debug") && this.console.time(this.prefix ? `[${this.prefix}] ${e}` : e);
+  time(t) {
+    this.shouldLog("debug") && this.console.time(this.prefix ? `[${this.prefix}] ${t}` : t);
   }
   /**
    * Ends a timer with the given label
    * @param {string} label - The timer label
    */
-  timeEnd(e) {
-    this.shouldLog("debug") && this.console.timeEnd(this.prefix ? `[${this.prefix}] ${e}` : e);
+  timeEnd(t) {
+    this.shouldLog("debug") && this.console.timeEnd(this.prefix ? `[${this.prefix}] ${t}` : t);
   }
   /**
    * Sets the log level
    * @param {string} level - The new log level
    */
-  setLevel(e) {
-    this.level = e, this.currentLevel = D[e.toUpperCase()] ?? D.INFO;
+  setLevel(t) {
+    this.level = t, this.currentLevel = D[t.toUpperCase()] ?? D.INFO;
   }
   /**
    * Enables logging
@@ -191,29 +191,29 @@ class qe {
     return this.enabled;
   }
 }
-class Qe {
+class Qt {
   /**
    * Creates a new LoggingManager instance
    * @param {object} options - Configuration options
    * @param {object} options.storage - Storage adapter instance
    * @param {object} options.console - Console object (default: console)
    */
-  constructor(e = {}) {
-    this.storage = e.storage, this.console = e.console || console, this.allowedComponents = /* @__PURE__ */ new Set(), this.globalEnabled = !0, this.allowAll = !1, this.registeredComponents = /* @__PURE__ */ new Set(), this.storage && this.loadFromStorage();
+  constructor(t = {}) {
+    this.storage = t.storage, this.console = t.console || console, this.allowedComponents = /* @__PURE__ */ new Set(), this.globalEnabled = !0, this.allowAll = !1, this.registeredComponents = /* @__PURE__ */ new Set(), this.storage && this.loadFromStorage();
   }
   /**
    * Enables logging for specific components
    * @param {...string} components - Component names to enable
    */
-  enable(...e) {
-    e.forEach((t) => this.allowedComponents.add(t.toLowerCase())), this.saveToStorage(), this.console.log("🔧 Logging enabled for:", e.join(", "));
+  enable(...t) {
+    t.forEach((e) => this.allowedComponents.add(e.toLowerCase())), this.saveToStorage(), this.console.log("🔧 Logging enabled for:", t.join(", "));
   }
   /**
    * Disables logging for specific components
    * @param {...string} components - Component names to disable
    */
-  disable(...e) {
-    e.forEach((t) => this.allowedComponents.delete(t.toLowerCase())), this.saveToStorage(), this.console.log("🔧 Logging disabled for:", e.join(", "));
+  disable(...t) {
+    t.forEach((e) => this.allowedComponents.delete(e.toLowerCase())), this.saveToStorage(), this.console.log("🔧 Logging disabled for:", t.join(", "));
   }
   /**
    * Enables logging for all components
@@ -237,9 +237,9 @@ class Qe {
    * Lists available components that have loggers
    */
   listComponents() {
-    this.console.log("🔧 Available components to filter:"), Array.from(this.registeredComponents).sort().forEach((e) => {
-      const t = this.isComponentEnabled(e);
-      this.console.log(`  ${t ? "✅" : "❌"} ${e}`);
+    this.console.log("🔧 Available components to filter:"), Array.from(this.registeredComponents).sort().forEach((t) => {
+      const e = this.isComponentEnabled(t);
+      this.console.log(`  ${e ? "✅" : "❌"} ${t}`);
     });
   }
   /**
@@ -247,15 +247,15 @@ class Qe {
    * @param {string} component - Component name
    * @returns {boolean} True if component should log
    */
-  isComponentEnabled(e) {
-    return this.globalEnabled ? this.allowAll ? !0 : this.allowedComponents.has(e.toLowerCase()) : !1;
+  isComponentEnabled(t) {
+    return this.globalEnabled ? this.allowAll ? !0 : this.allowedComponents.has(t.toLowerCase()) : !1;
   }
   /**
    * Registers a component for tracking
    * @param {string} component - Component name
    */
-  registerComponent(e) {
-    this.registeredComponents.add(e);
+  registerComponent(t) {
+    this.registeredComponents.add(t);
   }
   /**
    * Saves filter state to storage
@@ -263,12 +263,12 @@ class Qe {
   saveToStorage() {
     if (this.storage)
       try {
-        const e = {
+        const t = {
           allowedComponents: Array.from(this.allowedComponents),
           allowAll: this.allowAll,
           globalEnabled: this.globalEnabled
         };
-        this.storage.setItem(pe, JSON.stringify(e));
+        this.storage.setItem(pt, JSON.stringify(t));
       } catch {
       }
   }
@@ -278,20 +278,20 @@ class Qe {
   loadFromStorage() {
     if (this.storage)
       try {
-        const e = this.storage.getItem(pe), t = JSON.parse(e || "{}");
-        this.allowedComponents = new Set(t.allowedComponents || []), this.allowAll = t.allowAll || !1, this.globalEnabled = t.globalEnabled !== !1, e || (this.allowedComponents = new Set(be));
+        const t = this.storage.getItem(pt), e = JSON.parse(t || "{}");
+        this.allowedComponents = new Set(e.allowedComponents || []), this.allowAll = e.allowAll || !1, this.globalEnabled = e.globalEnabled !== !1, t || (this.allowedComponents = new Set(bt));
       } catch {
-        this.allowedComponents = new Set(be);
+        this.allowedComponents = new Set(bt);
       }
   }
 }
-class Be {
+class kt {
   /**
    * Gets an item from storage
    * @param {string} key - Storage key
    * @returns {string|null} Stored value or null
    */
-  getItem(e) {
+  getItem(t) {
     throw new Error("StorageAdapter.getItem must be implemented");
   }
   /**
@@ -299,56 +299,56 @@ class Be {
    * @param {string} key - Storage key
    * @param {string} value - Value to store
    */
-  setItem(e, t) {
+  setItem(t, e) {
     throw new Error("StorageAdapter.setItem must be implemented");
   }
   /**
    * Removes an item from storage
    * @param {string} key - Storage key
    */
-  removeItem(e) {
+  removeItem(t) {
     throw new Error("StorageAdapter.removeItem must be implemented");
   }
 }
-class De extends Be {
+class Dt extends kt {
   constructor() {
     super(), this.storage = /* @__PURE__ */ new Map();
   }
-  getItem(e) {
-    return this.storage.get(e) ?? null;
+  getItem(t) {
+    return this.storage.get(t) ?? null;
   }
-  setItem(e, t) {
-    this.storage.set(e, t);
+  setItem(t, e) {
+    this.storage.set(t, e);
   }
-  removeItem(e) {
-    this.storage.delete(e);
+  removeItem(t) {
+    this.storage.delete(t);
   }
 }
-class $e extends Be {
-  getItem(e) {
+class $t extends kt {
+  getItem(t) {
     try {
-      return localStorage.getItem(e);
+      return localStorage.getItem(t);
     } catch {
       return null;
     }
   }
-  setItem(e, t) {
+  setItem(t, e) {
     try {
-      localStorage.setItem(e, t);
+      localStorage.setItem(t, e);
     } catch {
     }
   }
-  removeItem(e) {
+  removeItem(t) {
     try {
-      localStorage.removeItem(e);
+      localStorage.removeItem(t);
     } catch {
     }
   }
 }
-function et() {
-  return typeof localStorage < "u" ? new $e() : new De();
+function te() {
+  return typeof localStorage < "u" ? new $t() : new Dt();
 }
-class ke {
+class Mt {
   /**
    * Gets the global object
    * @returns {object} Global object
@@ -361,7 +361,7 @@ class ke {
    * @param {string} key - Property key
    * @param {any} value - Property value
    */
-  setGlobalProperty(e, t) {
+  setGlobalProperty(t, e) {
     throw new Error("GlobalAdapter.setGlobalProperty must be implemented");
   }
   /**
@@ -369,56 +369,56 @@ class ke {
    * @param {string} key - Property key
    * @returns {boolean} True if property exists
    */
-  hasGlobalProperty(e) {
+  hasGlobalProperty(t) {
     throw new Error("GlobalAdapter.hasGlobalProperty must be implemented");
   }
 }
-class tt extends ke {
+class ee extends Mt {
   getGlobal() {
     return window;
   }
-  setGlobalProperty(e, t) {
-    window[e] = t;
+  setGlobalProperty(t, e) {
+    window[t] = e;
   }
-  hasGlobalProperty(e) {
-    return e in window;
+  hasGlobalProperty(t) {
+    return t in window;
   }
 }
-class st extends ke {
+class se extends Mt {
   getGlobal() {
     return globalThis;
   }
-  setGlobalProperty(e, t) {
-    globalThis[e] = t;
+  setGlobalProperty(t, e) {
+    globalThis[t] = e;
   }
-  hasGlobalProperty(e) {
-    return e in globalThis;
+  hasGlobalProperty(t) {
+    return t in globalThis;
   }
 }
-function ot() {
-  return typeof window < "u" ? new tt() : new st();
+function oe() {
+  return typeof window < "u" ? new ee() : new se();
 }
-const nt = et(), it = ot(), U = new Qe({
-  storage: nt,
+const ne = te(), ie = oe(), _ = new Qt({
+  storage: ne,
   console
 });
-typeof window < "u" && it.setGlobalProperty("logFilter", {
-  enable: (...n) => U.enable(...n),
-  disable: (...n) => U.disable(...n),
-  enableAll: () => U.enableAll(),
-  disableAll: () => U.disableAll(),
-  status: () => U.status(),
-  list: () => U.listComponents()
+typeof window < "u" && ie.setGlobalProperty("logFilter", {
+  enable: (...n) => _.enable(...n),
+  disable: (...n) => _.disable(...n),
+  enableAll: () => _.enableAll(),
+  disableAll: () => _.disableAll(),
+  status: () => _.status(),
+  list: () => _.listComponents()
 });
-function re(n = {}) {
-  return new qe({
+function rt(n = {}) {
+  return new qt({
     ...n,
-    loggingManager: U
+    loggingManager: _
   });
 }
 class $ {
-  constructor(e) {
-    this.workerScript = e, this.worker = null;
+  constructor(t) {
+    this.workerScript = t, this.worker = null;
   }
   /**
    * Factory method to create appropriate worker adapter for current platform
@@ -431,14 +431,14 @@ class $ {
    * const worker = WorkerAdapter.create('./network-worker.js');
    * worker.postMessage({ type: 'compute', data: [...] });
    */
-  static create(e) {
+  static create(t) {
     if (typeof globalThis < "u" && globalThis.__USE_MOCK_WORKERS__)
-      return new at(e);
+      return new ae(t);
     if (typeof Worker < "u")
-      return new ge(e);
+      return new gt(t);
     if (typeof require < "u")
       try {
-        return require.resolve("worker_threads"), new rt(e);
+        return require.resolve("worker_threads"), new re(t);
       } catch {
         throw new Error("Worker Threads not available in this Node.js version");
       }
@@ -467,7 +467,7 @@ class $ {
    * @param {Object} message - Message to send
    * @param {Array} [transferList] - Objects to transfer ownership
    */
-  postMessage(e, t = []) {
+  postMessage(t, e = []) {
     throw new Error("Must implement postMessage");
   }
   /**
@@ -475,7 +475,7 @@ class $ {
    * @abstract
    * @param {Function} callback - Handler for messages from worker
    */
-  onMessage(e) {
+  onMessage(t) {
     throw new Error("Must implement onMessage");
   }
   /**
@@ -483,7 +483,7 @@ class $ {
    * @abstract
    * @param {Function} callback - Handler for worker errors
    */
-  onError(e) {
+  onError(t) {
     throw new Error("Must implement onError");
   }
   /**
@@ -494,9 +494,9 @@ class $ {
     throw new Error("Must implement terminate");
   }
 }
-class ge extends $ {
-  constructor(e) {
-    super(e), this.worker = new Worker(e, { type: "module" });
+class gt extends $ {
+  constructor(t) {
+    super(t), this.worker = new Worker(t, { type: "module" });
   }
   /**
    * Create worker from inline code (useful for bundlers)
@@ -513,65 +513,65 @@ class ge extends $ {
    * `;
    * const worker = BrowserWorkerAdapter.fromCode(code);
    */
-  static fromCode(e) {
-    const t = new Blob([e], { type: "application/javascript" }), s = URL.createObjectURL(t);
-    return new ge(s);
+  static fromCode(t) {
+    const e = new Blob([t], { type: "application/javascript" }), s = URL.createObjectURL(e);
+    return new gt(s);
   }
-  postMessage(e, t = []) {
-    this.worker.postMessage(e, t);
+  postMessage(t, e = []) {
+    this.worker.postMessage(t, e);
   }
-  onMessage(e) {
-    this.worker.onmessage = (t) => e(t.data);
+  onMessage(t) {
+    this.worker.onmessage = (e) => t(e.data);
   }
-  onError(e) {
-    this.worker.onerror = (t) => {
-      e(new Error(t.message || "Worker error"));
+  onError(t) {
+    this.worker.onerror = (e) => {
+      t(new Error(e.message || "Worker error"));
     };
   }
   terminate() {
     this.worker && (this.worker.terminate(), this.worker = null);
   }
 }
-class rt extends $ {
-  constructor(e) {
-    super(e);
-    const { Worker: t } = require("worker_threads");
-    this.worker = new t(e);
+class re extends $ {
+  constructor(t) {
+    super(t);
+    const { Worker: e } = require("worker_threads");
+    this.worker = new e(t);
   }
-  postMessage(e, t = []) {
-    this.worker.postMessage(e, t);
+  postMessage(t, e = []) {
+    this.worker.postMessage(t, e);
   }
-  onMessage(e) {
-    this.worker.on("message", e);
+  onMessage(t) {
+    this.worker.on("message", t);
   }
-  onError(e) {
-    this.worker.on("error", (t) => {
-      e(t);
-    }), this.worker.on("exit", (t) => {
-      t !== 0 && e(new Error(`Worker stopped with exit code ${t}`));
+  onError(t) {
+    this.worker.on("error", (e) => {
+      t(e);
+    }), this.worker.on("exit", (e) => {
+      e !== 0 && t(new Error(`Worker stopped with exit code ${e}`));
     });
   }
   terminate() {
     this.worker && (this.worker.terminate(), this.worker = null);
   }
 }
-class at extends $ {
-  constructor(e) {
-    super(e), this.messageHandler = null;
+class ae extends $ {
+  constructor(t) {
+    super(t), this.messageHandler = null;
   }
-  postMessage(e, t = []) {
+  postMessage(t, e = []) {
     setTimeout(async () => {
       if (this.messageHandler)
         try {
-          const s = await this.executeSync(e);
+          const s = await this.executeSync(t);
           this.messageHandler({
-            id: e.id,
+            id: t.id,
             status: "complete",
             result: s
           });
         } catch (s) {
           this.errorHandler ? this.errorHandler(s) : this.messageHandler({
-            id: e.id,
+            id: t.id,
             status: "error",
             error: s.message || "Unknown error",
             stack: s.stack
@@ -579,11 +579,11 @@ class at extends $ {
         }
     }, 0);
   }
-  onMessage(e) {
-    this.messageHandler = e;
+  onMessage(t) {
+    this.messageHandler = t;
   }
-  onError(e) {
-    this.errorHandler = e;
+  onError(t) {
+    this.errorHandler = t;
   }
   terminate() {
     this.messageHandler = null, this.errorHandler = null;
@@ -592,28 +592,28 @@ class at extends $ {
    * Synchronous execution using module registry
    * @private
    */
-  async executeSync(e) {
-    const { executeTask: t } = await Promise.resolve().then(() => cs);
-    return t(e);
+  async executeSync(t) {
+    const { executeTask: e } = await Promise.resolve().then(() => cs);
+    return e(t);
   }
 }
-class ct {
+class ce {
   /**
    * Create a new worker pool
    *
    * @param {Object} options - Configuration options
    * @param {number} [options.maxWorkers] - Maximum number of workers (default: CPU count)
    * @param {string} [options.workerScript] - Path to worker script
-   * @param {number} [options.taskTimeout] - Task timeout in ms (default: 60000)
+   * @param {number} [options.taskTimeout] - Task timeout in ms (default: 300000, 5 minutes)
    * @param {boolean} [options.verbose] - Enable verbose logging
    * @param {boolean} [options.enableAffinity=true] - Enable worker affinity (route same algorithm to same worker)
    * @param {number} [options.affinityCacheLimit=50] - Max cached function keys per worker
    */
-  constructor(e = {}) {
-    this.maxWorkers = e.maxWorkers || this.detectCPUCount(), this.workerScript = e.workerScript || this.getDefaultWorkerScript(), this.taskTimeout = e.taskTimeout || 6e4, this.verbose = e.verbose || !1, this.affinityCacheLimit = e.affinityCacheLimit || 50, this.enableAffinity = e.enableAffinity !== !1, this.workers = [], this.availableWorkers = [], this.taskQueue = [], this.activeTasks = /* @__PURE__ */ new Map(), this.taskIdCounter = 0, this.initialized = !1, this.affinityMetrics = {
+  constructor(t = {}) {
+    this.maxWorkers = t.maxWorkers || this.detectCPUCount(), this.workerScript = t.workerScript || this.getDefaultWorkerScript(), this.taskTimeout = t.taskTimeout || 3e5, this.verbose = t.verbose || !1, this.affinityCacheLimit = t.affinityCacheLimit || 50, this.enableAffinity = t.enableAffinity !== !1, this.workers = [], this.availableWorkers = [], this.taskQueue = [], this.activeTasks = /* @__PURE__ */ new Map(), this.taskIdCounter = 0, this.initialized = !1, this.affinityMetrics = {
       hits: 0,
       misses: 0
-    }, this.log = re({
+    }, this.log = rt({
       prefix: "WorkerPool",
       level: this.verbose ? "debug" : "info"
     });
@@ -653,16 +653,16 @@ class ct {
         throw new Error("Workers not supported in this environment");
       this.log.debug("Initializing worker pool", { maxWorkers: this.maxWorkers });
       try {
-        for (let e = 0; e < this.maxWorkers; e++) {
-          const t = await this.createWorker(e);
-          this.workers.push(t), this.availableWorkers.push(t);
+        for (let t = 0; t < this.maxWorkers; t++) {
+          const e = await this.createWorker(t);
+          this.workers.push(e), this.availableWorkers.push(e);
         }
         this.initialized = !0, this.log.info("Worker pool initialized successfully", { workerCount: this.maxWorkers });
-      } catch (e) {
+      } catch (t) {
         throw this.log.error("Failed to initialize worker pool", {
-          error: e.message,
-          stack: e.stack
-        }), await this.terminate(), e;
+          error: t.message,
+          stack: t.stack
+        }), await this.terminate(), t;
       }
     }
   }
@@ -672,13 +672,13 @@ class ct {
    * @param {number} id - Worker ID for logging
    * @returns {WorkerAdapter} Configured worker
    */
-  async createWorker(e) {
-    const t = $.create(this.workerScript);
-    return t.id = e, t.currentTaskId = null, t.cachedFunctions = /* @__PURE__ */ new Set(), t.tasksExecuted = 0, t.lastTaskTime = 0, t.onMessage((s) => {
-      this.handleWorkerMessage(t, s);
-    }), t.onError((s) => {
-      this.handleWorkerError(t, s);
-    }), this.log.debug("Worker created", { workerId: e }), t;
+  async createWorker(t) {
+    const e = $.create(this.workerScript);
+    return e.id = t, e.currentTaskId = null, e.cachedFunctions = /* @__PURE__ */ new Set(), e.tasksExecuted = 0, e.lastTaskTime = 0, e.onMessage((s) => {
+      this.handleWorkerMessage(e, s);
+    }), e.onError((s) => {
+      this.handleWorkerError(e, s);
+    }), this.log.debug("Worker created", { workerId: t }), e;
   }
   /**
    * Execute task on worker pool
@@ -700,24 +700,24 @@ class ct {
    *   timeout: 30000
    * });
    */
-  async execute(e, t = {}) {
+  async execute(t, e = {}) {
     if (!this.initialized)
       throw new Error("Worker pool not initialized. Call initialize() first.");
     return new Promise((s, o) => {
-      const i = `task_${this.taskIdCounter++}`, r = { id: i, ...e }, a = t.timeout || this.taskTimeout, d = setTimeout(() => {
+      const i = `task_${this.taskIdCounter++}`, r = { id: i, ...t }, a = e.timeout || this.taskTimeout, l = setTimeout(() => {
         this.handleTaskTimeout(i);
       }, a);
       this.activeTasks.set(i, {
         resolve: s,
         reject: o,
-        onProgress: t.onProgress,
-        timeoutId: d,
+        onProgress: e.onProgress,
+        timeoutId: l,
         startTime: Date.now(),
         task: r
         // Store task for affinity tracking
       });
-      const g = this._selectWorker(r);
-      g ? this.assignTask(g, r) : (this.taskQueue.push(r), this.log.debug("Task queued", { taskId: i, queueLength: this.taskQueue.length }));
+      const h = this._selectWorker(r);
+      h ? this.assignTask(h, r) : (this.taskQueue.push(r), this.log.debug("Task queued", { taskId: i, queueLength: this.taskQueue.length }));
     });
   }
   /**
@@ -726,8 +726,8 @@ class ct {
    * @param {WorkerAdapter} worker - Worker to assign to
    * @param {Object} task - Task to execute
    */
-  assignTask(e, t) {
-    e.currentTaskId = t.id, e.postMessage(t);
+  assignTask(t, e) {
+    t.currentTaskId = e.id, t.postMessage(e);
   }
   // ============================================================================
   // WORKER AFFINITY METHODS
@@ -738,8 +738,8 @@ class ct {
    * @param {Object} task - Task with module and functionName
    * @returns {string|null} Affinity key or null if not applicable
    */
-  _getAffinityKey(e) {
-    return e && e.module && e.functionName ? `${e.module}:${e.functionName}` : null;
+  _getAffinityKey(t) {
+    return t && t.module && t.functionName ? `${t.module}:${t.functionName}` : null;
   }
   /**
    * Select optimal worker for task using affinity-aware algorithm
@@ -747,31 +747,37 @@ class ct {
    * @param {Object} task - Task to assign
    * @returns {WorkerAdapter|null} Selected worker or null if none available
    */
-  _selectWorker(e) {
+  _selectWorker(t) {
     if (this.availableWorkers.length === 0)
       return null;
     if (!this.enableAffinity) {
       const o = this.availableWorkers.pop();
       return this.log.debug("Worker selected (affinity disabled)", {
         workerId: o.id,
-        taskId: e.id
+        taskId: t.id
       }), o;
     }
-    const t = this._getAffinityKey(e);
-    if (t) {
+    const e = this._getAffinityKey(t);
+    if (e) {
       const o = this.availableWorkers.find(
-        (i) => i.cachedFunctions.has(t)
+        (i) => i.cachedFunctions.has(e)
       );
       if (o)
-        return this._recordAffinityHit(), this.log.debug("Worker selected via affinity", {
+        return this._recordAffinityHit(), this.log.info("🎯 Worker selected via affinity", {
           workerId: o.id,
-          taskId: e.id,
-          affinityKey: t,
+          taskId: t.id,
+          affinityKey: e,
           cachedFunctions: Array.from(o.cachedFunctions)
+        }), this.log.debug("Worker selected via affinity (detailed)", {
+          workerId: o.id,
+          taskId: t.id,
+          affinityKey: e,
+          cachedFunctions: Array.from(o.cachedFunctions),
+          tasksExecuted: o.tasksExecuted
         }), this._removeFromAvailable(o);
       this._recordAffinityMiss(), this.log.debug("No affinity match found", {
-        taskId: e.id,
-        affinityKey: t,
+        taskId: t.id,
+        affinityKey: e,
         availableWorkers: this.availableWorkers.length
       });
     }
@@ -780,9 +786,9 @@ class ct {
     );
     return this.log.debug("Worker selected (least loaded)", {
       workerId: s.id,
-      taskId: e.id,
+      taskId: t.id,
       tasksExecuted: s.tasksExecuted,
-      affinityKey: t || "none"
+      affinityKey: e || "none"
     }), this._removeFromAvailable(s);
   }
   /**
@@ -791,9 +797,9 @@ class ct {
    * @param {WorkerAdapter} worker - Worker to remove
    * @returns {WorkerAdapter} The removed worker
    */
-  _removeFromAvailable(e) {
-    const t = this.availableWorkers.indexOf(e);
-    return t > -1 && this.availableWorkers.splice(t, 1), e;
+  _removeFromAvailable(t) {
+    const e = this.availableWorkers.indexOf(t);
+    return e > -1 && this.availableWorkers.splice(e, 1), t;
   }
   /**
    * Record affinity cache hit
@@ -815,21 +821,27 @@ class ct {
    * @param {WorkerAdapter} worker - Worker that completed task
    * @param {Object} task - Completed task
    */
-  _updateWorkerAffinity(e, t) {
-    const s = this._getAffinityKey(t);
+  _updateWorkerAffinity(t, e) {
+    const s = this._getAffinityKey(e);
     if (!s) return;
-    const o = !e.cachedFunctions.has(s);
-    if (e.cachedFunctions.add(s), e.tasksExecuted++, e.lastTaskTime = Date.now(), o && this.log.debug("Worker affinity cache updated", {
-      workerId: e.id,
+    const o = !t.cachedFunctions.has(s);
+    if (t.cachedFunctions.add(s), t.tasksExecuted++, t.lastTaskTime = Date.now(), o && (this.log.info("📦 Worker affinity cache updated", {
+      workerId: t.id,
       affinityKey: s,
-      cacheSize: e.cachedFunctions.size,
-      tasksExecuted: e.tasksExecuted
-    }), e.cachedFunctions.size > this.affinityCacheLimit) {
-      const i = e.cachedFunctions.size;
-      this._evictAffinityEntries(e), this.log.debug("Worker affinity cache evicted", {
-        workerId: e.id,
+      cacheSize: t.cachedFunctions.size,
+      tasksExecuted: t.tasksExecuted
+    }), this.log.debug("Worker affinity cache updated (detailed)", {
+      workerId: t.id,
+      affinityKey: s,
+      cacheSize: t.cachedFunctions.size,
+      tasksExecuted: t.tasksExecuted,
+      allCachedFunctions: Array.from(t.cachedFunctions)
+    })), t.cachedFunctions.size > this.affinityCacheLimit) {
+      const i = t.cachedFunctions.size;
+      this._evictAffinityEntries(t), this.log.debug("Worker affinity cache evicted", {
+        workerId: t.id,
         beforeSize: i,
-        afterSize: e.cachedFunctions.size,
+        afterSize: t.cachedFunctions.size,
         limit: this.affinityCacheLimit
       });
     }
@@ -839,12 +851,12 @@ class ct {
    * @private
    * @param {WorkerAdapter} worker - Worker to evict entries from
    */
-  _evictAffinityEntries(e) {
-    const t = Array.from(e.cachedFunctions), s = t.slice(0, Math.floor(t.length / 2));
-    s.forEach((o) => e.cachedFunctions.delete(o)), this.log.debug("Evicted affinity entries", {
-      workerId: e.id,
+  _evictAffinityEntries(t) {
+    const e = Array.from(t.cachedFunctions), s = e.slice(0, Math.floor(e.length / 2));
+    s.forEach((o) => t.cachedFunctions.delete(o)), this.log.debug("Evicted affinity entries", {
+      workerId: t.id,
       evicted: s.length,
-      remaining: e.cachedFunctions.size
+      remaining: t.cachedFunctions.size
     });
   }
   // ============================================================================
@@ -856,18 +868,18 @@ class ct {
    * @param {WorkerAdapter} worker - Worker that sent message
    * @param {Object} message - Message from worker
    */
-  handleWorkerMessage(e, t) {
-    const { id: s, status: o, result: i, progress: r, error: a } = t, d = this.activeTasks.get(s);
-    if (!d) {
+  handleWorkerMessage(t, e) {
+    const { id: s, status: o, result: i, progress: r, error: a } = e, l = this.activeTasks.get(s);
+    if (!l) {
       this.log.warn("Received message for unknown task", { taskId: s });
       return;
     }
     if (o === "progress")
-      d.onProgress && d.onProgress(r), this.log.debug("Task progress", { taskId: s, progress: Math.round(r * 100) });
+      l.onProgress && l.onProgress(r), this.log.debug("Task progress", { taskId: s, progress: Math.round(r * 100) });
     else if (o === "complete") {
-      const g = Date.now() - d.startTime;
-      this.log.debug("Task completed", { taskId: s, duration: g }), clearTimeout(d.timeoutId), d.resolve(i), d.task && this._updateWorkerAffinity(e, d.task), this.activeTasks.delete(s), this.freeWorker(e);
-    } else o === "error" && (this.log.error("Task failed", { taskId: s, error: a }), clearTimeout(d.timeoutId), d.reject(new Error(a)), this.activeTasks.delete(s), this.freeWorker(e));
+      const h = Date.now() - l.startTime;
+      this.log.debug("Task completed", { taskId: s, duration: h }), clearTimeout(l.timeoutId), l.resolve(i), l.task && this._updateWorkerAffinity(t, l.task), this.activeTasks.delete(s), this.freeWorker(t);
+    } else o === "error" && (this.log.error("Task failed", { taskId: s, error: a }), clearTimeout(l.timeoutId), l.reject(new Error(a)), this.activeTasks.delete(s), this.freeWorker(t));
   }
   /**
    * Handle worker error
@@ -875,27 +887,27 @@ class ct {
    * @param {WorkerAdapter} worker - Worker that errored
    * @param {Error} error - Error object
    */
-  handleWorkerError(e, t) {
+  handleWorkerError(t, e) {
     if (this.log.error("Worker error", {
-      workerId: e.id,
-      error: t.message,
-      stack: t.stack
-    }), e.currentTaskId) {
-      const s = this.activeTasks.get(e.currentTaskId);
-      s && (clearTimeout(s.timeoutId), s.reject(t), this.activeTasks.delete(e.currentTaskId));
+      workerId: t.id,
+      error: e.message,
+      stack: e.stack
+    }), t.currentTaskId) {
+      const s = this.activeTasks.get(t.currentTaskId);
+      s && (clearTimeout(s.timeoutId), s.reject(e), this.activeTasks.delete(t.currentTaskId));
     }
-    this.restartWorker(e);
+    this.restartWorker(t);
   }
   /**
    * Handle task timeout
    * @private
    * @param {string} taskId - Task that timed out
    */
-  handleTaskTimeout(e) {
-    const t = this.activeTasks.get(e);
-    if (!t) return;
-    this.log.warn("Task timed out", { taskId: e, timeout: this.taskTimeout }), t.reject(new Error(`Task timed out after ${this.taskTimeout}ms`)), this.activeTasks.delete(e);
-    const s = this.workers.find((o) => o.currentTaskId === e);
+  handleTaskTimeout(t) {
+    const e = this.activeTasks.get(t);
+    if (!e) return;
+    this.log.warn("Task timed out", { taskId: t, timeout: this.taskTimeout }), e.reject(new Error(`Task timed out after ${this.taskTimeout}ms`)), this.activeTasks.delete(t);
+    const s = this.workers.find((o) => o.currentTaskId === t);
     s && this.restartWorker(s);
   }
   /**
@@ -903,35 +915,35 @@ class ct {
    * @private
    * @param {WorkerAdapter} worker - Worker to free
    */
-  freeWorker(e) {
-    if (e.currentTaskId = null, this.taskQueue.length > 0) {
-      const t = this.taskQueue.shift();
-      this.assignTask(e, t), this.log.debug("Task assigned from queue", { taskId: t.id, workerId: e.id });
+  freeWorker(t) {
+    if (t.currentTaskId = null, this.taskQueue.length > 0) {
+      const e = this.taskQueue.shift();
+      this.assignTask(t, e), this.log.debug("Task assigned from queue", { taskId: e.id, workerId: t.id });
     } else
-      this.availableWorkers.push(e);
+      this.availableWorkers.push(t);
   }
   /**
    * Restart failed worker
    * @private
    * @param {WorkerAdapter} oldWorker - Worker to restart
    */
-  async restartWorker(e) {
-    const t = this.workers.indexOf(e);
-    if (t !== -1) {
-      this.log.debug("Restarting worker", { workerId: e.id });
+  async restartWorker(t) {
+    const e = this.workers.indexOf(t);
+    if (e !== -1) {
+      this.log.debug("Restarting worker", { workerId: t.id });
       try {
-        e.terminate();
-        const s = await this.createWorker(e.id);
-        this.workers[t] = s, this.availableWorkers.push(s), this.log.info("Worker restarted successfully", {
-          workerId: e.id,
-          lostAffinityEntries: e.cachedFunctions?.size || 0
+        t.terminate();
+        const s = await this.createWorker(t.id);
+        this.workers[e] = s, this.availableWorkers.push(s), this.log.info("Worker restarted successfully", {
+          workerId: t.id,
+          lostAffinityEntries: t.cachedFunctions?.size || 0
         });
       } catch (s) {
         this.log.error("Failed to restart worker", {
-          workerId: e.id,
+          workerId: t.id,
           error: s.message,
           stack: s.stack
-        }), this.workers.splice(t, 1);
+        }), this.workers.splice(e, 1);
       }
     }
   }
@@ -941,11 +953,11 @@ class ct {
    * @param {number} [timeout=5000] - Max time to wait in ms
    * @returns {Promise<void>}
    */
-  async waitForActiveTasks(e = 5e3) {
+  async waitForActiveTasks(t = 5e3) {
     if (this.activeTasks.size !== 0)
-      return this.log.debug("Waiting for active tasks", { taskCount: this.activeTasks.size, timeout: e }), new Promise((t) => {
+      return this.log.debug("Waiting for active tasks", { taskCount: this.activeTasks.size, timeout: t }), new Promise((e) => {
         const s = Date.now(), o = setInterval(() => {
-          (this.activeTasks.size === 0 || Date.now() - s > e) && (clearInterval(o), this.log.debug("Wait complete", { remainingTasks: this.activeTasks.size }), t());
+          (this.activeTasks.size === 0 || Date.now() - s > t) && (clearInterval(o), this.log.debug("Wait complete", { remainingTasks: this.activeTasks.size }), e());
         }, 100);
       });
   }
@@ -955,15 +967,15 @@ class ct {
    * @param {boolean} [force=false] - Force termination without waiting
    * @returns {Promise<void>}
    */
-  async terminate(e = !1) {
-    this.initialized && (this.log.info("Terminating worker pool", { force: e }), e || await this.waitForActiveTasks(5e3), this.activeTasks.forEach((t, s) => {
-      clearTimeout(t.timeoutId), t.reject(new Error("Worker pool terminated"));
-    }), this.activeTasks.clear(), this.workers.forEach((t) => {
+  async terminate(t = !1) {
+    this.initialized && (this.log.info("Terminating worker pool", { force: t }), t || await this.waitForActiveTasks(5e3), this.activeTasks.forEach((e, s) => {
+      clearTimeout(e.timeoutId), e.reject(new Error("Worker pool terminated"));
+    }), this.activeTasks.clear(), this.workers.forEach((e) => {
       try {
-        t.terminate();
+        e.terminate();
       } catch (s) {
         this.log.error("Error terminating worker", {
-          workerId: t.id,
+          workerId: e.id,
           error: s.message
         });
       }
@@ -980,7 +992,7 @@ class ct {
    * console.log(`Queue: ${status.queuedTasks}, Active: ${status.activeTasks}`);
    */
   getStatus() {
-    const e = this.getAffinityStats();
+    const t = this.getAffinityStats();
     return {
       initialized: this.initialized,
       totalWorkers: this.workers.length,
@@ -992,7 +1004,7 @@ class ct {
       affinity: {
         enabled: this.enableAffinity,
         cacheLimit: this.affinityCacheLimit,
-        hitRate: e.hitRate
+        hitRate: t.hitRate
       }
     };
   }
@@ -1007,15 +1019,15 @@ class ct {
    * console.log(`Hits: ${stats.hits}, Misses: ${stats.misses}`);
    */
   getAffinityStats() {
-    const e = this.affinityMetrics.hits + this.affinityMetrics.misses;
+    const t = this.affinityMetrics.hits + this.affinityMetrics.misses;
     return {
       hits: this.affinityMetrics.hits,
       misses: this.affinityMetrics.misses,
-      hitRate: e > 0 ? this.affinityMetrics.hits / e : 0,
-      workerCaches: this.workers.map((t) => ({
-        workerId: t.id,
-        cachedFunctions: Array.from(t.cachedFunctions || []),
-        tasksExecuted: t.tasksExecuted || 0
+      hitRate: t > 0 ? this.affinityMetrics.hits / t : 0,
+      workerCaches: this.workers.map((e) => ({
+        workerId: e.id,
+        cachedFunctions: Array.from(e.cachedFunctions || []),
+        tasksExecuted: e.tasksExecuted || 0
       }))
     };
   }
@@ -1024,7 +1036,7 @@ class H {
   constructor() {
     if (H.instance)
       return H.instance;
-    this.workerPool = null, this.initialized = !1, this.initPromise = null, this.log = re({
+    this.workerPool = null, this.initialized = !1, this.initPromise = null, this.log = rt({
       prefix: "WorkerManager",
       level: "info"
       // Can be overridden by verbose option
@@ -1036,18 +1048,18 @@ class H {
    * @param {Object} [options={}] - Configuration options
    * @param {number} [options.maxWorkers] - Maximum number of workers (default: auto-detect CPU cores)
    * @param {string} [options.workerScript] - Path to worker script
-   * @param {number} [options.taskTimeout=60000] - Default task timeout in ms
+   * @param {number} [options.taskTimeout=300000] - Default task timeout in ms (default: 5 minutes)
    * @param {boolean} [options.verbose=false] - Enable verbose logging
    * @param {boolean} [options.enableAffinity=true] - Enable worker affinity (route same algorithm to same worker)
    * @param {number} [options.affinityCacheLimit=50] - Max cached function keys per worker
    * @returns {Promise<void>}
    */
-  async initialize(e = {}) {
+  async initialize(t = {}) {
     if (this.initPromise)
       return this.initPromise;
     if (this.initialized && this.workerPool)
       return Promise.resolve();
-    this.initPromise = this._doInitialize(e);
+    this.initPromise = this._doInitialize(t);
     try {
       await this.initPromise;
     } finally {
@@ -1058,30 +1070,31 @@ class H {
    * Internal initialization logic
    * @private
    */
-  async _doInitialize(e) {
+  async _doInitialize(t) {
     const {
-      maxWorkers: t,
+      maxWorkers: e,
       workerScript: s,
-      taskTimeout: o = 6e4,
+      taskTimeout: o = 3e5,
+      // 5 minutes default
       verbose: i = !1,
       enableAffinity: r = !0,
       affinityCacheLimit: a = 50
-    } = e;
+    } = t;
     this.log.setLevel(i ? "debug" : "info");
-    let d = s;
-    if (!d)
+    let l = s;
+    if (!l)
       try {
-        d = new URL("data:text/javascript;base64,LyoqCiAqIE5ldHdvcmsgV29ya2VyIC0gRXhlY3V0ZXMgY29tcHV0ZSBmdW5jdGlvbnMgZnJvbSBhbGdvcml0aG0gbW9kdWxlcwogKgogKiAqKkJ1bmRsZXItRnJpZW5kbHkgQXJjaGl0ZWN0dXJlOioqCiAqIC0gU3RhdGljYWxseSBpbXBvcnRzIGFsbCBhbGdvcml0aG0gbW9kdWxlcyB1cGZyb250CiAqIC0gQ3JlYXRlcyBhIHJlZ2lzdHJ5IHRoYXQgbWFwcyBtb2R1bGUgcGF0aHMgdG8gdGhlaXIgZXhwb3J0cwogKiAtIE1haW4gdGhyZWFkIHNlbmRzOiB7IGlkLCBtb2R1bGUsIGZ1bmN0aW9uTmFtZSwgYXJncyB9CiAqIC0gV29ya2VyIGxvb2tzIHVwIG1vZHVsZSBmcm9tIHJlZ2lzdHJ5IGFuZCBleGVjdXRlcyBmdW5jdGlvbgogKgogKiBUaGlzIGFwcHJvYWNoIHdvcmtzIHdpdGggYWxsIGJ1bmRsZXJzIChWaXRlLCBXZWJwYWNrLCBSb2xsdXApIGJlY2F1c2UKICogaW1wb3J0cyBhcmUga25vd24gYXQgYnVpbGQgdGltZS4KICoKICogQG1vZHVsZSBuZXR3b3JrLXdvcmtlcgogKi8KCmltcG9ydCB7IGNyZWF0ZUxvZ2dlciB9IGZyb20gJ0BndWluZXRpay9sb2dnZXInOwoKLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQovLyBTVEFUSUMgSU1QT1JUUyAtIEFsbCBhbGdvcml0aG0gbW9kdWxlcyBpbXBvcnRlZCB1cGZyb250Ci8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KCi8vIENyZWF0ZSBsb2dnZXIgZm9yIHdvcmtlciAocnVucyBpbiBzZXBhcmF0ZSBjb250ZXh0LCBubyB3aW5kb3cubG9nRmlsdGVyKQpjb25zdCBsb2cgPSBjcmVhdGVMb2dnZXIoewogIHByZWZpeDogJ25ldHdvcmstd29ya2VyJywKICBsZXZlbDogJ2luZm8nIC8vIFdvcmtlcnMgZGVmYXVsdCB0byBpbmZvIGxldmVsCn0pOwoKLy8gU3RhdGlzdGljcyBhbGdvcml0aG1zIChub2RlLWxldmVsIGFuZCBncmFwaC1sZXZlbCkKaW1wb3J0ICogYXMgbm9kZVN0YXRzQ29tcHV0ZSBmcm9tICcuLi9zdGF0aXN0aWNzL2FsZ29yaXRobXMvbm9kZS1zdGF0cy5qcyc7CmltcG9ydCAqIGFzIGdyYXBoU3RhdHNDb21wdXRlIGZyb20gJy4uL3N0YXRpc3RpY3MvYWxnb3JpdGhtcy9ncmFwaC1zdGF0cy5qcyc7CgovLyBDb21tdW5pdHkgZGV0ZWN0aW9uIGFsZ29yaXRobXMKaW1wb3J0ICogYXMgbG91dmFpbkNvbXB1dGUgZnJvbSAnLi4vY29tbXVuaXR5L2FsZ29yaXRobXMvbG91dmFpbi5qcyc7CgovLyBMYXlvdXQgYWxnb3JpdGhtcwppbXBvcnQgKiBhcyByYW5kb21Db21wdXRlIGZyb20gJy4uL2xheW91dHMvcmFuZG9tLmpzJzsKaW1wb3J0ICogYXMgY2lyY3VsYXJDb21wdXRlIGZyb20gJy4uL2xheW91dHMvY2lyY3VsYXIuanMnOwppbXBvcnQgKiBhcyBzcGlyYWxDb21wdXRlIGZyb20gJy4uL2xheW91dHMvc3BpcmFsLmpzJzsKaW1wb3J0ICogYXMgc2hlbGxDb21wdXRlIGZyb20gJy4uL2xheW91dHMvc2hlbGwuanMnOwppbXBvcnQgKiBhcyBzcGVjdHJhbENvbXB1dGUgZnJvbSAnLi4vbGF5b3V0cy9zcGVjdHJhbC5qcyc7CmltcG9ydCAqIGFzIGZvcmNlRGlyZWN0ZWRDb21wdXRlIGZyb20gJy4uL2xheW91dHMvZm9yY2UtZGlyZWN0ZWQuanMnOwppbXBvcnQgKiBhcyBrYW1hZGFLYXdhaUNvbXB1dGUgZnJvbSAnLi4vbGF5b3V0cy9rYW1hZGEta2F3YWkuanMnOwppbXBvcnQgKiBhcyBiaXBhcnRpdGVDb21wdXRlIGZyb20gJy4uL2xheW91dHMvYmlwYXJ0aXRlLmpzJzsKaW1wb3J0ICogYXMgbXVsdGlwYXJ0aXRlQ29tcHV0ZSBmcm9tICcuLi9sYXlvdXRzL211bHRpcGFydGl0ZS5qcyc7CmltcG9ydCAqIGFzIGJmc0NvbXB1dGUgZnJvbSAnLi4vbGF5b3V0cy9iZnMuanMnOwoKLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQovLyBNT0RVTEUgUkVHSVNUUlkgLSBNYXBzIG1vZHVsZSBwYXRocyB0byB0aGVpciBleHBvcnRzCi8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KCmNvbnN0IE1PRFVMRV9SRUdJU1RSWSA9IHsKICAvLyBOb2RlLWxldmVsIHN0YXRpc3RpY3MgKGFsbCBpbiBvbmUgZmlsZSkKICAnLi4vc3RhdGlzdGljcy9hbGdvcml0aG1zL25vZGUtc3RhdHMuanMnOiBub2RlU3RhdHNDb21wdXRlLAoKICAvLyBHcmFwaC1sZXZlbCBzdGF0aXN0aWNzCiAgJy4uL3N0YXRpc3RpY3MvYWxnb3JpdGhtcy9ncmFwaC1zdGF0cy5qcyc6IGdyYXBoU3RhdHNDb21wdXRlLAoKICAvLyBDb21tdW5pdHkKICAnLi4vY29tbXVuaXR5L2FsZ29yaXRobXMvbG91dmFpbi5qcyc6IGxvdXZhaW5Db21wdXRlLAoKICAvLyBMYXlvdXRzCiAgJy4uL2xheW91dHMvcmFuZG9tLmpzJzogcmFuZG9tQ29tcHV0ZSwKICAnLi4vbGF5b3V0cy9jaXJjdWxhci5qcyc6IGNpcmN1bGFyQ29tcHV0ZSwKICAnLi4vbGF5b3V0cy9zcGlyYWwuanMnOiBzcGlyYWxDb21wdXRlLAogICcuLi9sYXlvdXRzL3NoZWxsLmpzJzogc2hlbGxDb21wdXRlLAogICcuLi9sYXlvdXRzL3NwZWN0cmFsLmpzJzogc3BlY3RyYWxDb21wdXRlLAogICcuLi9sYXlvdXRzL2ZvcmNlLWRpcmVjdGVkLmpzJzogZm9yY2VEaXJlY3RlZENvbXB1dGUsCiAgJy4uL2xheW91dHMva2FtYWRhLWthd2FpLmpzJzoga2FtYWRhS2F3YWlDb21wdXRlLAogICcuLi9sYXlvdXRzL2JpcGFydGl0ZS5qcyc6IGJpcGFydGl0ZUNvbXB1dGUsCiAgJy4uL2xheW91dHMvbXVsdGlwYXJ0aXRlLmpzJzogbXVsdGlwYXJ0aXRlQ29tcHV0ZSwKICAnLi4vbGF5b3V0cy9iZnMuanMnOiBiZnNDb21wdXRlCn07CgovLyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09Ci8vIFdPUktFUiBNRVNTQUdFIEhBTkRMRVIKLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQoKLyoqCiAqIE1haW4gbWVzc2FnZSBoYW5kbGVyIC0gcmVjZWl2ZXMgdGFza3MgYW5kIGRlbGVnYXRlcyB0byBhbGdvcml0aG0gbW9kdWxlcwogKi8Kc2VsZi5vbm1lc3NhZ2UgPSBhc3luYyBmdW5jdGlvbihldmVudCkgewogIGNvbnN0IHsgaWQsIG1vZHVsZSwgZnVuY3Rpb25OYW1lLCBhcmdzID0gW10gfSA9IGV2ZW50LmRhdGE7CgogIHRyeSB7CiAgICAvLyBWYWxpZGF0ZSBtZXNzYWdlIGZvcm1hdAogICAgaWYgKCFtb2R1bGUgfHwgIWZ1bmN0aW9uTmFtZSkgewogICAgICB0aHJvdyBuZXcgRXJyb3IoJ0ludmFsaWQgdGFzazogbW9kdWxlIGFuZCBmdW5jdGlvbk5hbWUgYXJlIHJlcXVpcmVkJyk7CiAgICB9CgogICAgbG9nLmRlYnVnKCdQcm9jZXNzaW5nIHRhc2snLCB7CiAgICAgIGlkLAogICAgICBtb2R1bGUsCiAgICAgIGZ1bmN0aW9uTmFtZSwKICAgICAgYXJnc0xlbmd0aDogYXJncz8ubGVuZ3RoIHx8IDAKICAgIH0pOwoKICAgIC8vIENyZWF0ZSBwcm9ncmVzcyBjYWxsYmFjayB0aGF0IHJlcG9ydHMgYmFjayB0byBtYWluIHRocmVhZAogICAgY29uc3QgcHJvZ3Jlc3NDYWxsYmFjayA9IChwcm9ncmVzcykgPT4gewogICAgICBzZWxmLnBvc3RNZXNzYWdlKHsKICAgICAgICBpZCwKICAgICAgICBzdGF0dXM6ICdwcm9ncmVzcycsCiAgICAgICAgcHJvZ3Jlc3M6IE1hdGgubWluKE1hdGgubWF4KHByb2dyZXNzLCAwKSwgMSkgLy8gQ2xhbXAgdG8gWzAsIDFdCiAgICAgIH0pOwogICAgfTsKCiAgICAvLyBMb29rIHVwIGFsZ29yaXRobSBtb2R1bGUgZnJvbSByZWdpc3RyeQogICAgY29uc3QgYWxnb3JpdGhtTW9kdWxlID0gTU9EVUxFX1JFR0lTVFJZW21vZHVsZV07CgogICAgaWYgKCFhbGdvcml0aG1Nb2R1bGUpIHsKICAgICAgdGhyb3cgbmV3IEVycm9yKAogICAgICAgIGBNb2R1bGUgJyR7bW9kdWxlfScgbm90IGZvdW5kIGluIHJlZ2lzdHJ5LiBgICsKICAgICAgICBgQXZhaWxhYmxlIG1vZHVsZXM6ICR7T2JqZWN0LmtleXMoTU9EVUxFX1JFR0lTVFJZKS5qb2luKCcsICcpfWAKICAgICAgKTsKICAgIH0KCiAgICAvLyBHZXQgdGhlIGNvbXB1dGUgZnVuY3Rpb24KICAgIGNvbnN0IGNvbXB1dGVGdW5jdGlvbiA9IGFsZ29yaXRobU1vZHVsZVtmdW5jdGlvbk5hbWVdOwoKICAgIGlmICghY29tcHV0ZUZ1bmN0aW9uIHx8IHR5cGVvZiBjb21wdXRlRnVuY3Rpb24gIT09ICdmdW5jdGlvbicpIHsKICAgICAgdGhyb3cgbmV3IEVycm9yKAogICAgICAgIGBGdW5jdGlvbiAnJHtmdW5jdGlvbk5hbWV9JyBub3QgZm91bmQgaW4gbW9kdWxlICcke21vZHVsZX0nLiBgICsKICAgICAgICBgQXZhaWxhYmxlIGZ1bmN0aW9uczogJHtPYmplY3Qua2V5cyhhbGdvcml0aG1Nb2R1bGUpLmpvaW4oJywgJyl9YAogICAgICApOwogICAgfQoKICAgIC8vIEV4ZWN1dGUgdGhlIGNvbXB1dGUgZnVuY3Rpb24KICAgIC8vIExhc3QgYXJnIGlzIGFsd2F5cyB0aGUgcHJvZ3Jlc3MgY2FsbGJhY2sKICAgIGNvbnN0IHJlc3VsdCA9IGF3YWl0IGNvbXB1dGVGdW5jdGlvbiguLi5hcmdzLCBwcm9ncmVzc0NhbGxiYWNrKTsKCiAgICAvLyBTZW5kIHN1Y2Nlc3NmdWwgcmVzdWx0CiAgICBzZWxmLnBvc3RNZXNzYWdlKHsKICAgICAgaWQsCiAgICAgIHN0YXR1czogJ2NvbXBsZXRlJywKICAgICAgcmVzdWx0CiAgICB9KTsKCiAgfSBjYXRjaCAoZXJyb3IpIHsKICAgIC8vIFNlbmQgZXJyb3IKICAgIGxvZy5lcnJvcignVGFzayBmYWlsZWQnLCB7CiAgICAgIGlkLAogICAgICBlcnJvcjogZXJyb3IubWVzc2FnZSwKICAgICAgc3RhY2s6IGVycm9yLnN0YWNrCiAgICB9KTsKICAgIHNlbGYucG9zdE1lc3NhZ2UoewogICAgICBpZCwKICAgICAgc3RhdHVzOiAnZXJyb3InLAogICAgICBlcnJvcjogZXJyb3IubWVzc2FnZSB8fCAnVW5rbm93biBlcnJvcicsCiAgICAgIHN0YWNrOiBlcnJvci5zdGFjawogICAgfSk7CiAgfQp9OwoKLyoqCiAqIEhhbmRsZSB3b3JrZXIgZXJyb3JzCiAqLwpzZWxmLm9uZXJyb3IgPSBmdW5jdGlvbihlcnJvcikgewogIGxvZy5lcnJvcignV29ya2VyIGVycm9yJywgewogICAgZXJyb3I6IGVycm9yLm1lc3NhZ2UgfHwgJ1dvcmtlciBlcnJvciBvY2N1cnJlZCcsCiAgICBzdGFjazogZXJyb3Iuc3RhY2sKICB9KTsKICBzZWxmLnBvc3RNZXNzYWdlKHsKICAgIHN0YXR1czogJ2Vycm9yJywKICAgIGVycm9yOiBlcnJvci5tZXNzYWdlIHx8ICdXb3JrZXIgZXJyb3Igb2NjdXJyZWQnCiAgfSk7Cn07CgovLyBMb2cgd29ya2VyIGluaXRpYWxpemF0aW9uCmxvZy5pbmZvKCdJbml0aWFsaXplZCcsIHsgbW9kdWxlQ291bnQ6IE9iamVjdC5rZXlzKE1PRFVMRV9SRUdJU1RSWSkubGVuZ3RoIH0pOwo=", import.meta.url).href;
+        l = new URL("data:text/javascript;base64,LyoqCiAqIE5ldHdvcmsgV29ya2VyIC0gRXhlY3V0ZXMgY29tcHV0ZSBmdW5jdGlvbnMgZnJvbSBhbGdvcml0aG0gbW9kdWxlcwogKgogKiAqKkJ1bmRsZXItRnJpZW5kbHkgQXJjaGl0ZWN0dXJlOioqCiAqIC0gU3RhdGljYWxseSBpbXBvcnRzIGFsbCBhbGdvcml0aG0gbW9kdWxlcyB1cGZyb250CiAqIC0gQ3JlYXRlcyBhIHJlZ2lzdHJ5IHRoYXQgbWFwcyBtb2R1bGUgcGF0aHMgdG8gdGhlaXIgZXhwb3J0cwogKiAtIE1haW4gdGhyZWFkIHNlbmRzOiB7IGlkLCBtb2R1bGUsIGZ1bmN0aW9uTmFtZSwgYXJncyB9CiAqIC0gV29ya2VyIGxvb2tzIHVwIG1vZHVsZSBmcm9tIHJlZ2lzdHJ5IGFuZCBleGVjdXRlcyBmdW5jdGlvbgogKgogKiBUaGlzIGFwcHJvYWNoIHdvcmtzIHdpdGggYWxsIGJ1bmRsZXJzIChWaXRlLCBXZWJwYWNrLCBSb2xsdXApIGJlY2F1c2UKICogaW1wb3J0cyBhcmUga25vd24gYXQgYnVpbGQgdGltZS4KICoKICogQG1vZHVsZSBuZXR3b3JrLXdvcmtlcgogKi8KCmltcG9ydCB7IGNyZWF0ZUxvZ2dlciB9IGZyb20gJ0BndWluZXRpay9sb2dnZXInOwoKLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQovLyBTVEFUSUMgSU1QT1JUUyAtIEFsbCBhbGdvcml0aG0gbW9kdWxlcyBpbXBvcnRlZCB1cGZyb250Ci8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KCi8vIENyZWF0ZSBsb2dnZXIgZm9yIHdvcmtlciAocnVucyBpbiBzZXBhcmF0ZSBjb250ZXh0LCBubyB3aW5kb3cubG9nRmlsdGVyKQpjb25zdCBsb2cgPSBjcmVhdGVMb2dnZXIoewogIHByZWZpeDogJ25ldHdvcmstd29ya2VyJywKICBsZXZlbDogJ2luZm8nIC8vIFdvcmtlcnMgZGVmYXVsdCB0byBpbmZvIGxldmVsCn0pOwoKLy8gU3RhdGlzdGljcyBhbGdvcml0aG1zIChub2RlLWxldmVsIGFuZCBncmFwaC1sZXZlbCkKaW1wb3J0ICogYXMgbm9kZVN0YXRzQ29tcHV0ZSBmcm9tICcuLi9zdGF0aXN0aWNzL2FsZ29yaXRobXMvbm9kZS1zdGF0cy5qcyc7CmltcG9ydCAqIGFzIGdyYXBoU3RhdHNDb21wdXRlIGZyb20gJy4uL3N0YXRpc3RpY3MvYWxnb3JpdGhtcy9ncmFwaC1zdGF0cy5qcyc7CgovLyBDb21tdW5pdHkgZGV0ZWN0aW9uIGFsZ29yaXRobXMKaW1wb3J0ICogYXMgbG91dmFpbkNvbXB1dGUgZnJvbSAnLi4vY29tbXVuaXR5L2FsZ29yaXRobXMvbG91dmFpbi5qcyc7CgovLyBMYXlvdXQgYWxnb3JpdGhtcwppbXBvcnQgKiBhcyByYW5kb21Db21wdXRlIGZyb20gJy4uL2xheW91dHMvcmFuZG9tLmpzJzsKaW1wb3J0ICogYXMgY2lyY3VsYXJDb21wdXRlIGZyb20gJy4uL2xheW91dHMvY2lyY3VsYXIuanMnOwppbXBvcnQgKiBhcyBzcGlyYWxDb21wdXRlIGZyb20gJy4uL2xheW91dHMvc3BpcmFsLmpzJzsKaW1wb3J0ICogYXMgc2hlbGxDb21wdXRlIGZyb20gJy4uL2xheW91dHMvc2hlbGwuanMnOwppbXBvcnQgKiBhcyBzcGVjdHJhbENvbXB1dGUgZnJvbSAnLi4vbGF5b3V0cy9zcGVjdHJhbC5qcyc7CmltcG9ydCAqIGFzIGZvcmNlRGlyZWN0ZWRDb21wdXRlIGZyb20gJy4uL2xheW91dHMvZm9yY2UtZGlyZWN0ZWQuanMnOwppbXBvcnQgKiBhcyBrYW1hZGFLYXdhaUNvbXB1dGUgZnJvbSAnLi4vbGF5b3V0cy9rYW1hZGEta2F3YWkuanMnOwppbXBvcnQgKiBhcyBiaXBhcnRpdGVDb21wdXRlIGZyb20gJy4uL2xheW91dHMvYmlwYXJ0aXRlLmpzJzsKaW1wb3J0ICogYXMgbXVsdGlwYXJ0aXRlQ29tcHV0ZSBmcm9tICcuLi9sYXlvdXRzL211bHRpcGFydGl0ZS5qcyc7CmltcG9ydCAqIGFzIGJmc0NvbXB1dGUgZnJvbSAnLi4vbGF5b3V0cy9iZnMuanMnOwoKLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQovLyBNT0RVTEUgUkVHSVNUUlkgLSBNYXBzIG1vZHVsZSBwYXRocyB0byB0aGVpciBleHBvcnRzCi8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KCmNvbnN0IE1PRFVMRV9SRUdJU1RSWSA9IHsKICAvLyBOb2RlLWxldmVsIHN0YXRpc3RpY3MgKGFsbCBpbiBvbmUgZmlsZSkKICAnLi4vc3RhdGlzdGljcy9hbGdvcml0aG1zL25vZGUtc3RhdHMuanMnOiBub2RlU3RhdHNDb21wdXRlLAoKICAvLyBHcmFwaC1sZXZlbCBzdGF0aXN0aWNzCiAgJy4uL3N0YXRpc3RpY3MvYWxnb3JpdGhtcy9ncmFwaC1zdGF0cy5qcyc6IGdyYXBoU3RhdHNDb21wdXRlLAoKICAvLyBDb21tdW5pdHkKICAnLi4vY29tbXVuaXR5L2FsZ29yaXRobXMvbG91dmFpbi5qcyc6IGxvdXZhaW5Db21wdXRlLAoKICAvLyBMYXlvdXRzCiAgJy4uL2xheW91dHMvcmFuZG9tLmpzJzogcmFuZG9tQ29tcHV0ZSwKICAnLi4vbGF5b3V0cy9jaXJjdWxhci5qcyc6IGNpcmN1bGFyQ29tcHV0ZSwKICAnLi4vbGF5b3V0cy9zcGlyYWwuanMnOiBzcGlyYWxDb21wdXRlLAogICcuLi9sYXlvdXRzL3NoZWxsLmpzJzogc2hlbGxDb21wdXRlLAogICcuLi9sYXlvdXRzL3NwZWN0cmFsLmpzJzogc3BlY3RyYWxDb21wdXRlLAogICcuLi9sYXlvdXRzL2ZvcmNlLWRpcmVjdGVkLmpzJzogZm9yY2VEaXJlY3RlZENvbXB1dGUsCiAgJy4uL2xheW91dHMva2FtYWRhLWthd2FpLmpzJzoga2FtYWRhS2F3YWlDb21wdXRlLAogICcuLi9sYXlvdXRzL2JpcGFydGl0ZS5qcyc6IGJpcGFydGl0ZUNvbXB1dGUsCiAgJy4uL2xheW91dHMvbXVsdGlwYXJ0aXRlLmpzJzogbXVsdGlwYXJ0aXRlQ29tcHV0ZSwKICAnLi4vbGF5b3V0cy9iZnMuanMnOiBiZnNDb21wdXRlCn07CgovLyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09Ci8vIFdPUktFUiBNRVNTQUdFIEhBTkRMRVIKLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQoKLyoqCiAqIE1haW4gbWVzc2FnZSBoYW5kbGVyIC0gcmVjZWl2ZXMgdGFza3MgYW5kIGRlbGVnYXRlcyB0byBhbGdvcml0aG0gbW9kdWxlcwogKi8Kc2VsZi5vbm1lc3NhZ2UgPSBhc3luYyBmdW5jdGlvbihldmVudCkgewogIGNvbnN0IHsgaWQsIG1vZHVsZSwgZnVuY3Rpb25OYW1lLCBhcmdzID0gW10gfSA9IGV2ZW50LmRhdGE7CgogIHRyeSB7CiAgICAvLyBWYWxpZGF0ZSBtZXNzYWdlIGZvcm1hdAogICAgaWYgKCFtb2R1bGUgfHwgIWZ1bmN0aW9uTmFtZSkgewogICAgICB0aHJvdyBuZXcgRXJyb3IoJ0ludmFsaWQgdGFzazogbW9kdWxlIGFuZCBmdW5jdGlvbk5hbWUgYXJlIHJlcXVpcmVkJyk7CiAgICB9CgogICAgbG9nLmRlYnVnKCdQcm9jZXNzaW5nIHRhc2snLCB7CiAgICAgIGlkLAogICAgICBtb2R1bGUsCiAgICAgIGZ1bmN0aW9uTmFtZSwKICAgICAgYXJnc0xlbmd0aDogYXJncz8ubGVuZ3RoIHx8IDAKICAgIH0pOwoKICAgIC8vIENyZWF0ZSBwcm9ncmVzcyBjYWxsYmFjayB0aGF0IHJlcG9ydHMgYmFjayB0byBtYWluIHRocmVhZAogICAgY29uc3QgcHJvZ3Jlc3NDYWxsYmFjayA9IChwcm9ncmVzcykgPT4gewogICAgICBzZWxmLnBvc3RNZXNzYWdlKHsKICAgICAgICBpZCwKICAgICAgICBzdGF0dXM6ICdwcm9ncmVzcycsCiAgICAgICAgcHJvZ3Jlc3M6IE1hdGgubWluKE1hdGgubWF4KHByb2dyZXNzLCAwKSwgMSkgLy8gQ2xhbXAgdG8gWzAsIDFdCiAgICAgIH0pOwogICAgfTsKCiAgICAvLyBMb29rIHVwIGFsZ29yaXRobSBtb2R1bGUgZnJvbSByZWdpc3RyeQogICAgY29uc3QgYWxnb3JpdGhtTW9kdWxlID0gTU9EVUxFX1JFR0lTVFJZW21vZHVsZV07CgogICAgaWYgKCFhbGdvcml0aG1Nb2R1bGUpIHsKICAgICAgdGhyb3cgbmV3IEVycm9yKAogICAgICAgIGBNb2R1bGUgJyR7bW9kdWxlfScgbm90IGZvdW5kIGluIHJlZ2lzdHJ5LiBgICsKICAgICAgICBgQXZhaWxhYmxlIG1vZHVsZXM6ICR7T2JqZWN0LmtleXMoTU9EVUxFX1JFR0lTVFJZKS5qb2luKCcsICcpfWAKICAgICAgKTsKICAgIH0KCiAgICAvLyBHZXQgdGhlIGNvbXB1dGUgZnVuY3Rpb24KICAgIGNvbnN0IGNvbXB1dGVGdW5jdGlvbiA9IGFsZ29yaXRobU1vZHVsZVtmdW5jdGlvbk5hbWVdOwoKICAgIGlmICghY29tcHV0ZUZ1bmN0aW9uIHx8IHR5cGVvZiBjb21wdXRlRnVuY3Rpb24gIT09ICdmdW5jdGlvbicpIHsKICAgICAgdGhyb3cgbmV3IEVycm9yKAogICAgICAgIGBGdW5jdGlvbiAnJHtmdW5jdGlvbk5hbWV9JyBub3QgZm91bmQgaW4gbW9kdWxlICcke21vZHVsZX0nLiBgICsKICAgICAgICBgQXZhaWxhYmxlIGZ1bmN0aW9uczogJHtPYmplY3Qua2V5cyhhbGdvcml0aG1Nb2R1bGUpLmpvaW4oJywgJyl9YAogICAgICApOwogICAgfQoKICAgIC8vIEV4ZWN1dGUgdGhlIGNvbXB1dGUgZnVuY3Rpb24KICAgIC8vIExhc3QgYXJnIGlzIGFsd2F5cyB0aGUgcHJvZ3Jlc3MgY2FsbGJhY2sKICAgIGNvbnN0IHJlc3VsdCA9IGF3YWl0IGNvbXB1dGVGdW5jdGlvbiguLi5hcmdzLCBwcm9ncmVzc0NhbGxiYWNrKTsKCiAgICAvLyBTZW5kIHN1Y2Nlc3NmdWwgcmVzdWx0CiAgICBzZWxmLnBvc3RNZXNzYWdlKHsKICAgICAgaWQsCiAgICAgIHN0YXR1czogJ2NvbXBsZXRlJywKICAgICAgcmVzdWx0CiAgICB9KTsKCiAgfSBjYXRjaCAoZXJyb3IpIHsKICAgIC8vIFNlbmQgZXJyb3IKICAgIGxvZy5lcnJvcignVGFzayBmYWlsZWQnLCB7CiAgICAgIGlkLAogICAgICBlcnJvcjogZXJyb3IubWVzc2FnZSwKICAgICAgc3RhY2s6IGVycm9yLnN0YWNrCiAgICB9KTsKICAgIHNlbGYucG9zdE1lc3NhZ2UoewogICAgICBpZCwKICAgICAgc3RhdHVzOiAnZXJyb3InLAogICAgICBlcnJvcjogZXJyb3IubWVzc2FnZSB8fCAnVW5rbm93biBlcnJvcicsCiAgICAgIHN0YWNrOiBlcnJvci5zdGFjawogICAgfSk7CiAgfQp9OwoKLyoqCiAqIEhhbmRsZSB3b3JrZXIgZXJyb3JzCiAqLwpzZWxmLm9uZXJyb3IgPSBmdW5jdGlvbihlcnJvcikgewogIGxvZy5lcnJvcignV29ya2VyIGVycm9yJywgewogICAgZXJyb3I6IGVycm9yLm1lc3NhZ2UgfHwgJ1dvcmtlciBlcnJvciBvY2N1cnJlZCcsCiAgICBzdGFjazogZXJyb3Iuc3RhY2sKICB9KTsKICBzZWxmLnBvc3RNZXNzYWdlKHsKICAgIHN0YXR1czogJ2Vycm9yJywKICAgIGVycm9yOiBlcnJvci5tZXNzYWdlIHx8ICdXb3JrZXIgZXJyb3Igb2NjdXJyZWQnCiAgfSk7Cn07CgovLyBMb2cgd29ya2VyIGluaXRpYWxpemF0aW9uCmxvZy5pbmZvKCdJbml0aWFsaXplZCcsIHsgbW9kdWxlQ291bnQ6IE9iamVjdC5rZXlzKE1PRFVMRV9SRUdJU1RSWSkubGVuZ3RoIH0pOwo=", import.meta.url).href;
       } catch {
-        d = "/graph-js/src/compute/network-worker.js", this.log.warn("Could not resolve worker path from import.meta.url, using fallback", { workerPath: d });
+        l = "/graph-js/src/compute/network-worker.js", this.log.warn("Could not resolve worker path from import.meta.url, using fallback", { workerPath: l });
       }
     if (!$.isSupported())
       throw new Error(
         "Web Workers are not supported in this environment. This library requires Web Worker support (browser) or Worker Threads (Node.js)."
       );
-    this.workerPool = new ct({
-      maxWorkers: t || this._getDefaultWorkerCount(),
-      workerScript: d,
+    this.workerPool = new ce({
+      maxWorkers: e || this._getDefaultWorkerCount(),
+      workerScript: l,
       taskTimeout: o,
       verbose: i,
       enableAffinity: r,
@@ -1115,8 +1128,8 @@ class H {
    * @param {number} [execOptions.timeout] - Task timeout override
    * @returns {Promise<any>} Task result
    */
-  async execute(e, t = {}) {
-    return this.initialized || await this.initialize(), this.workerPool.execute(e, t);
+  async execute(t, e = {}) {
+    return this.initialized || await this.initialize(), this.workerPool.execute(t, e);
   }
   /**
    * Serialize a graph for transfer to workers
@@ -1125,13 +1138,13 @@ class H {
    * @param {Graph} graph - Graph to serialize
    * @returns {Object} Serialized graph data
    */
-  serializeGraph(e) {
+  serializeGraph(t) {
     return {
-      nodes: Array.from(e.nodes),
-      edges: e.edges.map((t) => ({
-        source: t.u,
-        target: t.v,
-        weight: t.weight
+      nodes: Array.from(t.nodes),
+      edges: t.edges.map((e) => ({
+        source: e.u,
+        target: e.v,
+        weight: e.weight
       }))
     };
   }
@@ -1144,13 +1157,26 @@ class H {
     return this.workerPool ? this.workerPool.getStatus() : null;
   }
   /**
+   * Get detailed affinity statistics
+   *
+   * @returns {Object|null} Affinity metrics including per-worker cache info or null if not initialized
+   *
+   * @example
+   * const stats = WorkerManager.getAffinityStats();
+   * console.log(`Affinity hit rate: ${(stats.hitRate * 100).toFixed(1)}%`);
+   * console.log(`Hits: ${stats.hits}, Misses: ${stats.misses}`);
+   */
+  getAffinityStats() {
+    return this.workerPool ? this.workerPool.getAffinityStats() : null;
+  }
+  /**
    * Terminate the worker pool and cleanup resources
    *
    * @param {boolean} [force=false] - Force immediate termination
    * @returns {Promise<void>}
    */
-  async terminate(e = !1) {
-    this.workerPool && (await this.workerPool.terminate(e), this.workerPool = null, this.initialized = !1);
+  async terminate(t = !1) {
+    this.workerPool && (await this.workerPool.terminate(t), this.workerPool = null, this.initialized = !1);
   }
   /**
    * Reset the singleton instance (mainly for testing)
@@ -1161,8 +1187,8 @@ class H {
   }
 }
 H.instance = null;
-const ee = new H();
-class L {
+const tt = new H();
+class E {
   /**
    * Create a statistic algorithm
    *
@@ -1173,14 +1199,14 @@ class L {
    * @param {string} computeConfig.module - Module path containing compute function
    * @param {string} computeConfig.functionName - Name of compute function to call
    */
-  constructor(e, t = "", s = "node", o = null) {
-    if (new.target === L)
+  constructor(t, e = "", s = "node", o = null) {
+    if (new.target === E)
       throw new Error("StatisticAlgorithm is abstract and cannot be instantiated directly");
     if (s !== "node" && s !== "graph")
       throw new Error(`Scope must be 'node' or 'graph', got: ${s}`);
     if (!o || !o.module || !o.functionName)
       throw new Error("computeConfig with module and functionName is required");
-    this.name = e, this.description = t, this.scope = s, this.computeConfig = o, this.options = {};
+    this.name = t, this.description = e, this.scope = s, this.computeConfig = o, this.options = {};
   }
   /**
    * Calculate the statistic for a graph.
@@ -1195,13 +1221,13 @@ class L {
    * @param {number} [execOptions.timeout] - Task timeout override
    * @returns {Promise<Object|number>} For node-level: { nodeId: value }, For graph-level: single number
    */
-  async calculate(e, t = null, s = {}) {
-    const o = ee.serializeGraph(e), i = {
+  async calculate(t, e = null, s = {}) {
+    const o = tt.serializeGraph(t), i = {
       module: this.computeConfig.module,
       functionName: this.computeConfig.functionName,
-      args: [o, t, this.options]
+      args: [o, e, this.options]
     };
-    return await ee.execute(i, s);
+    return await tt.execute(i, s);
   }
   /**
    * Get algorithm metadata
@@ -1232,7 +1258,7 @@ class L {
     return this.scope === "graph";
   }
 }
-class lt {
+class le {
   /**
    * Creates a new empty graph.
    */
@@ -1248,8 +1274,8 @@ class lt {
    * graph.addNode('A');
    * graph.addNode(42);
    */
-  addNode(e) {
-    return this.nodes.add(e), this;
+  addNode(t) {
+    return this.nodes.add(t), this;
   }
   /**
    * Add multiple nodes to the graph.
@@ -1259,8 +1285,8 @@ class lt {
    * @example
    * graph.addNodesFrom(['node1', 'node2', 'node3']);
    */
-  addNodesFrom(e) {
-    return e.forEach((t) => this.nodes.add(t)), this;
+  addNodesFrom(t) {
+    return t.forEach((e) => this.nodes.add(e)), this;
   }
   /**
    * Remove a node and all its associated edges from the graph.
@@ -1274,12 +1300,12 @@ class lt {
    * graph.addEdge('A', 'B', 1);
    * graph.removeNode('A'); // Removes 'A' and edge A-B
    */
-  removeNode(e) {
-    if (!this.nodes.has(e))
-      throw new Error(`Node '${e}' does not exist in the graph`);
-    return this.nodes.delete(e), this.edges = this.edges.filter((t) => t.u !== e && t.v !== e), this.adjacencyMap.has(e) && (Array.from(this.adjacencyMap.get(e).keys()).forEach((s) => {
-      this.adjacencyMap.has(s) && this.adjacencyMap.get(s).delete(e);
-    }), this.adjacencyMap.delete(e)), this;
+  removeNode(t) {
+    if (!this.nodes.has(t))
+      throw new Error(`Node '${t}' does not exist in the graph`);
+    return this.nodes.delete(t), this.edges = this.edges.filter((e) => e.u !== t && e.v !== t), this.adjacencyMap.has(t) && (Array.from(this.adjacencyMap.get(t).keys()).forEach((s) => {
+      this.adjacencyMap.has(s) && this.adjacencyMap.get(s).delete(t);
+    }), this.adjacencyMap.delete(t)), this;
   }
   /**
    * Check if a node exists in the graph.
@@ -1291,8 +1317,8 @@ class lt {
    * console.log(graph.hasNode('A')); // true
    * console.log(graph.hasNode('Z')); // false
    */
-  hasNode(e) {
-    return this.nodes.has(e);
+  hasNode(t) {
+    return this.nodes.has(t);
   }
   /**
    * Add multiple edges to the graph from a list of edge tuples.
@@ -1306,9 +1332,9 @@ class lt {
    *   ['C', 'D'] // weight defaults to 1
    * ]);
    */
-  addEdgesFrom(e) {
-    return e.forEach(([t, s, o = 1]) => {
-      this.addEdge(t, s, o);
+  addEdgesFrom(t) {
+    return t.forEach(([e, s, o = 1]) => {
+      this.addEdge(e, s, o);
     }), this;
   }
   /**
@@ -1323,10 +1349,10 @@ class lt {
    * @example
    * graph.addEdge('A', 'B', 2.5);
    */
-  addEdge(e, t, s = 1) {
-    this.nodes.add(e), this.nodes.add(t);
-    const o = { u: e, v: t, weight: s };
-    return this.edges.push(o), this.adjacencyMap.has(e) || this.adjacencyMap.set(e, /* @__PURE__ */ new Map()), this.adjacencyMap.has(t) || this.adjacencyMap.set(t, /* @__PURE__ */ new Map()), this.adjacencyMap.get(e).set(t, s), this.adjacencyMap.get(t).set(e, s), this;
+  addEdge(t, e, s = 1) {
+    this.nodes.add(t), this.nodes.add(e);
+    const o = { u: t, v: e, weight: s };
+    return this.edges.push(o), this.adjacencyMap.has(t) || this.adjacencyMap.set(t, /* @__PURE__ */ new Map()), this.adjacencyMap.has(e) || this.adjacencyMap.set(e, /* @__PURE__ */ new Map()), this.adjacencyMap.get(t).set(e, s), this.adjacencyMap.get(e).set(t, s), this;
   }
   /**
    * Get all neighbors (adjacent nodes) of a given node.
@@ -1339,8 +1365,8 @@ class lt {
    * graph.addEdge('A', 'C');
    * console.log(graph.getNeighbors('A')); // ['B', 'C']
    */
-  getNeighbors(e) {
-    return this.adjacencyMap.has(e) ? Array.from(this.adjacencyMap.get(e).keys()) : [];
+  getNeighbors(t) {
+    return this.adjacencyMap.has(t) ? Array.from(this.adjacencyMap.get(t).keys()) : [];
   }
   /**
    * Get all edges in the graph.
@@ -1401,13 +1427,13 @@ class lt {
    * graph.addEdge('A', 'B', 1);
    * graph.removeEdge('A', 'B');
    */
-  removeEdge(e, t) {
+  removeEdge(t, e) {
     const s = this.edges.findIndex(
-      (o) => o.u === e && o.v === t || o.u === t && o.v === e
+      (o) => o.u === t && o.v === e || o.u === e && o.v === t
     );
     if (s === -1)
-      throw new Error(`Edge between '${e}' and '${t}' does not exist`);
-    return this.edges.splice(s, 1), this.adjacencyMap.has(e) && this.adjacencyMap.get(e).delete(t), this.adjacencyMap.has(t) && this.adjacencyMap.get(t).delete(e), this;
+      throw new Error(`Edge between '${t}' and '${e}' does not exist`);
+    return this.edges.splice(s, 1), this.adjacencyMap.has(t) && this.adjacencyMap.get(t).delete(e), this.adjacencyMap.has(e) && this.adjacencyMap.get(e).delete(t), this;
   }
   /**
    * Check if an edge exists between two nodes.
@@ -1421,8 +1447,8 @@ class lt {
    * console.log(graph.hasEdge('B', 'A')); // true (undirected)
    * console.log(graph.hasEdge('A', 'C')); // false
    */
-  hasEdge(e, t) {
-    return this.adjacencyMap.has(e) && this.adjacencyMap.get(e).has(t);
+  hasEdge(t, e) {
+    return this.adjacencyMap.has(t) && this.adjacencyMap.get(t).has(e);
   }
   /**
    * Get the weight of an edge between two nodes.
@@ -1434,8 +1460,8 @@ class lt {
    * graph.addEdge('A', 'B', 2.5);
    * console.log(graph.getEdgeWeight('A', 'B')); // 2.5
    */
-  getEdgeWeight(e, t) {
-    return this.hasEdge(e, t) ? this.adjacencyMap.get(e).get(t) : null;
+  getEdgeWeight(t, e) {
+    return this.hasEdge(t, e) ? this.adjacencyMap.get(t).get(e) : null;
   }
   /**
    * Update the weight of an existing edge.
@@ -1449,12 +1475,12 @@ class lt {
    * graph.addEdge('A', 'B', 1);
    * graph.updateEdgeWeight('A', 'B', 2.5);
    */
-  updateEdgeWeight(e, t, s) {
-    if (!this.hasEdge(e, t))
-      throw new Error(`Edge between '${e}' and '${t}' does not exist`);
-    this.adjacencyMap.get(e).set(t, s), this.adjacencyMap.get(t).set(e, s);
+  updateEdgeWeight(t, e, s) {
+    if (!this.hasEdge(t, e))
+      throw new Error(`Edge between '${t}' and '${e}' does not exist`);
+    this.adjacencyMap.get(t).set(e, s), this.adjacencyMap.get(e).set(t, s);
     const o = this.edges.find(
-      (i) => i.u === e && i.v === t || i.u === t && i.v === e
+      (i) => i.u === t && i.v === e || i.u === e && i.v === t
     );
     return o && (o.weight = s), this;
   }
@@ -1468,8 +1494,8 @@ class lt {
    * graph.addEdge('A', 'C');
    * console.log(graph.degree('A')); // 2
    */
-  degree(e) {
-    return this.adjacencyMap.has(e) ? this.adjacencyMap.get(e).size : 0;
+  degree(t) {
+    return this.adjacencyMap.has(t) ? this.adjacencyMap.get(t).size : 0;
   }
   /**
    * Clear all nodes and edges from the graph.
@@ -1484,21 +1510,21 @@ class lt {
     return this.nodes.clear(), this.edges = [], this.adjacencyMap.clear(), this;
   }
 }
-const K = re({
+const K = rt({
   prefix: "compute-utils",
   level: "info"
   // Default to info, can be verbose in debug builds
 });
-function N(n) {
+function L(n) {
   K.debug("Starting reconstruction", {
     isObject: n && typeof n == "object",
     hasNodes: n && "nodes" in n,
     hasEdges: n && "edges" in n,
     graphDataKeys: n ? Object.keys(n) : "N/A"
   });
-  const e = new lt();
+  const t = new le();
   if (!n || typeof n != "object")
-    return K.error("Invalid graphData passed to reconstructGraph", { graphData: n }), e;
+    return K.error("Invalid graphData passed to reconstructGraph", { graphData: n }), t;
   if (n.nodes !== void 0 && n.nodes !== null) {
     K.debug("Processing nodes", {
       type: typeof n.nodes,
@@ -1506,27 +1532,27 @@ function N(n) {
       length: Array.isArray(n.nodes) ? n.nodes.length : "N/A"
     });
     try {
-      let t;
+      let e;
       if (Array.isArray(n.nodes))
-        t = n.nodes;
+        e = n.nodes;
       else if (n.nodes[Symbol.iterator])
-        t = Array.from(n.nodes);
+        e = Array.from(n.nodes);
       else
         throw new Error(`nodes is not iterable: ${typeof n.nodes}`);
-      K.debug("Node array created", { length: t.length }), t.forEach((s) => {
-        e.addNode(s);
+      K.debug("Node array created", { length: e.length }), e.forEach((s) => {
+        t.addNode(s);
       }), K.debug("Nodes added successfully", {
-        type: typeof e.nodes,
-        size: e.nodes.size
+        type: typeof t.nodes,
+        size: t.nodes.size
       });
-    } catch (t) {
+    } catch (e) {
       throw K.error("Error adding nodes", {
-        error: t.message,
-        stack: t.stack,
+        error: e.message,
+        stack: e.stack,
         nodesValue: n.nodes,
         nodesType: typeof n.nodes,
         nodesConstructor: n.nodes?.constructor?.name
-      }), new Error(`Failed to reconstruct nodes: ${t.message}`);
+      }), new Error(`Failed to reconstruct nodes: ${e.message}`);
     }
   } else
     K.warn("No nodes found in graphData");
@@ -1537,90 +1563,90 @@ function N(n) {
       length: Array.isArray(n.edges) ? n.edges.length : "N/A"
     });
     try {
-      let t;
+      let e;
       if (Array.isArray(n.edges))
-        t = n.edges;
+        e = n.edges;
       else if (n.edges[Symbol.iterator])
-        t = Array.from(n.edges);
+        e = Array.from(n.edges);
       else
         throw new Error(`edges is not iterable: ${typeof n.edges}`);
-      K.debug("Edge array created", { length: t.length }), t.forEach((s) => {
+      K.debug("Edge array created", { length: e.length }), e.forEach((s) => {
         const o = s.source !== void 0 ? s.source : s.u, i = s.target !== void 0 ? s.target : s.v, r = s.weight || 1;
-        o !== void 0 && i !== void 0 && e.addEdge(o, i, r);
+        o !== void 0 && i !== void 0 && t.addEdge(o, i, r);
       }), K.debug("Edges added successfully");
-    } catch (t) {
+    } catch (e) {
       throw K.error("Error adding edges", {
-        error: t.message,
-        stack: t.stack,
+        error: e.message,
+        stack: e.stack,
         edgesValue: n.edges,
         edgesType: typeof n.edges
-      }), new Error(`Failed to reconstruct edges: ${t.message}`);
+      }), new Error(`Failed to reconstruct edges: ${e.message}`);
     }
   } else
     K.warn("No edges found in graphData");
   return K.debug("Reconstruction complete", {
-    nodes: e.nodes.size,
-    edges: e.edges.length
-  }), e;
+    nodes: t.nodes.size,
+    edges: t.edges.length
+  }), t;
 }
-function y(n, e) {
-  n && typeof n == "function" && n(Math.min(Math.max(e, 0), 1));
+function y(n, t) {
+  n && typeof n == "function" && n(Math.min(Math.max(t, 0), 1));
 }
-function dt(n, e) {
-  const t = /* @__PURE__ */ new Map([[e, 0]]), s = /* @__PURE__ */ new Map([[e, 1]]), o = /* @__PURE__ */ new Map(), i = [e], r = [];
+function de(n, t) {
+  const e = /* @__PURE__ */ new Map([[t, 0]]), s = /* @__PURE__ */ new Map([[t, 1]]), o = /* @__PURE__ */ new Map(), i = [t], r = [];
   for (; i.length > 0; ) {
     const a = i.shift();
     r.push(a);
-    const d = n.getNeighbors(a), g = t.get(a);
-    d.forEach((l) => {
-      t.has(l) || (t.set(l, g + 1), i.push(l)), t.get(l) === g + 1 && (s.set(l, (s.get(l) || 0) + s.get(a)), o.has(l) || o.set(l, []), o.get(l).push(a));
+    const l = n.getNeighbors(a), h = e.get(a);
+    l.forEach((d) => {
+      e.has(d) || (e.set(d, h + 1), i.push(d)), e.get(d) === h + 1 && (s.set(d, (s.get(d) || 0) + s.get(a)), o.has(d) || o.set(d, []), o.get(d).push(a));
     });
   }
-  return { distance: t, pathCount: s, predecessors: o, stack: r };
+  return { distance: e, pathCount: s, predecessors: o, stack: r };
 }
-function Me(n, e) {
-  const t = /* @__PURE__ */ new Map(), s = [e], o = /* @__PURE__ */ new Set([e]);
-  for (t.set(e, 0); s.length > 0; ) {
-    const i = s.shift(), r = t.get(i);
+function Bt(n, t) {
+  const e = /* @__PURE__ */ new Map(), s = [t], o = /* @__PURE__ */ new Set([t]);
+  for (e.set(t, 0); s.length > 0; ) {
+    const i = s.shift(), r = e.get(i);
     for (const a of n.getNeighbors(i))
-      o.has(a) || (o.add(a), s.push(a), t.set(a, r + 1));
+      o.has(a) || (o.add(a), s.push(a), e.set(a, r + 1));
   }
-  return t;
+  return e;
 }
-function Ne(n, e) {
-  const t = n.getNeighbors(e), s = t.length;
+function Nt(n, t) {
+  const e = n.getNeighbors(t), s = e.length;
   if (s < 2)
     return 0;
   let o = 0;
-  for (let i = 0; i < t.length; i++)
-    for (let r = i + 1; r < t.length; r++)
-      n.hasEdge(t[i], t[r]) && o++;
+  for (let i = 0; i < e.length; i++)
+    for (let r = i + 1; r < e.length; r++)
+      n.hasEdge(e[i], e[r]) && o++;
   return 2 * o / (s * (s - 1));
 }
-function ht(n, e) {
-  const t = n.getNeighbors(e);
+function he(n, t) {
+  const e = n.getNeighbors(t);
   let s = 0;
-  for (let o = 0; o < t.length; o++)
-    for (let i = o + 1; i < t.length; i++)
-      n.hasEdge(t[o], t[i]) && s++;
+  for (let o = 0; o < e.length; o++)
+    for (let i = o + 1; i < e.length; i++)
+      n.hasEdge(e[o], e[i]) && s++;
   return s;
 }
-function O(n) {
-  const e = Math.sqrt(
-    Object.values(n).reduce((t, s) => t + s * s, 0)
+function U(n) {
+  const t = Math.sqrt(
+    Object.values(n).reduce((e, s) => e + s * s, 0)
   );
-  return e > 0 && Object.keys(n).forEach((t) => {
-    n[t] /= e;
+  return t > 0 && Object.keys(n).forEach((e) => {
+    n[e] /= t;
   }), n;
 }
-function Le(n, e) {
-  const t = Object.keys(n);
+function Lt(n, t) {
+  const e = Object.keys(n);
   let s = 0;
-  for (const o of t)
-    s += Math.abs((n[o] || 0) - (e[o] || 0));
+  for (const o of e)
+    s += Math.abs((n[o] || 0) - (t[o] || 0));
   return s;
 }
-class gt extends L {
+class ge extends E {
   constructor() {
     super("degree", "Number of connections per node", "node", {
       module: "../statistics/algorithms/node-stats.js",
@@ -1629,29 +1655,29 @@ class gt extends L {
   }
   // calculate() inherited from base class - delegates to worker!
 }
-class ut extends L {
-  constructor(e = {}) {
+class ue extends E {
+  constructor(t = {}) {
     super("closeness", "Average distance to all other nodes (inverted)", "node", {
       module: "../statistics/algorithms/node-stats.js",
       functionName: "closenessCompute"
     }), this.options = {
-      normalized: e.normalized !== !1
+      normalized: t.normalized !== !1
     };
   }
   // calculate() inherited from base class - delegates to worker!
 }
-class mt extends L {
-  constructor(e = {}) {
+class me extends E {
+  constructor(t = {}) {
     super("ego-density", "Density of connections among neighbors", "node", {
       module: "../statistics/algorithms/node-stats.js",
       functionName: "egoDensityCompute"
     }), this.options = {
-      radius: e.radius || 1
+      radius: t.radius || 1
     };
   }
   // calculate() inherited from base class - delegates to worker!
 }
-class ft extends L {
+class fe extends E {
   constructor() {
     super("betweenness", "Frequency on shortest paths between other nodes", "node", {
       module: "../statistics/algorithms/node-stats.js",
@@ -1660,7 +1686,7 @@ class ft extends L {
   }
   // calculate() inherited from base class - delegates to worker!
 }
-class yt extends L {
+class ye extends E {
   constructor() {
     super("clustering", "Local clustering coefficient", "node", {
       module: "../statistics/algorithms/node-stats.js",
@@ -1669,44 +1695,44 @@ class yt extends L {
   }
   // calculate() inherited from base class - delegates to worker!
 }
-class pt extends L {
-  constructor(e = {}) {
+class pe extends E {
+  constructor(t = {}) {
     super("eigenvector", "Importance based on neighbor importance", "node", {
       module: "../statistics/algorithms/node-stats.js",
       functionName: "eigenvectorCompute"
     }), this.options = {
-      maxIter: e.maxIter || 100,
-      tolerance: e.tolerance || 1e-6
+      maxIter: t.maxIter || 100,
+      tolerance: t.tolerance || 1e-6
     };
   }
   // calculate() inherited from base class - delegates to worker!
 }
-class bt extends L {
-  constructor(e = {}) {
+class be extends E {
+  constructor(t = {}) {
     super("pagerank", "PageRank importance score with damping", "node", {
       module: "../statistics/algorithms/node-stats.js",
       functionName: "pageRankCompute"
     }), this.options = {
-      dampingFactor: e.dampingFactor ?? 0.85,
-      maxIter: e.maxIter ?? 100,
-      tolerance: e.tolerance ?? 1e-6
+      dampingFactor: t.dampingFactor ?? 0.85,
+      maxIter: t.maxIter ?? 100,
+      tolerance: t.tolerance ?? 1e-6
     };
   }
   // calculate() inherited from base class - delegates to worker!
 }
-class It extends L {
-  constructor(e = {}) {
+class Ie extends E {
+  constructor(t = {}) {
     super("eigenvector-laplacian", "X,Y coordinates from Laplacian eigenvectors", "node", {
       module: "../statistics/algorithms/node-stats.js",
       functionName: "eigenvectorLaplacianCompute"
     }), this.options = {
-      maxIter: e.maxIter || 100,
-      tolerance: e.tolerance || 1e-6
+      maxIter: t.maxIter || 100,
+      tolerance: t.tolerance || 1e-6
     };
   }
   // calculate() inherited from base class - delegates to worker!
 }
-class Ct extends L {
+class Ce extends E {
   constructor() {
     super("cliques", "Number of maximal cliques per node", "node", {
       module: "../statistics/algorithms/node-stats.js",
@@ -1715,240 +1741,240 @@ class Ct extends L {
   }
   // calculate() inherited from base class - delegates to worker!
 }
-async function wt(n, e, t, s) {
-  const o = N(n), i = e || Array.from(o.nodes), r = {};
-  return i.forEach((a, d) => {
-    r[a] = o.degree(a), d % 100 === 0 && y(s, d / i.length);
+async function we(n, t, e, s) {
+  const o = L(n), i = t || Array.from(o.nodes), r = {};
+  return i.forEach((a, l) => {
+    r[a] = o.degree(a), l % 100 === 0 && y(s, l / i.length);
   }), y(s, 1), r;
 }
-async function vt(n, e, t, s) {
-  const o = N(n), i = e || Array.from(o.nodes), r = Array.from(o.nodes), a = {};
-  r.forEach((l) => {
-    a[l] = 0;
-  }), i.forEach((l, c) => {
-    const h = dt(o, l);
-    At(a, h, r, l), c % Math.max(1, Math.floor(i.length / 10)) === 0 && y(s, c / i.length);
+async function ve(n, t, e, s) {
+  const o = L(n), i = t || Array.from(o.nodes), r = Array.from(o.nodes), a = {};
+  r.forEach((d) => {
+    a[d] = 0;
+  }), i.forEach((d, c) => {
+    const g = de(o, d);
+    Ae(a, g, r, d), c % Math.max(1, Math.floor(i.length / 10)) === 0 && y(s, c / i.length);
   });
-  const d = r.length, g = d > 2 ? 2 / ((d - 1) * (d - 2)) : 1;
-  return r.forEach((l) => {
-    a[l] *= g;
+  const l = r.length, h = l > 2 ? 2 / ((l - 1) * (l - 2)) : 1;
+  return r.forEach((d) => {
+    a[d] *= h;
   }), y(s, 1), a;
 }
-function At(n, e, t, s) {
-  const { pathCount: o, predecessors: i, stack: r } = e, a = /* @__PURE__ */ new Map();
-  for (t.forEach((d) => {
-    a.set(d, 0);
+function Ae(n, t, e, s) {
+  const { pathCount: o, predecessors: i, stack: r } = t, a = /* @__PURE__ */ new Map();
+  for (e.forEach((l) => {
+    a.set(l, 0);
   }); r.length > 0; ) {
-    const d = r.pop();
-    (i.get(d) || []).forEach((l) => {
-      const c = o.get(l) / o.get(d) * (1 + a.get(d));
-      a.set(l, a.get(l) + c);
-    }), d !== s && (n[d] += a.get(d));
+    const l = r.pop();
+    (i.get(l) || []).forEach((d) => {
+      const c = o.get(d) / o.get(l) * (1 + a.get(l));
+      a.set(d, a.get(d) + c);
+    }), l !== s && (n[l] += a.get(l));
   }
 }
-async function Gt(n, e, t, s) {
-  const o = N(n), i = e || Array.from(o.nodes), r = {};
-  return i.forEach((a, d) => {
-    r[a] = Ne(o, a), d % 100 === 0 && y(s, d / i.length);
+async function Ge(n, t, e, s) {
+  const o = L(n), i = t || Array.from(o.nodes), r = {};
+  return i.forEach((a, l) => {
+    r[a] = Nt(o, a), l % 100 === 0 && y(s, l / i.length);
   }), y(s, 1), r;
 }
-async function Tt(n, e, t, s) {
-  const o = N(n), { maxIter: i = 100, tolerance: r = 1e-6 } = t || {}, a = Array.from(o.nodes), d = a.length;
-  let g = {};
-  a.forEach((l) => {
-    g[l] = 1 / d;
+async function Te(n, t, e, s) {
+  const o = L(n), { maxIter: i = 100, tolerance: r = 1e-6 } = e || {}, a = Array.from(o.nodes), l = a.length;
+  let h = {};
+  a.forEach((d) => {
+    h[d] = 1 / l;
   });
-  for (let l = 0; l < i; l++) {
+  for (let d = 0; d < i; d++) {
     const c = {};
-    a.forEach((u) => {
-      c[u] = 0;
-    }), a.forEach((u) => {
-      o.getNeighbors(u).forEach((b) => {
-        const v = o.adjacencyMap.get(u).get(b);
-        c[b] += g[u] * v;
+    a.forEach((m) => {
+      c[m] = 0;
+    }), a.forEach((m) => {
+      o.getNeighbors(m).forEach((p) => {
+        const v = o.adjacencyMap.get(m).get(p);
+        c[p] += h[m] * v;
       });
-    }), O(c);
-    const h = Le(c, g);
-    if (g = c, l % 10 === 0 && y(s, l / i), h < r)
+    }), U(c);
+    const g = Lt(c, h);
+    if (h = c, d % 10 === 0 && y(s, d / i), g < r)
       break;
   }
-  return y(s, 1), g;
+  return y(s, 1), h;
 }
-async function Pt(n, e, t, s) {
-  const o = N(n), { dampingFactor: i = 0.85, maxIter: r = 100, tolerance: a = 1e-6 } = t || {}, d = Array.from(o.nodes), g = d.length;
-  if (g === 0)
+async function Pe(n, t, e, s) {
+  const o = L(n), { dampingFactor: i = 0.85, maxIter: r = 100, tolerance: a = 1e-6 } = e || {}, l = Array.from(o.nodes), h = l.length;
+  if (h === 0)
     return y(s, 1), {};
-  let l = {};
-  d.forEach((b) => {
-    l[b] = 1 / g;
+  let d = {};
+  l.forEach((p) => {
+    d[p] = 1 / h;
   });
   const c = {};
-  d.forEach((b) => {
-    c[b] = o.getNeighbors(b).length;
+  l.forEach((p) => {
+    c[p] = o.getNeighbors(p).length;
   });
-  const h = d.filter((b) => c[b] === 0), u = (1 - i) / g;
-  for (let b = 0; b < r; b++) {
+  const g = l.filter((p) => c[p] === 0), m = (1 - i) / h;
+  for (let p = 0; p < r; p++) {
     const v = {};
-    let C = 0;
-    h.forEach((w) => {
-      C += l[w];
+    let b = 0;
+    g.forEach((w) => {
+      b += d[w];
     });
-    const A = i * C / g;
-    d.forEach((w) => {
-      v[w] = u + A;
-    }), d.forEach((w) => {
+    const A = i * b / h;
+    l.forEach((w) => {
+      v[w] = m + A;
+    }), l.forEach((w) => {
       const x = o.getNeighbors(w);
       if (x.length > 0) {
-        const T = i * l[w] / x.length;
-        x.forEach((B) => {
-          v[B] += T;
+        const P = i * d[w] / x.length;
+        x.forEach((G) => {
+          v[G] += P;
         });
       }
     });
-    const m = Le(v, l);
-    if (l = v, b % 10 === 0 && y(s, b / r), m < a)
+    const C = Lt(v, d);
+    if (d = v, p % 10 === 0 && y(s, p / r), C < a)
       break;
   }
-  const p = Object.values(l).reduce((b, v) => b + v, 0);
-  return p > 0 && d.forEach((b) => {
-    l[b] /= p;
-  }), y(s, 1), l;
+  const u = Object.values(d).reduce((p, v) => p + v, 0);
+  return u > 0 && l.forEach((p) => {
+    d[p] /= u;
+  }), y(s, 1), d;
 }
-async function xt(n, e, t, s) {
-  const o = N(n), i = e || Array.from(o.nodes), r = {};
-  return i.forEach((a, d) => {
-    r[a] = ht(o, a), d % 100 === 0 && y(s, d / i.length);
+async function xe(n, t, e, s) {
+  const o = L(n), i = t || Array.from(o.nodes), r = {};
+  return i.forEach((a, l) => {
+    r[a] = he(o, a), l % 100 === 0 && y(s, l / i.length);
   }), y(s, 1), r;
 }
-async function Wt(n, e, t, s) {
-  const o = N(n), i = e || Array.from(o.nodes), a = Array.from(o.nodes).length, d = {}, g = t?.normalized !== !1;
-  return i.forEach((l, c) => {
-    const h = /* @__PURE__ */ new Map(), u = [l], p = /* @__PURE__ */ new Set([l]);
-    for (h.set(l, 0); u.length > 0; ) {
-      const v = u.shift(), C = h.get(v);
+async function We(n, t, e, s) {
+  const o = L(n), i = t || Array.from(o.nodes), a = Array.from(o.nodes).length, l = {}, h = e?.normalized !== !1;
+  return i.forEach((d, c) => {
+    const g = /* @__PURE__ */ new Map(), m = [d], u = /* @__PURE__ */ new Set([d]);
+    for (g.set(d, 0); m.length > 0; ) {
+      const v = m.shift(), b = g.get(v);
       for (const A of o.getNeighbors(v))
-        p.has(A) || (p.add(A), u.push(A), h.set(A, C + 1));
+        u.has(A) || (u.add(A), m.push(A), g.set(A, b + 1));
     }
-    const b = h.size - 1;
-    if (b === 0)
-      d[l] = 0;
+    const p = g.size - 1;
+    if (p === 0)
+      l[d] = 0;
     else {
-      const v = Array.from(h.values()).reduce((C, A) => C + A, 0);
+      const v = Array.from(g.values()).reduce((b, A) => b + A, 0);
       if (v === 0)
-        d[l] = 0;
+        l[d] = 0;
       else {
-        const C = b / v;
-        d[l] = g ? C * (b / (a - 1)) : C;
+        const b = p / v;
+        l[d] = h ? b * (p / (a - 1)) : b;
       }
     }
     c % 100 === 0 && y(s, c / i.length);
-  }), y(s, 1), d;
+  }), y(s, 1), l;
 }
-async function Zt(n, e, t, s) {
-  const o = N(n), i = e || Array.from(o.nodes), r = {};
-  return i.forEach((a, d) => {
-    const g = o.getNeighbors(a), l = g.length;
-    if (l < 2)
+async function Ze(n, t, e, s) {
+  const o = L(n), i = t || Array.from(o.nodes), r = {};
+  return i.forEach((a, l) => {
+    const h = o.getNeighbors(a), d = h.length;
+    if (d < 2)
       r[a] = 0;
     else {
       let c = 0;
-      for (let u = 0; u < l; u++)
-        for (let p = u + 1; p < l; p++)
-          o.hasEdge(g[u], g[p]) && c++;
-      const h = l * (l - 1) / 2;
-      r[a] = c / h;
+      for (let m = 0; m < d; m++)
+        for (let u = m + 1; u < d; u++)
+          o.hasEdge(h[m], h[u]) && c++;
+      const g = d * (d - 1) / 2;
+      r[a] = c / g;
     }
-    d % 100 === 0 && y(s, d / i.length);
+    l % 100 === 0 && y(s, l / i.length);
   }), y(s, 1), r;
 }
-async function Xt(n, e, t, s) {
-  const o = N(n), i = Array.from(o.nodes), r = i.length;
+async function Xe(n, t, e, s) {
+  const o = L(n), i = Array.from(o.nodes), r = i.length;
   if (r < 3) {
-    const p = {};
-    return i.forEach((b) => {
-      p[b] = { laplacian_x: Math.random() * 2 - 1, laplacian_y: Math.random() * 2 - 1 };
-    }), y(s, 1), p;
+    const u = {};
+    return i.forEach((p) => {
+      u[p] = { laplacian_x: Math.random() * 2 - 1, laplacian_y: Math.random() * 2 - 1 };
+    }), y(s, 1), u;
   }
-  const { maxIter: a = 100, tolerance: d = 1e-6 } = t || {}, g = Array(r).fill(null).map(() => Array(r).fill(0)), l = /* @__PURE__ */ new Map();
-  i.forEach((p, b) => l.set(p, b));
-  for (let p = 0; p < r; p++) {
-    const b = i[p], v = o.getNeighbors(b);
-    g[p][p] = v.length, v.forEach((C) => {
-      const A = l.get(C);
-      A !== void 0 && (g[p][A] = -1);
+  const { maxIter: a = 100, tolerance: l = 1e-6 } = e || {}, h = Array(r).fill(null).map(() => Array(r).fill(0)), d = /* @__PURE__ */ new Map();
+  i.forEach((u, p) => d.set(u, p));
+  for (let u = 0; u < r; u++) {
+    const p = i[u], v = o.getNeighbors(p);
+    h[u][u] = v.length, v.forEach((b) => {
+      const A = d.get(b);
+      A !== void 0 && (h[u][A] = -1);
     });
   }
   y(s, 0.2);
-  const c = Array(r).fill(0).map(() => Math.random()), h = Array(r).fill(0).map(() => Math.random());
-  O(c), O(h);
-  for (let p = 0; p < a; p++) {
-    const b = Ie(g, c);
-    O(b);
+  const c = Array(r).fill(0).map(() => Math.random()), g = Array(r).fill(0).map(() => Math.random());
+  U(c), U(g);
+  for (let u = 0; u < a; u++) {
+    const p = It(h, c);
+    U(p);
     let v = 0;
-    for (let C = 0; C < r; C++)
-      v += Math.abs(b[C] - c[C]);
-    if (v < d) break;
-    for (let C = 0; C < r; C++)
-      c[C] = b[C];
-    p % 20 === 0 && y(s, 0.2 + p / a * 0.4);
+    for (let b = 0; b < r; b++)
+      v += Math.abs(p[b] - c[b]);
+    if (v < l) break;
+    for (let b = 0; b < r; b++)
+      c[b] = p[b];
+    u % 20 === 0 && y(s, 0.2 + u / a * 0.4);
   }
-  y(s, 0.6), le(h, c), O(h);
-  for (let p = 0; p < a; p++) {
-    const b = Ie(g, h);
-    O(b), le(b, c), le(b, h), O(b);
+  y(s, 0.6), lt(g, c), U(g);
+  for (let u = 0; u < a; u++) {
+    const p = It(h, g);
+    U(p), lt(p, c), lt(p, g), U(p);
     let v = 0;
-    for (let C = 0; C < r; C++)
-      v += Math.abs(b[C] - h[C]);
-    if (v < d) break;
-    for (let C = 0; C < r; C++)
-      h[C] = b[C];
-    p % 20 === 0 && y(s, 0.6 + p / a * 0.39);
+    for (let b = 0; b < r; b++)
+      v += Math.abs(p[b] - g[b]);
+    if (v < l) break;
+    for (let b = 0; b < r; b++)
+      g[b] = p[b];
+    u % 20 === 0 && y(s, 0.6 + u / a * 0.39);
   }
   y(s, 0.99);
-  const u = {};
-  return i.forEach((p, b) => {
-    u[p] = {
-      laplacian_x: c[b],
-      laplacian_y: h[b]
+  const m = {};
+  return i.forEach((u, p) => {
+    m[u] = {
+      laplacian_x: c[p],
+      laplacian_y: g[p]
     };
-  }), y(s, 1), u;
+  }), y(s, 1), m;
 }
-function Ie(n, e) {
-  const t = n.length, s = Array(t).fill(0);
-  for (let o = 0; o < t; o++)
-    for (let i = 0; i < t; i++)
-      s[o] += n[o][i] * e[i];
+function It(n, t) {
+  const e = n.length, s = Array(e).fill(0);
+  for (let o = 0; o < e; o++)
+    for (let i = 0; i < e; i++)
+      s[o] += n[o][i] * t[i];
   return s;
 }
-function le(n, e) {
-  let t = 0;
+function lt(n, t) {
+  let e = 0;
   for (let s = 0; s < n.length; s++)
-    t += n[s] * e[s];
+    e += n[s] * t[s];
   for (let s = 0; s < n.length; s++)
-    n[s] -= t * e[s];
+    n[s] -= e * t[s];
 }
-const Ee = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const Et = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  BetweennessStatistic: ft,
-  CliquesStatistic: Ct,
-  ClosenessStatistic: ut,
-  ClusteringStatistic: yt,
-  DegreeStatistic: gt,
-  EgoDensityStatistic: mt,
-  EigenvectorLaplacianStatistic: It,
-  EigenvectorStatistic: pt,
-  PageRankStatistic: bt,
-  betweennessCompute: vt,
-  cliquesCompute: xt,
-  closenessCompute: Wt,
-  clusteringCompute: Gt,
-  degreeCompute: wt,
-  egoDensityCompute: Zt,
-  eigenvectorCompute: Tt,
-  eigenvectorLaplacianCompute: Xt,
-  pageRankCompute: Pt
+  BetweennessStatistic: fe,
+  CliquesStatistic: Ce,
+  ClosenessStatistic: ue,
+  ClusteringStatistic: ye,
+  DegreeStatistic: ge,
+  EgoDensityStatistic: me,
+  EigenvectorLaplacianStatistic: Ie,
+  EigenvectorStatistic: pe,
+  PageRankStatistic: be,
+  betweennessCompute: ve,
+  cliquesCompute: xe,
+  closenessCompute: We,
+  clusteringCompute: Ge,
+  degreeCompute: we,
+  egoDensityCompute: Ze,
+  eigenvectorCompute: Te,
+  eigenvectorLaplacianCompute: Xe,
+  pageRankCompute: Pe
 }, Symbol.toStringTag, { value: "Module" }));
-class Bt extends L {
+class ke extends E {
   constructor() {
     super("density", "Ratio of actual edges to possible edges", "graph", {
       module: "../statistics/algorithms/graph-stats.js",
@@ -1957,7 +1983,7 @@ class Bt extends L {
   }
   // calculate() inherited from base class - delegates to worker!
 }
-class kt extends L {
+class Me extends E {
   constructor() {
     super("diameter", "Longest shortest path in the graph", "graph", {
       module: "../statistics/algorithms/graph-stats.js",
@@ -1966,7 +1992,7 @@ class kt extends L {
   }
   // calculate() inherited from base class - delegates to worker!
 }
-class Mt extends L {
+class Be extends E {
   constructor() {
     super("average_clustering", "Mean clustering coefficient across all nodes", "graph", {
       module: "../statistics/algorithms/graph-stats.js",
@@ -1975,7 +2001,7 @@ class Mt extends L {
   }
   // calculate() inherited from base class - delegates to worker!
 }
-class Nt extends L {
+class Ne extends E {
   constructor() {
     super("average_shortest_path", "Mean distance between all node pairs", "graph", {
       module: "../statistics/algorithms/graph-stats.js",
@@ -1984,7 +2010,7 @@ class Nt extends L {
   }
   // calculate() inherited from base class - delegates to worker!
 }
-class Lt extends L {
+class Le extends E {
   constructor() {
     super("connected_components", "Number of disconnected subgraphs", "graph", {
       module: "../statistics/algorithms/graph-stats.js",
@@ -1993,7 +2019,7 @@ class Lt extends L {
   }
   // calculate() inherited from base class - delegates to worker!
 }
-class Et extends L {
+class Ee extends E {
   constructor() {
     super("average_degree", "Mean number of connections per node", "graph", {
       module: "../statistics/algorithms/graph-stats.js",
@@ -2002,80 +2028,80 @@ class Et extends L {
   }
   // calculate() inherited from base class - delegates to worker!
 }
-async function Rt(n, e, t, s) {
-  const o = N(n), i = o.nodes.size, r = o.edges.length;
+async function Re(n, t, e, s) {
+  const o = L(n), i = o.nodes.size, r = o.edges.length;
   if (i < 2)
     return 0;
-  const a = i * (i - 1) / 2, d = r / a;
-  return y(s, 1), d;
+  const a = i * (i - 1) / 2, l = r / a;
+  return y(s, 1), l;
 }
-async function zt(n, e, t, s) {
-  const o = N(n), i = Array.from(o.nodes);
+async function ze(n, t, e, s) {
+  const o = L(n), i = Array.from(o.nodes);
   let r = 0;
-  return i.forEach((a, d) => {
-    const g = Me(o, a);
-    for (const l of g.values())
-      l > r && (r = l);
-    d % Math.max(1, Math.floor(i.length / 10)) === 0 && y(s, d / i.length);
+  return i.forEach((a, l) => {
+    const h = Bt(o, a);
+    for (const d of h.values())
+      d > r && (r = d);
+    l % Math.max(1, Math.floor(i.length / 10)) === 0 && y(s, l / i.length);
   }), y(s, 1), r;
 }
-async function Jt(n, e, t, s) {
-  const o = N(n), i = Array.from(o.nodes);
+async function Fe(n, t, e, s) {
+  const o = L(n), i = Array.from(o.nodes);
   let r = 0;
-  return i.forEach((a, d) => {
-    r += Ne(o, a), d % 100 === 0 && y(s, d / i.length);
+  return i.forEach((a, l) => {
+    r += Nt(o, a), l % 100 === 0 && y(s, l / i.length);
   }), y(s, 1), i.length > 0 ? r / i.length : 0;
 }
-async function Ft(n, e, t, s) {
-  const o = N(n), i = Array.from(o.nodes);
+async function Je(n, t, e, s) {
+  const o = L(n), i = Array.from(o.nodes);
   let r = 0, a = 0;
-  return i.forEach((d, g) => {
-    Me(o, d).forEach((c, h) => {
-      h !== d && (a += c, r++);
-    }), g % Math.max(1, Math.floor(i.length / 10)) === 0 && y(s, g / i.length);
+  return i.forEach((l, h) => {
+    Bt(o, l).forEach((c, g) => {
+      g !== l && (a += c, r++);
+    }), h % Math.max(1, Math.floor(i.length / 10)) === 0 && y(s, h / i.length);
   }), y(s, 1), r > 0 ? a / r : 0;
 }
-async function Kt(n, e, t, s) {
-  const o = N(n), i = Array.from(o.nodes), r = /* @__PURE__ */ new Set(), a = {};
-  let d = 0;
-  return i.forEach((g) => {
-    if (!r.has(g)) {
-      const l = [g];
-      for (r.add(g), a[g] = d; l.length > 0; ) {
-        const c = l.shift();
-        for (const h of o.getNeighbors(c))
-          r.has(h) || (r.add(h), l.push(h), a[h] = d);
+async function Ke(n, t, e, s) {
+  const o = L(n), i = Array.from(o.nodes), r = /* @__PURE__ */ new Set(), a = {};
+  let l = 0;
+  return i.forEach((h) => {
+    if (!r.has(h)) {
+      const d = [h];
+      for (r.add(h), a[h] = l; d.length > 0; ) {
+        const c = d.shift();
+        for (const g of o.getNeighbors(c))
+          r.has(g) || (r.add(g), d.push(g), a[g] = l);
       }
-      d++;
+      l++;
     }
   }), y(s, 1), {
-    count: d,
+    count: l,
     components: a
   };
 }
-async function St(n, e, t, s) {
-  const o = N(n), i = Array.from(o.nodes);
+async function je(n, t, e, s) {
+  const o = L(n), i = Array.from(o.nodes);
   let r = 0;
   return i.forEach((a) => {
     r += o.getNeighbors(a).length;
   }), y(s, 1), i.length > 0 ? r / i.length : 0;
 }
-const Re = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const Rt = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  AverageClusteringStatistic: Mt,
-  AverageDegreeStatistic: Et,
-  AverageShortestPathStatistic: Nt,
-  ConnectedComponentsStatistic: Lt,
-  DensityStatistic: Bt,
-  DiameterStatistic: kt,
-  averageClusteringCompute: Jt,
-  averageDegreeCompute: St,
-  averageShortestPathCompute: Ft,
-  connectedComponentsCompute: Kt,
-  densityCompute: Rt,
-  diameterCompute: zt
+  AverageClusteringStatistic: Be,
+  AverageDegreeStatistic: Ee,
+  AverageShortestPathStatistic: Ne,
+  ConnectedComponentsStatistic: Le,
+  DensityStatistic: ke,
+  DiameterStatistic: Me,
+  averageClusteringCompute: Fe,
+  averageDegreeCompute: je,
+  averageShortestPathCompute: Je,
+  connectedComponentsCompute: Ke,
+  densityCompute: Re,
+  diameterCompute: ze
 }, Symbol.toStringTag, { value: "Module" }));
-class ue {
+class ut {
   /**
    * Create a community detection algorithm
    *
@@ -2085,12 +2111,12 @@ class ue {
    * @param {string} computeConfig.module - Module path containing compute function
    * @param {string} computeConfig.functionName - Name of compute function to call
    */
-  constructor(e, t = "", s = null) {
-    if (new.target === ue)
+  constructor(t, e = "", s = null) {
+    if (new.target === ut)
       throw new Error("CommunityAlgorithm is abstract and cannot be instantiated directly");
     if (!s || !s.module || !s.functionName)
       throw new Error("computeConfig with module and functionName is required");
-    this.name = e, this.description = t, this.computeConfig = s, this.options = {};
+    this.name = t, this.description = e, this.computeConfig = s, this.options = {};
   }
   /**
    * Detect communities in a graph.
@@ -2111,14 +2137,14 @@ class ue {
    *   ...
    * }
    */
-  async detect(e, t = {}) {
-    const s = ee.serializeGraph(e), o = {
+  async detect(t, e = {}) {
+    const s = tt.serializeGraph(t), o = {
       module: this.computeConfig.module,
       functionName: this.computeConfig.functionName,
       args: [s, this.options]
     };
     return {
-      ...await ee.execute(o, t),
+      ...await tt.execute(o, e),
       algorithm: this.name
     };
   }
@@ -2134,7 +2160,7 @@ class ue {
     };
   }
 }
-class Ce extends ue {
+class Ct extends ut {
   /**
    * Create a Louvain algorithm instance
    *
@@ -2142,7 +2168,7 @@ class Ce extends ue {
    * @param {number} [options.resolution=1.0] - Resolution parameter for modularity
    * @param {number} [options.maxIterations=100] - Maximum number of iterations
    */
-  constructor(e = {}) {
+  constructor(t = {}) {
     super(
       "louvain",
       "Louvain method for community detection using modularity optimization",
@@ -2151,106 +2177,106 @@ class Ce extends ue {
         functionName: "louvainCompute"
       }
     ), this.options = {
-      resolution: e.resolution || 1,
-      maxIterations: e.maxIterations || 100
+      resolution: t.resolution || 1,
+      maxIterations: t.maxIterations || 100
     };
   }
   // detect() inherited from base class - delegates to worker!
 }
-async function Yt(n, e, t) {
-  const s = N(n), { resolution: o = 1, maxIterations: i = 100 } = e || {}, r = Array.from(s.nodes), a = (C) => {
-    const A = s.getNeighbors(C);
-    let m = 0;
+async function Se(n, t, e) {
+  const s = L(n), { resolution: o = 1, maxIterations: i = 100 } = t || {}, r = Array.from(s.nodes), a = (b) => {
+    const A = s.getNeighbors(b);
+    let C = 0;
     return A.forEach((w) => {
-      m += s.getEdgeWeight(C, w);
-    }), m;
+      C += s.getEdgeWeight(b, w);
+    }), C;
   };
-  let d = 0;
-  s.edges.forEach((C) => {
-    d += C.weight;
+  let l = 0;
+  s.edges.forEach((b) => {
+    l += b.weight;
   });
-  const g = 2 * d, l = {};
-  r.forEach((C) => {
-    l[C] = C;
+  const h = 2 * l, d = {};
+  r.forEach((b) => {
+    d[b] = b;
   });
-  let c = !0, h = 0;
-  for (; c && h < i; ) {
-    c = !1, h++;
-    for (const C of r) {
-      const A = l[C], m = s.getNeighbors(C), w = /* @__PURE__ */ new Set();
-      m.forEach((E) => {
-        w.add(l[E]);
+  let c = !0, g = 0;
+  for (; c && g < i; ) {
+    c = !1, g++;
+    for (const b of r) {
+      const A = d[b], C = s.getNeighbors(b), w = /* @__PURE__ */ new Set();
+      C.forEach((M) => {
+        w.add(d[M]);
       });
-      const x = a(C);
-      let T = A, B = 0;
-      w.forEach((E) => {
-        if (E === A) return;
-        const k = jt(
+      const x = a(b);
+      let P = A, G = 0;
+      w.forEach((M) => {
+        if (M === A) return;
+        const X = Ye(
           s,
-          C,
+          b,
           A,
-          E,
-          l,
-          g,
+          M,
+          d,
+          h,
           o,
           x,
           a
         );
-        k > B && (B = k, T = E);
-      }), T !== A && (l[C] = T, c = !0);
+        X > G && (G = X, P = M);
+      }), P !== A && (d[b] = P, c = !0);
     }
-    if (y(t, Math.min(h / i, 0.9)), !c) break;
+    if (y(e, Math.min(g / i, 0.9)), !c) break;
   }
-  const u = Array.from(new Set(Object.values(l))), p = {};
-  u.forEach((C, A) => {
-    p[C] = A;
+  const m = Array.from(new Set(Object.values(d))), u = {};
+  m.forEach((b, A) => {
+    u[b] = A;
   });
-  const b = {};
-  Object.keys(l).forEach((C) => {
-    b[C] = p[l[C]];
+  const p = {};
+  Object.keys(d).forEach((b) => {
+    p[b] = u[d[b]];
   });
-  const v = Vt(s, b, d, a);
-  return y(t, 1), {
-    communities: b,
+  const v = Ve(s, p, l, a);
+  return y(e, 1), {
+    communities: p,
     modularity: v,
-    numCommunities: u.length,
-    iterations: h
+    numCommunities: m.length,
+    iterations: g
   };
 }
-function jt(n, e, t, s, o, i, r, a, d) {
-  const g = n.getNeighbors(e);
-  let l = 0, c = 0;
-  g.forEach((v) => {
-    const C = n.getEdgeWeight(e, v);
-    o[v] === s && (l += C), o[v] === t && v !== e && (c += C);
+function Ye(n, t, e, s, o, i, r, a, l) {
+  const h = n.getNeighbors(t);
+  let d = 0, c = 0;
+  h.forEach((v) => {
+    const b = n.getEdgeWeight(t, v);
+    o[v] === s && (d += b), o[v] === e && v !== t && (c += b);
   });
-  const h = Array.from(n.nodes);
-  let u = 0, p = 0;
-  return h.forEach((v) => {
-    o[v] === s && (u += d(v)), o[v] === t && (p += d(v));
-  }), l / i - r * (u * a) / (i * i) - (c / i - r * (p * a) / (i * i));
+  const g = Array.from(n.nodes);
+  let m = 0, u = 0;
+  return g.forEach((v) => {
+    o[v] === s && (m += l(v)), o[v] === e && (u += l(v));
+  }), d / i - r * (m * a) / (i * i) - (c / i - r * (u * a) / (i * i));
 }
-function Vt(n, e, t, s) {
-  if (t === 0) return 0;
-  const o = 2 * t, i = new Set(Object.values(e));
+function Ve(n, t, e, s) {
+  if (e === 0) return 0;
+  const o = 2 * e, i = new Set(Object.values(t));
   let r = 0;
   return i.forEach((a) => {
-    let d = 0, g = 0;
-    Object.keys(e).filter(
-      (c) => e[c] === a
+    let l = 0, h = 0;
+    Object.keys(t).filter(
+      (c) => t[c] === a
     ).forEach((c) => {
-      g += s(c);
+      h += s(c);
     }), n.edges.forEach((c) => {
-      const h = c.u, u = c.v, p = c.weight;
-      e[h] === a && e[u] === a && (d += p);
-    }), r += d / o - Math.pow(g / o, 2);
+      const g = c.u, m = c.v, u = c.weight;
+      t[g] === a && t[m] === a && (l += u);
+    }), r += l / o - Math.pow(h / o, 2);
   }), r;
 }
-const ze = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const zt = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  LouvainAlgorithm: Ce,
-  default: Ce,
-  louvainCompute: Yt
+  LouvainAlgorithm: Ct,
+  default: Ct,
+  louvainCompute: Se
 }, Symbol.toStringTag, { value: "Module" }));
 class V {
   /**
@@ -2276,12 +2302,12 @@ class V {
    *   iterations: 100
    * });
    */
-  constructor(e, t = {}, s = null) {
-    if (!e)
+  constructor(t, e = {}, s = null) {
+    if (!t)
       throw new Error("Graph is required for layout computation");
     if (!s || !s.module || !s.functionName)
       throw new Error("computeConfig with module and functionName is required");
-    this.graph = e, this.options = t, this.computeConfig = s, this._positions = null;
+    this.graph = t, this.options = e, this.computeConfig = s, this._positions = null;
   }
   /**
    * Compute node positions based on the layout algorithm.
@@ -2299,13 +2325,13 @@ class V {
    *   onProgress: (p) => console.log(`${Math.round(p * 100)}%`)
    * });
    */
-  async computePositions(e = {}) {
-    const t = { ...this.options, ...e }, { onProgress: s, timeout: o, ...i } = t, r = ee.serializeGraph(this.graph), a = {
+  async computePositions(t = {}) {
+    const e = { ...this.options, ...t }, { onProgress: s, timeout: o, ...i } = e, r = tt.serializeGraph(this.graph), a = {
       module: this.computeConfig.module,
       functionName: this.computeConfig.functionName,
       args: [r, i]
     };
-    return await ee.execute(a, {
+    return await tt.execute(a, {
       onProgress: s,
       timeout: o
     });
@@ -2322,8 +2348,8 @@ class V {
    * const positions = await layout.getPositions();
    * // positions = { 'A': {x: 100, y: 200}, 'B': {x: 300, y: 150}, ... }
    */
-  async getPositions(e = {}, t = !1) {
-    return (!this._positions || t) && (this._positions = await this.computePositions(e)), this._positions;
+  async getPositions(t = {}, e = !1) {
+    return (!this._positions || e) && (this._positions = await this.computePositions(t)), this._positions;
   }
   /**
    * Update layout iteratively (for algorithms that support incremental refinement).
@@ -2341,7 +2367,7 @@ class V {
    *   // Render updated positions
    * }
    */
-  async updateLayout(e = 1) {
+  async updateLayout(t = 1) {
     return this.getPositions({}, !0);
   }
   /**
@@ -2377,7 +2403,7 @@ class V {
     return this.graph.numberOfNodes();
   }
 }
-class we extends V {
+class wt extends V {
   /**
    * Create a random layout instance
    *
@@ -2387,12 +2413,12 @@ class we extends V {
    * @param {Object} [options.center={x:0, y:0}] - Center point
    * @param {number} [options.seed=null] - Random seed for reproducibility (null = non-deterministic)
    */
-  constructor(e, t = {}) {
-    super(e, {
+  constructor(t, e = {}) {
+    super(t, {
       scale: 100,
       center: { x: 0, y: 0 },
       seed: null,
-      ...t
+      ...e
     }, {
       module: "../layouts/random.js",
       functionName: "randomCompute"
@@ -2400,30 +2426,30 @@ class we extends V {
   }
   // computePositions() inherited from base class - delegates to worker!
 }
-async function Ht(n, e, t) {
+async function He(n, t, e) {
   const s = Array.from(n.nodes || []), {
     scale: o = 1,
     center: i = { x: 0, y: 0 },
     seed: r = null
-  } = e || {}, a = {};
-  let d;
-  return r !== null ? d = function(l) {
+  } = t || {}, a = {};
+  let l;
+  return r !== null ? l = function(d) {
     return function() {
-      let c = l += 1831565813;
+      let c = d += 1831565813;
       return c = Math.imul(c ^ c >>> 15, c | 1), c ^= c + Math.imul(c ^ c >>> 7, c | 61), ((c ^ c >>> 14) >>> 0) / 4294967296;
     };
-  }(r) : d = Math.random, s.forEach((g) => {
-    const l = (d() * 2 - 1) * o + i.x, c = (d() * 2 - 1) * o + i.y;
-    a[g] = { x: l, y: c };
-  }), y(t, 1), a;
+  }(r) : l = Math.random, s.forEach((h) => {
+    const d = (l() * 2 - 1) * o + i.x, c = (l() * 2 - 1) * o + i.y;
+    a[h] = { x: d, y: c };
+  }), y(e, 1), a;
 }
-const Je = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const Ft = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  RandomLayout: we,
-  default: we,
-  randomCompute: Ht
+  RandomLayout: wt,
+  default: wt,
+  randomCompute: He
 }, Symbol.toStringTag, { value: "Module" }));
-class ve extends V {
+class vt extends V {
   /**
    * Create a circular layout instance
    *
@@ -2433,12 +2459,12 @@ class ve extends V {
    * @param {Object} [options.center={x:0, y:0}] - Center point
    * @param {Function} [options.sortBy=null] - Optional sort function for node ordering
    */
-  constructor(e, t = {}) {
-    super(e, {
+  constructor(t, e = {}) {
+    super(t, {
       scale: 100,
       center: { x: 0, y: 0 },
       sortBy: null,
-      ...t
+      ...e
     }, {
       module: "../layouts/circular.js",
       functionName: "circularCompute"
@@ -2446,37 +2472,37 @@ class ve extends V {
   }
   // computePositions() inherited from base class - delegates to worker!
 }
-async function _t(n, e, t) {
-  const s = N(n), {
+async function Oe(n, t, e) {
+  const s = L(n), {
     scale: o = 1,
     center: i = { x: 0, y: 0 },
     sortBy: r = null
-  } = e || {};
+  } = t || {};
   let a = Array.from(s.nodes);
-  const d = a.length;
-  if (d === 0)
-    return y(t, 1), {};
-  if (d === 1) {
-    const l = { [a[0]]: { x: i.x, y: i.y } };
-    return y(t, 1), l;
+  const l = a.length;
+  if (l === 0)
+    return y(e, 1), {};
+  if (l === 1) {
+    const d = { [a[0]]: { x: i.x, y: i.y } };
+    return y(e, 1), d;
   }
   r && typeof r == "function" && (a = a.sort(r));
-  const g = {};
-  return a.forEach((l, c) => {
-    const h = 2 * Math.PI * c / d;
-    g[l] = {
-      x: Math.cos(h) * o + i.x,
-      y: Math.sin(h) * o + i.y
+  const h = {};
+  return a.forEach((d, c) => {
+    const g = 2 * Math.PI * c / l;
+    h[d] = {
+      x: Math.cos(g) * o + i.x,
+      y: Math.sin(g) * o + i.y
     };
-  }), y(t, 1), g;
+  }), y(e, 1), h;
 }
-const Fe = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const Jt = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  CircularLayout: ve,
-  circularCompute: _t,
-  default: ve
+  CircularLayout: vt,
+  circularCompute: Oe,
+  default: vt
 }, Symbol.toStringTag, { value: "Module" }));
-class Ae extends V {
+class At extends V {
   /**
    * Create a spiral layout instance
    *
@@ -2487,13 +2513,13 @@ class Ae extends V {
    * @param {number} [options.resolution=0.35] - Spiral compactness (lower = more compressed)
    * @param {boolean} [options.equidistant=false] - True = equidistant nodes, False = equal angles
    */
-  constructor(e, t = {}) {
-    super(e, {
+  constructor(t, e = {}) {
+    super(t, {
       scale: 100,
       center: { x: 0, y: 0 },
       resolution: 0.35,
       equidistant: !1,
-      ...t
+      ...e
     }, {
       module: "../layouts/spiral.js",
       functionName: "spiralCompute"
@@ -2501,59 +2527,59 @@ class Ae extends V {
   }
   // computePositions() inherited from base class - delegates to worker!
 }
-function Ut(n, e = 1) {
+function _e(n, t = 1) {
   if (n.length === 0) return n;
-  let t = 1 / 0, s = -1 / 0, o = 1 / 0, i = -1 / 0;
-  for (const [l, c] of n)
-    t = Math.min(t, l), s = Math.max(s, l), o = Math.min(o, c), i = Math.max(i, c);
-  const r = s - t || 1, a = i - o || 1, d = Math.max(r, a), g = 2 * e / d;
-  return n.map(([l, c]) => [
-    (l - t - r / 2) * g + e,
-    (c - o - a / 2) * g + e
+  let e = 1 / 0, s = -1 / 0, o = 1 / 0, i = -1 / 0;
+  for (const [d, c] of n)
+    e = Math.min(e, d), s = Math.max(s, d), o = Math.min(o, c), i = Math.max(i, c);
+  const r = s - e || 1, a = i - o || 1, l = Math.max(r, a), h = 2 * t / l;
+  return n.map(([d, c]) => [
+    (d - e - r / 2) * h + t,
+    (c - o - a / 2) * h + t
   ]);
 }
-async function Ot(n, e, t) {
+async function Ue(n, t, e) {
   const s = Array.from(n.nodes || []), o = s.length, {
     scale: i = 1,
     center: r = { x: 0, y: 0 },
     resolution: a = 0.35,
-    equidistant: d = !1
-  } = e || {};
+    equidistant: l = !1
+  } = t || {};
   if (o === 0)
-    return y(t, 1), {};
+    return y(e, 1), {};
   if (o === 1) {
     const c = { [s[0]]: { x: r.x, y: r.y } };
-    return y(t, 1), c;
+    return y(e, 1), c;
   }
-  let g = [];
-  if (d) {
-    let h = 0.5, u = a;
-    u += 1 / (h * u);
-    for (let p = 0; p < o; p++) {
-      const b = h * u;
-      u += 1 / b, g.push([Math.cos(u) * b, Math.sin(u) * b]);
+  let h = [];
+  if (l) {
+    let g = 0.5, m = a;
+    m += 1 / (g * m);
+    for (let u = 0; u < o; u++) {
+      const p = g * m;
+      m += 1 / p, h.push([Math.cos(m) * p, Math.sin(m) * p]);
     }
   } else
     for (let c = 0; c < o; c++) {
-      const h = a * c, u = c;
-      g.push([Math.cos(h) * u, Math.sin(h) * u]);
+      const g = a * c, m = c;
+      h.push([Math.cos(g) * m, Math.sin(g) * m]);
     }
-  g = Ut(g, i);
-  const l = {};
-  return s.forEach((c, h) => {
-    l[c] = {
-      x: g[h][0] + r.x,
-      y: g[h][1] + r.y
+  h = _e(h, i);
+  const d = {};
+  return s.forEach((c, g) => {
+    d[c] = {
+      x: h[g][0] + r.x,
+      y: h[g][1] + r.y
     };
-  }), y(t, 1), l;
+  }), y(e, 1), d;
 }
-const Ke = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const Kt = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  SpiralLayout: Ae,
-  default: Ae,
-  spiralCompute: Ot
+  SpiralLayout: At,
+  default: At,
+  spiralCompute: Ue
 }, Symbol.toStringTag, { value: "Module" }));
-class Ge extends V {
+class Gt extends V {
   /**
    * Create a shell layout instance
    *
@@ -2564,15 +2590,15 @@ class Ge extends V {
    * @param {Array<Array<string>>} [options.nlist=null] - Pre-defined node shells (groups of node IDs)
    * @param {number|null} [options.rotate=null] - Rotation offset between shells (default: π/num_shells)
    */
-  constructor(e, t = {}) {
-    super(e, {
+  constructor(t, e = {}) {
+    super(t, {
       scale: 100,
       center: { x: 0, y: 0 },
       nlist: null,
       rotate: null,
       nodeProperties: null,
       // Map of node ID -> {degree, ...properties}
-      ...t
+      ...e
     }, {
       module: "../layouts/shell.js",
       functionName: "shellCompute"
@@ -2580,71 +2606,71 @@ class Ge extends V {
   }
   // computePositions() inherited from base class - delegates to worker!
 }
-async function qt(n, e, t) {
+async function qe(n, t, e) {
   const s = Array.from(n.nodes || []), o = s.length, {
     scale: i = 1,
     center: r = { x: 0, y: 0 },
     nlist: a = null,
-    rotate: d = null,
-    nodeProperties: g = null
-    // Map of node ID -> {degree, ...properties}
-  } = e || {};
+    rotate: l = null,
+    nodeProperties: h = null
+    // Map or Object of node ID -> {degree, ...properties}
+  } = t || {}, d = h instanceof Map, c = h && typeof h == "object" && !d, g = d ? h.size > 0 : c ? Object.keys(h).length > 0 : !1, m = (w) => d ? h.get(w) : c ? h[w] : null;
   if (o === 0)
-    return y(t, 1), {};
+    return y(e, 1), {};
   if (o === 1) {
-    const v = { [s[0]]: { x: r.x, y: r.y } };
-    return y(t, 1), v;
+    const w = { [s[0]]: { x: r.x, y: r.y } };
+    return y(e, 1), w;
   }
-  let l;
-  if (a && Array.isArray(a))
-    l = a;
-  else {
-    let v = /* @__PURE__ */ new Map();
-    if (g && g.size > 0)
-      s.forEach((m) => {
-        const w = g.get(m), x = w && typeof w == "object" && w.degree || 0;
-        v.set(m, x);
-      });
-    else if (s.forEach((m) => {
-      v.set(m, 0);
-    }), n.edges)
-      for (const m of n.edges) {
-        const w = m.u !== void 0 ? m.u : m.source !== void 0 ? m.source : m[0], x = m.v !== void 0 ? m.v : m.target !== void 0 ? m.target : m[1];
-        v.has(w) && v.set(w, v.get(w) + 1), v.has(x) && v.set(x, v.get(x) + 1);
-      }
-    const C = /* @__PURE__ */ new Map();
-    s.forEach((m) => {
-      const w = v.get(m) || 0;
-      C.has(w) || C.set(w, []), C.get(w).push(m);
-    }), l = Array.from(C.keys()).sort((m, w) => w - m).map((m) => C.get(m));
-  }
-  const c = i / l.length;
-  let h;
-  l[0].length === 1 ? h = 0 : h = c;
   let u;
-  d === null ? u = Math.PI / l.length : u = d;
-  const p = {};
-  let b = u;
-  for (const v of l) {
-    const C = v.length;
-    if (C === 0) continue;
-    const A = [];
-    for (let m = 0; m < C; m++)
-      A.push(2 * Math.PI * m / C + b);
-    v.forEach((m, w) => {
-      const x = A[w], T = h * Math.cos(x) + r.x, B = h * Math.sin(x) + r.y;
-      p[m] = { x: T, y: B };
-    }), h += c, b += u;
+  if (a && Array.isArray(a))
+    u = a;
+  else {
+    let w = /* @__PURE__ */ new Map();
+    if (g)
+      s.forEach((G) => {
+        const M = m(G), X = M && typeof M == "object" && M.degree || 0;
+        w.set(G, X);
+      });
+    else if (s.forEach((G) => {
+      w.set(G, 0);
+    }), n.edges)
+      for (const G of n.edges) {
+        const M = G.u !== void 0 ? G.u : G.source !== void 0 ? G.source : G[0], X = G.v !== void 0 ? G.v : G.target !== void 0 ? G.target : G[1];
+        w.has(M) && w.set(M, w.get(M) + 1), w.has(X) && w.set(X, w.get(X) + 1);
+      }
+    const x = /* @__PURE__ */ new Map();
+    s.forEach((G) => {
+      const M = w.get(G) || 0;
+      x.has(M) || x.set(M, []), x.get(M).push(G);
+    }), u = Array.from(x.keys()).sort((G, M) => M - G).map((G) => x.get(G));
   }
-  return y(t, 1), p;
+  const p = i / u.length;
+  let v;
+  u[0].length === 1 ? v = 0 : v = p;
+  let b;
+  l === null ? b = Math.PI / u.length : b = l;
+  const A = {};
+  let C = b;
+  for (const w of u) {
+    const x = w.length;
+    if (x === 0) continue;
+    const P = [];
+    for (let G = 0; G < x; G++)
+      P.push(2 * Math.PI * G / x + C);
+    w.forEach((G, M) => {
+      const X = P[M], Z = v * Math.cos(X) + r.x, N = v * Math.sin(X) + r.y;
+      A[G] = { x: Z, y: N };
+    }), v += p, C += b;
+  }
+  return y(e, 1), A;
 }
-const Se = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const jt = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  ShellLayout: Ge,
-  default: Ge,
-  shellCompute: qt
+  ShellLayout: Gt,
+  default: Gt,
+  shellCompute: qe
 }, Symbol.toStringTag, { value: "Module" }));
-class Te extends V {
+class Tt extends V {
   /**
    * Create a spectral layout instance
    *
@@ -2653,11 +2679,11 @@ class Te extends V {
    * @param {number} [options.scale=100] - Scale factor for positions
    * @param {Object} [options.center={x:0, y:0}] - Center point
    */
-  constructor(e, t = {}) {
-    super(e, {
+  constructor(t, e = {}) {
+    super(t, {
       scale: 100,
       center: { x: 0, y: 0 },
-      ...t
+      ...e
     }, {
       module: "../layouts/spectral.js",
       functionName: "spectralCompute"
@@ -2665,99 +2691,98 @@ class Te extends V {
   }
   // computePositions() inherited from base class - delegates to worker!
 }
-async function Qt(n, e, t) {
+async function Qe(n, t, e) {
   const s = Array.from(n.nodes || []), o = s.length;
-  console.log("[spectralCompute] Starting with", o, "nodes");
+  console.log("[spectralCompute] Starting with", o, "nodes"), console.log("[spectralCompute] Raw options:", t), console.log("[spectralCompute] Raw options keys:", t ? Object.keys(t) : "null"), console.log("[spectralCompute] nodeProperties in options:", t?.nodeProperties);
   const {
     scale: i = 1,
     center: r = { x: 0, y: 0 },
     nodeProperties: a = null
-    // Map of node ID -> {laplacian_x, laplacian_y}
-  } = e || {};
-  if (console.log("[spectralCompute] nodeProperties:", a ? `Map with ${a.size} entries` : "null"), o === 0)
-    return y(t, 1), {};
+    // Map or Object of node ID -> {laplacian_x, laplacian_y}
+  } = t || {}, l = a instanceof Map, h = a && typeof a == "object" && !l, d = l ? a.size > 0 : h ? Object.keys(a).length > 0 : !1;
+  if (console.log(
+    "[spectralCompute] nodeProperties:",
+    l ? `Map with ${a.size} entries` : h ? `Object with ${Object.keys(a).length} entries` : "null"
+  ), o === 0)
+    return y(e, 1), {};
   if (o === 1) {
-    const h = { [s[0]]: { x: r.x, y: r.y } };
-    return y(t, 1), h;
+    const v = { [s[0]]: { x: r.x, y: r.y } };
+    return y(e, 1), v;
   }
-  const d = {}, g = [], l = a || /* @__PURE__ */ new Map();
+  const c = {}, g = [], m = (v) => l ? a.get(v) : h ? a[v] : null;
   console.log("[spectralCompute] Processing", o, "nodes for eigenvector extraction");
-  for (const h of s) {
-    let u, p;
-    if (l && l.size > 0) {
-      const b = l.get(h);
-      if (b && b.laplacian_x !== void 0 && b.laplacian_y !== void 0)
-        u = b.laplacian_x, p = b.laplacian_y;
-      else
-        throw new Error(
-          `Spectral layout requires eigenvector-laplacian stat. Node "${h}" missing laplacian_x/laplacian_y. Include 'eigenvector-laplacian' in analyze() features.`
-        );
-    } else if (n.nodes && typeof n.nodes[Symbol.iterator] == "function")
+  const u = [];
+  for (const v of s) {
+    let b, A;
+    if (d) {
+      const C = m(v);
+      C && C.laplacian_x !== void 0 && C.laplacian_y !== void 0 ? (b = C.laplacian_x, A = C.laplacian_y) : (u.push(v), b = (Math.random() - 0.5) * 0.1, A = (Math.random() - 0.5) * 0.1, console.log(`[spectralCompute] Node "${v}" missing laplacian data, using fallback position`));
+    } else
       throw new Error(
         "Spectral layout requires eigenvector-laplacian stat. Include 'eigenvector-laplacian' in analyze() features."
       );
-    g.push([u, p]);
+    g.push([b, A]);
   }
-  console.log("[spectralCompute] Extracted", g.length, "coordinates. Sample:", g[0]), y(t, 0.5), console.log("[spectralCompute] Starting rescaleLayout...");
-  const c = Dt(g, i);
-  return console.log("[spectralCompute] Rescaled. Sample:", c[0]), y(t, 0.99), s.forEach((h, u) => {
-    d[h] = {
-      x: c[u][0] + r.x,
-      y: c[u][1] + r.y
+  u.length > 0 && console.log(`[spectralCompute] ${u.length} nodes missing laplacian data, used fallback positions`), console.log("[spectralCompute] Extracted", g.length, "coordinates. Sample:", g[0]), y(e, 0.5), console.log("[spectralCompute] Starting rescaleLayout...");
+  const p = De(g, i);
+  return console.log("[spectralCompute] Rescaled. Sample:", p[0]), y(e, 0.99), s.forEach((v, b) => {
+    c[v] = {
+      x: p[b][0] + r.x,
+      y: p[b][1] + r.y
     };
-  }), console.log("[spectralCompute] Created positions for", Object.keys(d).length, "nodes"), y(t, 1), console.log("[spectralCompute] Completed successfully"), d;
+  }), console.log("[spectralCompute] Created positions for", Object.keys(c).length, "nodes"), y(e, 1), console.log("[spectralCompute] Completed successfully"), c;
 }
-function Dt(n, e = 1) {
+function De(n, t = 1) {
   if (n.length === 0) return n;
-  let t = 1 / 0, s = -1 / 0, o = 1 / 0, i = -1 / 0;
-  for (const [l, c] of n)
-    t = Math.min(t, l), s = Math.max(s, l), o = Math.min(o, c), i = Math.max(i, c);
-  const r = s - t || 1, a = i - o || 1, d = Math.max(r, a), g = 2 * e / d;
-  return n.map(([l, c]) => [
-    (l - t - r / 2) * g + e,
-    (c - o - a / 2) * g + e
+  let e = 1 / 0, s = -1 / 0, o = 1 / 0, i = -1 / 0;
+  for (const [d, c] of n)
+    e = Math.min(e, d), s = Math.max(s, d), o = Math.min(o, c), i = Math.max(i, c);
+  const r = s - e || 1, a = i - o || 1, l = Math.max(r, a), h = 2 * t / l;
+  return n.map(([d, c]) => [
+    (d - e - r / 2) * h + t,
+    (c - o - a / 2) * h + t
   ]);
 }
-const Ye = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const St = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  SpectralLayout: Te,
-  default: Te,
-  spectralCompute: Qt
+  SpectralLayout: Tt,
+  default: Tt,
+  spectralCompute: Qe
 }, Symbol.toStringTag, { value: "Module" }));
-function ne(n, e, t = 1, s = { x: 0, y: 0 }) {
-  if (e.length === 0) return n;
+function nt(n, t, e = 1, s = { x: 0, y: 0 }) {
+  if (t.length === 0) return n;
   let o = 0, i = 0;
-  e.forEach((c) => {
+  t.forEach((c) => {
     o += n[c].x, i += n[c].y;
   });
-  const r = o / e.length, a = i / e.length, d = {};
-  e.forEach((c) => {
-    d[c] = {
+  const r = o / t.length, a = i / t.length, l = {};
+  t.forEach((c) => {
+    l[c] = {
       x: n[c].x - r,
       y: n[c].y - a
     };
   });
-  let g = 0;
-  e.forEach((c) => {
-    const h = Math.abs(d[c].x), u = Math.abs(d[c].y);
-    g = Math.max(g, h, u);
+  let h = 0;
+  t.forEach((c) => {
+    const g = Math.abs(l[c].x), m = Math.abs(l[c].y);
+    h = Math.max(h, g, m);
   });
-  const l = {};
-  if (g > 0) {
-    const c = t / g;
-    e.forEach((h) => {
-      l[h] = {
-        x: d[h].x * c + s.x,
-        y: d[h].y * c + s.y
+  const d = {};
+  if (h > 0) {
+    const c = e / h;
+    t.forEach((g) => {
+      d[g] = {
+        x: l[g].x * c + s.x,
+        y: l[g].y * c + s.y
       };
     });
   } else
-    e.forEach((c) => {
-      l[c] = { x: s.x, y: s.y };
+    t.forEach((c) => {
+      d[c] = { x: s.x, y: s.y };
     });
-  return l;
+  return d;
 }
-class Pe extends V {
+class Pt extends V {
   /**
    * Create a force-directed layout instance
    *
@@ -2770,15 +2795,15 @@ class Pe extends V {
    * @param {Object} [options.initialPositions=null] - Initial node positions
    * @param {number} [options.threshold=1e-4] - Convergence threshold
    */
-  constructor(e, t = {}) {
-    super(e, {
+  constructor(t, e = {}) {
+    super(t, {
       iterations: 50,
       k: null,
       scale: 1,
       center: { x: 0, y: 0 },
       initialPositions: null,
       threshold: 1e-4,
-      ...t
+      ...e
     }, {
       module: "../layouts/force-directed.js",
       functionName: "forceDirectedCompute"
@@ -2786,80 +2811,80 @@ class Pe extends V {
   }
   // computePositions() inherited from base class - delegates to worker!
 }
-async function $t(n, e, t) {
-  const s = N(n), {
+async function $e(n, t, e) {
+  const s = L(n), {
     iterations: o = 50,
     k: i = null,
     scale: r = 1,
     center: a = { x: 0, y: 0 },
-    initialPositions: d = null,
-    threshold: g = 1e-4
-  } = e || {}, l = Array.from(s.nodes), c = l.length;
+    initialPositions: l = null,
+    threshold: h = 1e-4
+  } = t || {}, d = Array.from(s.nodes), c = d.length;
   if (c === 0)
-    return y(t, 1), {};
+    return y(e, 1), {};
   if (c === 1) {
-    const T = { [l[0]]: { x: a.x, y: a.y } };
-    return y(t, 1), T;
+    const P = { [d[0]]: { x: a.x, y: a.y } };
+    return y(e, 1), P;
   }
-  let h = {};
-  d ? h = { ...d } : l.forEach((T) => {
-    h[T] = {
+  let g = {};
+  l ? g = { ...l } : d.forEach((P) => {
+    g[P] = {
       x: Math.random(),
       y: Math.random()
     };
   });
-  const u = i !== null ? i : Math.sqrt(1 / c);
-  let p = 1 / 0, b = -1 / 0, v = 1 / 0, C = -1 / 0;
-  l.forEach((T) => {
-    const B = h[T];
-    p = Math.min(p, B.x), b = Math.max(b, B.x), v = Math.min(v, B.y), C = Math.max(C, B.y);
+  const m = i !== null ? i : Math.sqrt(1 / c);
+  let u = 1 / 0, p = -1 / 0, v = 1 / 0, b = -1 / 0;
+  d.forEach((P) => {
+    const G = g[P];
+    u = Math.min(u, G.x), p = Math.max(p, G.x), v = Math.min(v, G.y), b = Math.max(b, G.y);
   });
-  let A = Math.max(b - p, C - v) * 0.1;
-  const m = A / (o + 1), w = /* @__PURE__ */ new Map();
-  l.forEach((T) => {
-    const B = new Set(s.getNeighbors(T));
-    w.set(T, B);
+  let A = Math.max(p - u, b - v) * 0.1;
+  const C = A / (o + 1), w = /* @__PURE__ */ new Map();
+  d.forEach((P) => {
+    const G = new Set(s.getNeighbors(P));
+    w.set(P, G);
   });
-  for (let T = 0; T < o; T++) {
-    const B = {};
-    l.forEach((k) => {
-      B[k] = { x: 0, y: 0 };
-    }), l.forEach((k) => {
-      const W = h[k];
-      let M = 0, J = 0;
-      l.forEach((R) => {
-        if (R !== k) {
-          const I = h[R], f = W.x - I.x, P = W.y - I.y;
-          let Z = Math.sqrt(f * f + P * P);
-          Z < 0.01 && (Z = 0.01);
-          const X = w.get(k).has(R), F = u * u / (Z * Z), Y = X ? Z / u : 0, _ = F - Y;
-          M += f / Z * _, J += P / Z * _;
+  for (let P = 0; P < o; P++) {
+    const G = {};
+    d.forEach((X) => {
+      G[X] = { x: 0, y: 0 };
+    }), d.forEach((X) => {
+      const Z = g[X];
+      let N = 0, F = 0;
+      d.forEach((R) => {
+        if (R !== X) {
+          const I = g[R], f = Z.x - I.x, W = Z.y - I.y;
+          let k = Math.sqrt(f * f + W * W);
+          k < 0.01 && (k = 0.01);
+          const B = w.get(X).has(R), J = m * m / (k * k), S = B ? k / m : 0, O = J - S;
+          N += f / k * O, F += W / k * O;
         }
-      }), B[k] = { x: M, y: J };
+      }), G[X] = { x: N, y: F };
     });
-    let E = 0;
-    if (l.forEach((k) => {
-      const W = B[k], M = Math.sqrt(W.x * W.x + W.y * W.y);
-      if (M > 0) {
-        const J = Math.max(M, 0.01), R = A / J;
-        h[k].x += W.x * R, h[k].y += W.y * R, E += M;
+    let M = 0;
+    if (d.forEach((X) => {
+      const Z = G[X], N = Math.sqrt(Z.x * Z.x + Z.y * Z.y);
+      if (N > 0) {
+        const F = Math.max(N, 0.01), R = A / F;
+        g[X].x += Z.x * R, g[X].y += Z.y * R, M += N;
       }
-    }), A -= m, E / c < g) {
-      y(t, 1);
+    }), A -= C, M / c < h) {
+      y(e, 1);
       break;
     }
-    T % 10 === 0 && y(t, T / o);
+    P % 10 === 0 && y(e, P / o);
   }
-  const x = ne(h, l, r, a);
-  return y(t, 1), x;
+  const x = nt(g, d, r, a);
+  return y(e, 1), x;
 }
-const je = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const Yt = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  ForceDirectedLayout: Pe,
-  default: Pe,
-  forceDirectedCompute: $t
+  ForceDirectedLayout: Pt,
+  default: Pt,
+  forceDirectedCompute: $e
 }, Symbol.toStringTag, { value: "Module" }));
-class xe extends V {
+class xt extends V {
   /**
    * Create a Kamada-Kawai layout instance
    *
@@ -2872,15 +2897,15 @@ class xe extends V {
    * @param {number} [options.threshold=1e-4] - Convergence threshold
    * @param {number} [options.K=null] - Scaling factor for spring constant (auto-calculated if null)
    */
-  constructor(e, t = {}) {
-    super(e, {
+  constructor(t, e = {}) {
+    super(t, {
       iterations: 1e3,
       scale: 1,
       center: { x: 0, y: 0 },
       initialPositions: null,
       threshold: 1e-4,
       K: null,
-      ...t
+      ...e
     }, {
       module: "../layouts/kamada-kawai.js",
       functionName: "kamadaKawaiCompute"
@@ -2888,7 +2913,7 @@ class xe extends V {
   }
   // computePositions() inherited from base class - delegates to worker!
 }
-async function es(n, e, t) {
+async function ts(n, t, e) {
   console.log("[Kamada-Kawai] Received graphData:", {
     hasNodes: "nodes" in n,
     nodesType: typeof n.nodes,
@@ -2897,7 +2922,7 @@ async function es(n, e, t) {
     edgesType: typeof n.edges,
     edgesIsArray: Array.isArray(n.edges)
   });
-  const s = N(n);
+  const s = L(n);
   console.log("[Kamada-Kawai] After reconstructGraph, graph.nodes:", {
     type: typeof s.nodes,
     isSet: s.nodes instanceof Set,
@@ -2908,251 +2933,251 @@ async function es(n, e, t) {
     scale: i = 1,
     center: r = { x: 0, y: 0 },
     initialPositions: a = null,
-    threshold: d = 1e-4,
-    K: g = null
-  } = e || {}, l = Array.from(s.nodes), c = l.length;
+    threshold: l = 1e-4,
+    K: h = null
+  } = t || {}, d = Array.from(s.nodes), c = d.length;
   if (console.log("[Kamada-Kawai] Nodes array:", {
-    length: l.length,
-    isArray: Array.isArray(l),
-    sample: l.slice(0, 3)
+    length: d.length,
+    isArray: Array.isArray(d),
+    sample: d.slice(0, 3)
   }), c === 0)
-    return y(t, 1), {};
+    return y(e, 1), {};
   if (c === 1) {
-    const I = { [l[0]]: { x: r.x, y: r.y } };
-    return y(t, 1), I;
+    const I = { [d[0]]: { x: r.x, y: r.y } };
+    return y(e, 1), I;
   }
-  y(t, 0.1), console.log("[Kamada-Kawai] About to compute all-pairs shortest paths:", {
-    nodesLength: l.length,
-    nodesIsArray: Array.isArray(l),
-    nodesType: typeof l
+  y(e, 0.1), console.log("[Kamada-Kawai] About to compute all-pairs shortest paths:", {
+    nodesLength: d.length,
+    nodesIsArray: Array.isArray(d),
+    nodesType: typeof d
   });
-  let h;
+  let g;
   try {
-    h = ts(s, l), console.log("[Kamada-Kawai] All-pairs shortest paths computed successfully");
-    let I = !1, f = !1, P = 0, Z = 0;
-    for (let X = 0; X < h.length; X++)
-      for (let F = 0; F < h[X].length; F++)
-        isFinite(h[X][F]) || (I = h[X][F] === 1 / 0, f = isNaN(h[X][F]), I && P++, f && Z++);
-    (P > 0 || Z > 0) && console.warn("[Kamada-Kawai] Distances contain problematic values:", {
-      infinityCount: P,
-      nanCount: Z,
-      totalDistances: h.length * h[0].length,
-      sample: h[0].slice(0, 5)
+    g = es(s, d), console.log("[Kamada-Kawai] All-pairs shortest paths computed successfully");
+    let I = !1, f = !1, W = 0, k = 0;
+    for (let B = 0; B < g.length; B++)
+      for (let J = 0; J < g[B].length; J++)
+        isFinite(g[B][J]) || (I = g[B][J] === 1 / 0, f = isNaN(g[B][J]), I && W++, f && k++);
+    (W > 0 || k > 0) && console.warn("[Kamada-Kawai] Distances contain problematic values:", {
+      infinityCount: W,
+      nanCount: k,
+      totalDistances: g.length * g[0].length,
+      sample: g[0].slice(0, 5)
     });
   } catch (I) {
     throw console.error("[Kamada-Kawai] Error in computeAllPairsShortestPaths:", I.message, I.stack), I;
   }
-  y(t, 0.3), console.log("[Kamada-Kawai] About to initialize positions");
-  let u;
+  y(e, 0.3), console.log("[Kamada-Kawai] About to initialize positions");
+  let m;
   try {
-    u = ss(l, a), console.log("[Kamada-Kawai] Positions initialized successfully, pos:", {
-      type: typeof u,
-      isArray: Array.isArray(u),
-      length: u?.length || "N/A"
+    m = ss(d, a), console.log("[Kamada-Kawai] Positions initialized successfully, pos:", {
+      type: typeof m,
+      isArray: Array.isArray(m),
+      length: m?.length || "N/A"
     });
   } catch (I) {
     throw console.error("[Kamada-Kawai] Error in initializePositions:", I.message, I.stack), I;
   }
-  const p = h.flat().filter((I) => isFinite(I) && I > 0);
-  p.length === 0 && console.warn("[Kamada-Kawai] All distances are placeholder (disconnected)!");
-  const b = p.length > 0 ? p.reduce((I, f) => Math.max(I, f), 0) : 1, v = Math.sqrt(c), C = v / b, A = g !== null ? g : c;
+  const u = g.flat().filter((I) => isFinite(I) && I > 0);
+  u.length === 0 && console.warn("[Kamada-Kawai] All distances are placeholder (disconnected)!");
+  const p = u.length > 0 ? u.reduce((I, f) => Math.max(I, f), 0) : 1, v = Math.sqrt(c), b = v / p, A = h !== null ? h : c;
   console.log("[Kamada-Kawai] Distance matrix stats:", {
-    totalPairs: h.flat().length,
-    finitePairs: p.length,
-    infinitePairs: h.flat().length - p.length,
-    max_dij: b,
+    totalPairs: g.flat().length,
+    finitePairs: u.length,
+    infinitePairs: g.flat().length - u.length,
+    max_dij: p,
     L0: v,
-    L: C,
+    L: b,
     kkconst: A,
-    isKvalFinite: isFinite(A) && isFinite(C),
-    avgDij: p.reduce((I, f) => I + f, 0) / p.length
-  }), y(t, 0.4);
-  const m = Array(c).fill(null).map(() => Array(c).fill(0)), w = Array(c).fill(null).map(() => Array(c).fill(0));
+    isKvalFinite: isFinite(A) && isFinite(b),
+    avgDij: u.reduce((I, f) => I + f, 0) / u.length
+  }), y(e, 0.4);
+  const C = Array(c).fill(null).map(() => Array(c).fill(0)), w = Array(c).fill(null).map(() => Array(c).fill(0));
   for (let I = 0; I < c; I++)
     for (let f = 0; f < c; f++) {
       if (I === f) continue;
-      const P = h[I][f];
-      m[I][f] = A / (P * P), w[I][f] = C * P;
+      const W = g[I][f];
+      C[I][f] = A / (W * W), w[I][f] = b * W;
     }
   if (c > 1) {
-    const P = Math.sqrt(
-      Math.pow(u[0][0] - u[1][0], 2) + Math.pow(u[0][1] - u[1][1], 2)
+    const W = Math.sqrt(
+      Math.pow(m[0][0] - m[1][0], 2) + Math.pow(m[0][1] - m[1][1], 2)
     );
     console.log("[Kamada-Kawai] Sample spring values:", {
-      "graph_dist[0,1]": h[0][1],
-      "spring_const_kij[0,1]": m[0][1].toExponential(4),
+      "graph_dist[0,1]": g[0][1],
+      "spring_const_kij[0,1]": C[0][1].toExponential(4),
       "desired_dist_lij[0,1]": w[0][1].toFixed(4),
-      initial_euclidean_dist: P.toFixed(4),
-      stress_ratio: (P / w[0][1]).toFixed(4),
-      force: (m[0][1] * Math.abs(P - w[0][1])).toExponential(4)
+      initial_euclidean_dist: W.toFixed(4),
+      stress_ratio: (W / w[0][1]).toFixed(4),
+      force: (C[0][1] * Math.abs(W - w[0][1])).toExponential(4)
     });
   }
-  const x = Array(c).fill(0), T = Array(c).fill(0);
+  const x = Array(c).fill(0), P = Array(c).fill(0);
   for (let I = 0; I < c; I++)
     for (let f = 0; f < c; f++) {
       if (f === I) continue;
-      const P = u[I][0] - u[f][0], Z = u[I][1] - u[f][1], X = Math.sqrt(P * P + Z * Z);
-      X !== 0 && (x[I] += m[I][f] * (P - w[I][f] * P / X), T[I] += m[I][f] * (Z - w[I][f] * Z / X));
+      const W = m[I][0] - m[f][0], k = m[I][1] - m[f][1], B = Math.sqrt(W * W + k * k);
+      B !== 0 && (x[I] += C[I][f] * (W - w[I][f] * W / B), P[I] += C[I][f] * (k - w[I][f] * k / B));
     }
-  const B = x.map((I, f) => Math.sqrt(I * I + T[f] * T[f])), E = Math.max(...B), k = B.reduce((I, f) => I + f, 0) / c;
+  const G = x.map((I, f) => Math.sqrt(I * I + P[f] * P[f])), M = Math.max(...G), X = G.reduce((I, f) => I + f, 0) / c;
   console.log("[Kamada-Kawai] Initial gradient stats:", {
-    maxEnergy: E.toFixed(4),
-    avgEnergy: k.toFixed(4),
-    threshold: Math.sqrt(d).toFixed(6)
+    maxEnergy: M.toFixed(4),
+    avgEnergy: X.toFixed(4),
+    threshold: Math.sqrt(l).toFixed(6)
   });
   for (let I = 0; I < o; I++) {
-    let f = 0, P = -1;
-    for (let G = 0; G < c; G++) {
-      const z = x[G] * x[G] + T[G] * T[G];
-      z > P && (f = G, P = z);
+    let f = 0, W = -1;
+    for (let T = 0; T < c; T++) {
+      const z = x[T] * x[T] + P[T] * P[T];
+      z > W && (f = T, W = z);
     }
-    if (P < d) {
-      console.log(`[Kamada-Kawai] Converged at iteration ${I}/${o} with max_delta ${Math.sqrt(P).toFixed(6)} (threshold: ${Math.sqrt(d).toFixed(6)})`);
+    if (W < l) {
+      console.log(`[Kamada-Kawai] Converged at iteration ${I}/${o} with max_delta ${Math.sqrt(W).toFixed(6)} (threshold: ${Math.sqrt(l).toFixed(6)})`);
       break;
     }
-    y(t, 0.4 + 0.6 * (I + 1) / o), (I % 500 === 0 || I < 5 || I === o - 1) && console.log(`[Kamada-Kawai] Iteration ${I}/${o}: max_delta = ${Math.sqrt(P).toFixed(6)}, node ${f}`);
-    const Z = u[f][0], X = u[f][1];
-    let F = 0, Y = 0, _ = 0;
-    for (let G = 0; G < c; G++) {
-      if (G === f) continue;
-      const z = Z - u[G][0], S = X - u[G][1], q = Math.sqrt(z * z + S * S);
+    y(e, 0.4 + 0.6 * (I + 1) / o), (I % 500 === 0 || I < 5 || I === o - 1) && console.log(`[Kamada-Kawai] Iteration ${I}/${o}: max_delta = ${Math.sqrt(W).toFixed(6)}, node ${f}`);
+    const k = m[f][0], B = m[f][1];
+    let J = 0, S = 0, O = 0;
+    for (let T = 0; T < c; T++) {
+      if (T === f) continue;
+      const z = k - m[T][0], j = B - m[T][1], q = Math.sqrt(z * z + j * j);
       if (q === 0) continue;
-      const j = q * (z * z + S * S);
-      F += m[f][G] * (1 - w[f][G] * S * S / j), Y += m[f][G] * w[f][G] * z * S / j, _ += m[f][G] * (1 - w[f][G] * z * z / j);
+      const Y = q * (z * z + j * j);
+      J += C[f][T] * (1 - w[f][T] * j * j / Y), S += C[f][T] * w[f][T] * z * j / Y, O += C[f][T] * (1 - w[f][T] * z * z / Y);
     }
-    let ae = 0, ce = 0;
-    const me = 1e-13, te = x[f], se = T[f];
-    if (te * te + se * se >= me * me) {
-      const G = _ * F - Y * Y;
-      Math.abs(G) > 1e-10 ? (ce = (Y * te - F * se) / G, ae = (Y * se - _ * te) / G) : I < 5 && console.warn(`[Kamada-Kawai] Iteration ${I}: Singular matrix (det=${G.toExponential(2)}) for node ${f}`);
+    let at = 0, ct = 0;
+    const mt = 1e-13, et = x[f], st = P[f];
+    if (et * et + st * st >= mt * mt) {
+      const T = O * J - S * S;
+      Math.abs(T) > 1e-10 ? (ct = (S * et - J * st) / T, at = (S * st - O * et) / T) : I < 5 && console.warn(`[Kamada-Kawai] Iteration ${I}: Singular matrix (det=${T.toExponential(2)}) for node ${f}`);
     } else I < 5 && console.warn(`[Kamada-Kawai] Iteration ${I}: Gradient too small for node ${f}`);
     I < 3 && f === 0 && console.log(`[Kamada-Kawai] Iteration ${I}, node ${f}:`, {
-      A: F.toFixed(4),
-      B: Y.toFixed(4),
-      C: _.toFixed(4),
-      det: (_ * F - Y * Y).toExponential(4),
-      myD1: te.toFixed(4),
-      myD2: se.toFixed(4),
-      delta_x: ae.toFixed(6),
-      delta_y: ce.toFixed(6),
-      old_pos: [Z.toFixed(2), X.toFixed(2)]
+      A: J.toFixed(4),
+      B: S.toFixed(4),
+      C: O.toFixed(4),
+      det: (O * J - S * S).toExponential(4),
+      myD1: et.toFixed(4),
+      myD2: st.toFixed(4),
+      delta_x: at.toFixed(6),
+      delta_y: ct.toFixed(6),
+      old_pos: [k.toFixed(2), B.toFixed(2)]
     });
-    const fe = Z + ae, ye = X + ce;
-    x[f] = 0, T[f] = 0;
-    for (let G = 0; G < c; G++) {
-      if (G === f) continue;
-      const z = Z - u[G][0], S = X - u[G][1], q = Math.sqrt(z * z + S * S), j = fe - u[G][0], Q = ye - u[G][1], oe = Math.sqrt(j * j + Q * Q);
-      q === 0 || oe === 0 || (x[G] -= m[f][G] * (-z + w[f][G] * z / q), T[G] -= m[f][G] * (-S + w[f][G] * S / q), x[G] += m[f][G] * (-j + w[f][G] * j / oe), T[G] += m[f][G] * (-Q + w[f][G] * Q / oe), x[f] += m[f][G] * (j - w[f][G] * j / oe), T[f] += m[f][G] * (Q - w[f][G] * Q / oe));
+    const ft = k + at, yt = B + ct;
+    x[f] = 0, P[f] = 0;
+    for (let T = 0; T < c; T++) {
+      if (T === f) continue;
+      const z = k - m[T][0], j = B - m[T][1], q = Math.sqrt(z * z + j * j), Y = ft - m[T][0], Q = yt - m[T][1], ot = Math.sqrt(Y * Y + Q * Q);
+      q === 0 || ot === 0 || (x[T] -= C[f][T] * (-z + w[f][T] * z / q), P[T] -= C[f][T] * (-j + w[f][T] * j / q), x[T] += C[f][T] * (-Y + w[f][T] * Y / ot), P[T] += C[f][T] * (-Q + w[f][T] * Q / ot), x[f] += C[f][T] * (Y - w[f][T] * Y / ot), P[f] += C[f][T] * (Q - w[f][T] * Q / ot));
     }
-    u[f][0] = fe, u[f][1] = ye;
+    m[f][0] = ft, m[f][1] = yt;
   }
-  y(t, 0.95), console.log("[Kamada-Kawai] Before rescaling - preparing positions");
-  const W = {};
-  l.forEach((I, f) => {
-    W[I] = {
-      x: u[f][0],
-      y: u[f][1]
+  y(e, 0.95), console.log("[Kamada-Kawai] Before rescaling - preparing positions");
+  const Z = {};
+  d.forEach((I, f) => {
+    Z[I] = {
+      x: m[f][0],
+      y: m[f][1]
     };
   });
-  const M = l[0];
+  const N = d[0];
   console.log("[Kamada-Kawai] Sample positions BEFORE rescaling:", {
-    sample: M,
-    value: W[M],
-    allCount: Object.keys(W).length,
+    sample: N,
+    value: Z[N],
+    allCount: Object.keys(Z).length,
     minMax: (() => {
-      let I = 1 / 0, f = -1 / 0, P = 1 / 0, Z = -1 / 0;
-      return Object.values(W).forEach((X) => {
-        I = Math.min(I, X.x), f = Math.max(f, X.x), P = Math.min(P, X.y), Z = Math.max(Z, X.y);
-      }), { minX: I, maxX: f, minY: P, maxY: Z, rangeX: f - I, rangeY: Z - P };
+      let I = 1 / 0, f = -1 / 0, W = 1 / 0, k = -1 / 0;
+      return Object.values(Z).forEach((B) => {
+        I = Math.min(I, B.x), f = Math.max(f, B.x), W = Math.min(W, B.y), k = Math.max(k, B.y);
+      }), { minX: I, maxX: f, minY: W, maxY: k, rangeX: f - I, rangeY: k - W };
     })()
   }), console.log("[Kamada-Kawai] Calling rescaleLayout with correct signature, scale:", i, "center:", r);
-  const J = ne(W, l, i, r);
+  const F = nt(Z, d, i, r);
   console.log("[Kamada-Kawai] rescaleLayout completed successfully"), console.log("[Kamada-Kawai] Sample positions AFTER rescaling:", {
-    sample: M,
-    value: J[M],
+    sample: N,
+    value: F[N],
     minMax: (() => {
-      let I = 1 / 0, f = -1 / 0, P = 1 / 0, Z = -1 / 0;
-      return Object.values(J).forEach((X) => {
-        I = Math.min(I, X.x), f = Math.max(f, X.x), P = Math.min(P, X.y), Z = Math.max(Z, X.y);
-      }), { minX: I, maxX: f, minY: P, maxY: Z, rangeX: f - I, rangeY: Z - P };
+      let I = 1 / 0, f = -1 / 0, W = 1 / 0, k = -1 / 0;
+      return Object.values(F).forEach((B) => {
+        I = Math.min(I, B.x), f = Math.max(f, B.x), W = Math.min(W, B.y), k = Math.max(k, B.y);
+      }), { minX: I, maxX: f, minY: W, maxY: k, rangeX: f - I, rangeY: k - W };
     })()
   });
   const R = {};
   console.log("[Kamada-Kawai] Creating final positions dictionary");
   try {
-    Object.entries(J).forEach(([P, Z]) => {
-      R[P] = {
-        x: Z.x,
-        y: Z.y
+    Object.entries(F).forEach(([W, k]) => {
+      R[W] = {
+        x: k.x,
+        y: k.y
       };
     }), console.log("[Kamada-Kawai] Final positions dictionary created successfully, count:", Object.keys(R).length);
-    const I = l.slice(0, 3), f = {};
-    I.forEach((P) => {
-      f[P] = R[P];
+    const I = d.slice(0, 3), f = {};
+    I.forEach((W) => {
+      f[W] = R[W];
     }), console.log("[Kamada-Kawai] Sample final positions:", f);
   } catch (I) {
-    throw console.error("[Kamada-Kawai] Error creating positions dictionary:", I.message), console.error("  rescaledDict:", J), I;
+    throw console.error("[Kamada-Kawai] Error creating positions dictionary:", I.message), console.error("  rescaledDict:", F), I;
   }
-  return y(t, 1), R;
+  return y(e, 1), R;
 }
-function ts(n, e) {
-  const t = e.length, s = Array(t).fill(null).map(() => Array(t).fill(1 / 0)), o = {};
-  e.forEach((r, a) => {
+function es(n, t) {
+  const e = t.length, s = Array(e).fill(null).map(() => Array(e).fill(1 / 0)), o = {};
+  t.forEach((r, a) => {
     o[r] = a, s[a][a] = 0;
   });
-  for (let r = 0; r < t; r++) {
-    const a = e[r], d = [[a, 0]], g = /* @__PURE__ */ new Set([a]);
-    for (; d.length > 0; ) {
-      const [l, c] = d.shift(), h = o[l];
-      h !== void 0 && (s[r][h] = c);
-      const u = n.getNeighbors(l) || [];
-      for (const p of u)
-        g.has(p) || (g.add(p), d.push([p, c + 1]));
+  for (let r = 0; r < e; r++) {
+    const a = t[r], l = [[a, 0]], h = /* @__PURE__ */ new Set([a]);
+    for (; l.length > 0; ) {
+      const [d, c] = l.shift(), g = o[d];
+      g !== void 0 && (s[r][g] = c);
+      const m = n.getNeighbors(d) || [];
+      for (const u of m)
+        h.has(u) || (h.add(u), l.push([u, c + 1]));
     }
   }
   let i = 0;
-  for (let r = 0; r < t; r++)
-    for (let a = r + 1; a < t; a++)
+  for (let r = 0; r < e; r++)
+    for (let a = r + 1; a < e; a++)
       isFinite(s[r][a]) && s[r][a] > i && (i = s[r][a]);
-  for (let r = 0; r < t; r++)
-    for (let a = 0; a < t; a++)
+  for (let r = 0; r < e; r++)
+    for (let a = 0; a < e; a++)
       s[r][a] > i && (s[r][a] = i);
   return s;
 }
-function ss(n, e) {
-  const t = n.length, s = [];
-  if (e && Object.keys(e).length > 0)
+function ss(n, t) {
+  const e = n.length, s = [];
+  if (t && Object.keys(t).length > 0)
     n.forEach((o) => {
-      const i = e[o];
+      const i = t[o];
       i ? s.push([i.x || 0, i.y || 0]) : s.push([Math.random(), Math.random()]);
     });
   else {
-    const o = Math.sqrt(t);
-    if (t > 100) {
+    const o = Math.sqrt(e);
+    if (e > 100) {
       const i = o * 3;
       console.log(`[Kamada-Kawai] Random initialization: spread=${i.toFixed(2)}, L0=${o.toFixed(2)}`);
-      for (let r = 0; r < t; r++) {
-        const a = (Math.random() - 0.5) * i, d = (Math.random() - 0.5) * i;
-        s.push([a, d]);
+      for (let r = 0; r < e; r++) {
+        const a = (Math.random() - 0.5) * i, l = (Math.random() - 0.5) * i;
+        s.push([a, l]);
       }
     } else {
-      const i = 2 * Math.PI / t, r = o * 2;
+      const i = 2 * Math.PI / e, r = o * 2;
       console.log(`[Kamada-Kawai] Circular initialization: radius=${r.toFixed(2)}, L0=${o.toFixed(2)}`);
-      for (let a = 0; a < t; a++) {
-        const d = r * Math.cos(a * i), g = r * Math.sin(a * i);
-        s.push([d, g]);
+      for (let a = 0; a < e; a++) {
+        const l = r * Math.cos(a * i), h = r * Math.sin(a * i);
+        s.push([l, h]);
       }
     }
   }
   return s;
 }
-const Ve = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const Vt = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  KamadaKawaiLayout: xe,
-  default: xe,
-  kamadaKawaiCompute: es
+  KamadaKawaiLayout: xt,
+  default: xt,
+  kamadaKawaiCompute: ts
 }, Symbol.toStringTag, { value: "Module" }));
-class We extends V {
+class Wt extends V {
   /**
    * Create a bipartite layout instance
    *
@@ -3164,14 +3189,14 @@ class We extends V {
    * @param {number} [options.aspectRatio=4/3] - Width to height ratio
    * @param {Object} [options.center={x:0, y:0}] - Center point
    */
-  constructor(e, t = {}) {
-    super(e, {
+  constructor(t, e = {}) {
+    super(t, {
       partition: null,
       align: "vertical",
       scale: 1,
       aspectRatio: 4 / 3,
       center: { x: 0, y: 0 },
-      ...t
+      ...e
     }, {
       module: "../layouts/bipartite.js",
       functionName: "bipartiteCompute"
@@ -3179,57 +3204,57 @@ class We extends V {
   }
   // computePositions() inherited from base class - delegates to worker!
 }
-async function os(n, e, t) {
-  const s = N(n), {
+async function os(n, t, e) {
+  const s = L(n), {
     partition: o = null,
     align: i = "vertical",
     scale: r = 1,
     aspectRatio: a = 4 / 3,
-    center: d = { x: 0, y: 0 }
-  } = e || {}, g = Array.from(s.nodes), l = g.length;
-  if (l === 0)
-    return y(t, 1), {};
-  if (l === 1) {
-    const W = { [g[0]]: { x: d.x, y: d.y } };
-    return y(t, 1), W;
+    center: l = { x: 0, y: 0 }
+  } = t || {}, h = Array.from(s.nodes), d = h.length;
+  if (d === 0)
+    return y(e, 1), {};
+  if (d === 1) {
+    const Z = { [h[0]]: { x: l.x, y: l.y } };
+    return y(e, 1), Z;
   }
-  y(t, 0.3);
-  let c, h;
-  o && o.length > 0 ? (c = new Set(o), h = new Set(g.filter((W) => !c.has(W)))) : (c = /* @__PURE__ */ new Set(), h = /* @__PURE__ */ new Set(), g.forEach((W, M) => {
-    M % 2 === 0 ? c.add(W) : h.add(W);
-  })), y(t, 0.5);
-  const u = Array.from(c), p = Array.from(h), b = [], v = u.length - 1 || 1, C = p.length - 1 || 1, A = a * 2, m = 2, w = A / 2, x = m / 2;
-  u.forEach((W, M) => {
-    const J = -w, R = v > 0 ? M * m / v - x : 0;
-    b.push([J, R]);
-  }), p.forEach((W, M) => {
-    const J = w, R = C > 0 ? M * m / C - x : 0;
-    b.push([J, R]);
-  }), y(t, 0.7);
-  const T = [...u, ...p], B = {};
-  T.forEach((W, M) => {
-    B[W] = {
-      x: b[M][0],
-      y: b[M][1]
+  y(e, 0.3);
+  let c, g;
+  o && o.length > 0 ? (c = new Set(o), g = new Set(h.filter((Z) => !c.has(Z)))) : (c = /* @__PURE__ */ new Set(), g = /* @__PURE__ */ new Set(), h.forEach((Z, N) => {
+    N % 2 === 0 ? c.add(Z) : g.add(Z);
+  })), y(e, 0.5);
+  const m = Array.from(c), u = Array.from(g), p = [], v = m.length - 1 || 1, b = u.length - 1 || 1, A = a * 2, C = 2, w = A / 2, x = C / 2;
+  m.forEach((Z, N) => {
+    const F = -w, R = v > 0 ? N * C / v - x : 0;
+    p.push([F, R]);
+  }), u.forEach((Z, N) => {
+    const F = w, R = b > 0 ? N * C / b - x : 0;
+    p.push([F, R]);
+  }), y(e, 0.7);
+  const P = [...m, ...u], G = {};
+  P.forEach((Z, N) => {
+    G[Z] = {
+      x: p[N][0],
+      y: p[N][1]
     };
   });
-  const E = ne(B, T, r, d);
-  y(t, 0.9);
-  const k = {};
-  return T.forEach((W) => {
-    k[W] = E[W];
-  }), i === "horizontal" && Object.keys(k).forEach((W) => {
-    const M = k[W].x;
-    k[W].x = k[W].y, k[W].y = M;
-  }), y(t, 1), k;
+  const M = nt(G, P, r, l);
+  y(e, 0.9);
+  const X = {};
+  return P.forEach((Z) => {
+    X[Z] = M[Z];
+  }), i === "horizontal" && Object.keys(X).forEach((Z) => {
+    const N = X[Z].x;
+    X[Z].x = X[Z].y, X[Z].y = N;
+  }), y(e, 1), X;
 }
-const He = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const Ht = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  BipartiteLayout: We,
+  BipartiteLayout: Wt,
   bipartiteCompute: os,
-  default: We
+  default: Wt
 }, Symbol.toStringTag, { value: "Module" }));
-class Ze extends V {
+class Zt extends V {
   /**
    * Create a multipartite layout instance
    *
@@ -3240,13 +3265,13 @@ class Ze extends V {
    * @param {number} [options.scale=1] - Scale factor for positions
    * @param {Object} [options.center={x:0, y:0}] - Center point
    */
-  constructor(e, t = {}) {
-    super(e, {
+  constructor(t, e = {}) {
+    super(t, {
       subsets: null,
       align: "vertical",
       scale: 1,
       center: { x: 0, y: 0 },
-      ...t
+      ...e
     }, {
       module: "../layouts/multipartite.js",
       functionName: "multipartiteCompute"
@@ -3254,70 +3279,70 @@ class Ze extends V {
   }
   // computePositions() inherited from base class - delegates to worker!
 }
-async function ns(n, e, t) {
-  const s = N(n), {
+async function ns(n, t, e) {
+  const s = L(n), {
     subsets: o = null,
     align: i = "vertical",
     scale: r = 1,
     center: a = { x: 0, y: 0 }
-  } = e || {}, d = Array.from(s.nodes), g = d.length;
-  if (g === 0)
-    return y(t, 1), {};
-  if (g === 1) {
-    const A = { [d[0]]: { x: a.x, y: a.y } };
-    return y(t, 1), A;
+  } = t || {}, l = Array.from(s.nodes), h = l.length;
+  if (h === 0)
+    return y(e, 1), {};
+  if (h === 1) {
+    const A = { [l[0]]: { x: a.x, y: a.y } };
+    return y(e, 1), A;
   }
-  y(t, 0.3);
-  let l;
+  y(e, 0.3);
+  let d;
   if (o && Object.keys(o).length > 0)
-    l = Object.keys(o).sort((m, w) => {
-      const x = parseInt(m), T = parseInt(w);
-      return isNaN(x) ? 1 : isNaN(T) ? -1 : x - T;
-    }).map((m) => o[m]);
+    d = Object.keys(o).sort((C, w) => {
+      const x = parseInt(C), P = parseInt(w);
+      return isNaN(x) ? 1 : isNaN(P) ? -1 : x - P;
+    }).map((C) => o[C]);
   else {
     const A = /* @__PURE__ */ new Map();
-    d.forEach((m, w) => {
+    l.forEach((C, w) => {
       const x = w % 3;
-      A.has(x) || A.set(x, []), A.get(x).push(m);
-    }), l = Array.from(A.values());
+      A.has(x) || A.set(x, []), A.get(x).push(C);
+    }), d = Array.from(A.values());
   }
-  y(t, 0.5);
-  const c = [], h = {}, u = l.length, p = u * 2 - 1;
-  l.forEach((A, m) => {
-    const w = A.length - 1 || 1, x = (m * 2 - p / 2) / (u - 1 || 1);
-    A.forEach((T, B) => {
-      const E = w > 0 ? 2 * B / w - 1 : 0;
-      c.push([x, E]);
+  y(e, 0.5);
+  const c = [], g = {}, m = d.length, u = m * 2 - 1;
+  d.forEach((A, C) => {
+    const w = A.length - 1 || 1, x = (C * 2 - u / 2) / (m - 1 || 1);
+    A.forEach((P, G) => {
+      const M = w > 0 ? 2 * G / w - 1 : 0;
+      c.push([x, M]);
     });
-  }), y(t, 0.7);
-  const b = [];
-  l.forEach((A) => {
-    A.forEach((m) => {
-      b.push(m);
+  }), y(e, 0.7);
+  const p = [];
+  d.forEach((A) => {
+    A.forEach((C) => {
+      p.push(C);
     });
   });
   const v = {};
-  b.forEach((A, m) => {
+  p.forEach((A, C) => {
     v[A] = {
-      x: c[m][0],
-      y: c[m][1]
+      x: c[C][0],
+      y: c[C][1]
     };
   });
-  const C = ne(v, b, r, a);
-  return y(t, 0.9), b.forEach((A) => {
-    h[A] = C[A];
-  }), i === "horizontal" && Object.keys(h).forEach((A) => {
-    const m = h[A].x;
-    h[A].x = h[A].y, h[A].y = m;
-  }), y(t, 1), h;
+  const b = nt(v, p, r, a);
+  return y(e, 0.9), p.forEach((A) => {
+    g[A] = b[A];
+  }), i === "horizontal" && Object.keys(g).forEach((A) => {
+    const C = g[A].x;
+    g[A].x = g[A].y, g[A].y = C;
+  }), y(e, 1), g;
 }
-const _e = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const Ot = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  MultipartiteLayout: Ze,
-  default: Ze,
+  MultipartiteLayout: Zt,
+  default: Zt,
   multipartiteCompute: ns
 }, Symbol.toStringTag, { value: "Module" }));
-class Xe extends V {
+class Xt extends V {
   /**
    * Create a BFS layout instance
    *
@@ -3328,13 +3353,13 @@ class Xe extends V {
    * @param {number} [options.scale=1] - Scale factor for positions
    * @param {Object} [options.center={x:0, y:0}] - Center point
    */
-  constructor(e, t = {}) {
-    super(e, {
+  constructor(t, e = {}) {
+    super(t, {
       startNode: null,
       align: "vertical",
       scale: 1,
       center: { x: 0, y: 0 },
-      ...t
+      ...e
     }, {
       module: "../layouts/bfs.js",
       functionName: "bfsCompute"
@@ -3342,156 +3367,156 @@ class Xe extends V {
   }
   // computePositions() inherited from base class - delegates to worker!
 }
-async function is(n, e, t) {
-  const s = N(n), {
+async function is(n, t, e) {
+  const s = L(n), {
     startNode: o = null,
     align: i = "vertical",
     scale: r = 1,
     center: a = { x: 0, y: 0 }
-  } = e || {}, d = Array.from(s.nodes), g = d.length;
-  if (g === 0)
-    return y(t, 1), {};
-  if (g === 1) {
-    const m = { [d[0]]: { x: a.x, y: a.y } };
-    return y(t, 1), m;
+  } = t || {}, l = Array.from(s.nodes), h = l.length;
+  if (h === 0)
+    return y(e, 1), {};
+  if (h === 1) {
+    const C = { [l[0]]: { x: a.x, y: a.y } };
+    return y(e, 1), C;
   }
-  y(t, 0.2);
-  let l = o;
-  (!l || !d.includes(l)) && (l = d[0]), y(t, 0.3);
-  const c = rs(s, l);
-  y(t, 0.6);
-  const h = /* @__PURE__ */ new Set();
-  if (c.forEach((m) => {
-    m.forEach((w) => h.add(w));
-  }), h.size !== g) {
-    const m = d.filter((w) => !h.has(w));
-    m.length > 0 && c.push(m);
+  y(e, 0.2);
+  let d = o;
+  (!d || !l.includes(d)) && (d = l[0]), y(e, 0.3);
+  const c = rs(s, d);
+  y(e, 0.6);
+  const g = /* @__PURE__ */ new Set();
+  if (c.forEach((C) => {
+    C.forEach((w) => g.add(w));
+  }), g.size !== h) {
+    const C = l.filter((w) => !g.has(w));
+    C.length > 0 && c.push(C);
   }
-  y(t, 0.7);
-  const u = [], p = c.length;
-  Math.max(...c.map((m) => m.length)), c.forEach((m, w) => {
-    const x = p > 1 ? 2 * w / (p - 1) - 1 : 0, T = m.length - 1 || 1;
-    m.forEach((B, E) => {
-      const k = T > 0 ? 2 * E / T - 1 : 0;
-      u.push([x, k]);
+  y(e, 0.7);
+  const m = [], u = c.length;
+  Math.max(...c.map((C) => C.length)), c.forEach((C, w) => {
+    const x = u > 1 ? 2 * w / (u - 1) - 1 : 0, P = C.length - 1 || 1;
+    C.forEach((G, M) => {
+      const X = P > 0 ? 2 * M / P - 1 : 0;
+      m.push([x, X]);
     });
-  }), y(t, 0.85);
-  const b = [];
-  c.forEach((m) => {
-    m.forEach((w) => {
-      b.push(w);
+  }), y(e, 0.85);
+  const p = [];
+  c.forEach((C) => {
+    C.forEach((w) => {
+      p.push(w);
     });
   });
   const v = {};
-  b.forEach((m, w) => {
-    v[m] = {
-      x: u[w][0],
-      y: u[w][1]
+  p.forEach((C, w) => {
+    v[C] = {
+      x: m[w][0],
+      y: m[w][1]
     };
   });
-  const C = ne(v, b, r, a);
-  y(t, 0.95);
+  const b = nt(v, p, r, a);
+  y(e, 0.95);
   const A = {};
-  return b.forEach((m) => {
-    A[m] = C[m];
-  }), i === "horizontal" && Object.keys(A).forEach((m) => {
-    const w = A[m].x;
-    A[m].x = A[m].y, A[m].y = w;
-  }), y(t, 1), A;
+  return p.forEach((C) => {
+    A[C] = b[C];
+  }), i === "horizontal" && Object.keys(A).forEach((C) => {
+    const w = A[C].x;
+    A[C].x = A[C].y, A[C].y = w;
+  }), y(e, 1), A;
 }
-function rs(n, e, t) {
-  const s = [], o = /* @__PURE__ */ new Set(), i = [e];
+function rs(n, t, e) {
+  const s = [], o = /* @__PURE__ */ new Set(), i = [t];
   let r = [];
-  for (o.add(e); i.length > 0; ) {
+  for (o.add(t); i.length > 0; ) {
     const c = i.shift();
     r.push(c);
-    const u = (n.getNeighbors(c) || []).filter((p) => !o.has(p));
-    u.forEach((p) => {
-      o.add(p), i.push(p);
-    }), (i.length === 0 || u.length > 0) && r.length > 0 && (s.push([...r]), r = []);
+    const m = (n.getNeighbors(c) || []).filter((u) => !o.has(u));
+    m.forEach((u) => {
+      o.add(u), i.push(u);
+    }), (i.length === 0 || m.length > 0) && r.length > 0 && (s.push([...r]), r = []);
   }
   s.length = 0, r = [];
-  const a = /* @__PURE__ */ new Map(), d = [e];
-  let g = 0;
-  a.set(e, 0);
-  let l = 0;
-  for (; g < d.length; ) {
-    const c = d[g], h = a.get(c);
-    h > l && (r.length > 0 && (s.push([...r]), r = []), l = h), r.push(c), (n.getNeighbors(c) || []).forEach((p) => {
-      a.has(p) || (a.set(p, h + 1), d.push(p));
-    }), g++;
+  const a = /* @__PURE__ */ new Map(), l = [t];
+  let h = 0;
+  a.set(t, 0);
+  let d = 0;
+  for (; h < l.length; ) {
+    const c = l[h], g = a.get(c);
+    g > d && (r.length > 0 && (s.push([...r]), r = []), d = g), r.push(c), (n.getNeighbors(c) || []).forEach((u) => {
+      a.has(u) || (a.set(u, g + 1), l.push(u));
+    }), h++;
   }
   return r.length > 0 && s.push([...r]), s;
 }
-const Ue = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const _t = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  BFSLayout: Xe,
+  BFSLayout: Xt,
   bfsCompute: is,
-  default: Xe
-}, Symbol.toStringTag, { value: "Module" })), ie = re({
+  default: Xt
+}, Symbol.toStringTag, { value: "Module" })), it = rt({
   prefix: "network-worker",
   level: "info"
   // Workers default to info level
-}), de = {
+}), dt = {
   // Node-level statistics (all in one file)
-  "../statistics/algorithms/node-stats.js": Ee,
+  "../statistics/algorithms/node-stats.js": Et,
   // Graph-level statistics
-  "../statistics/algorithms/graph-stats.js": Re,
+  "../statistics/algorithms/graph-stats.js": Rt,
   // Community
-  "../community/algorithms/louvain.js": ze,
+  "../community/algorithms/louvain.js": zt,
   // Layouts
-  "../layouts/random.js": Je,
-  "../layouts/circular.js": Fe,
-  "../layouts/spiral.js": Ke,
-  "../layouts/shell.js": Se,
-  "../layouts/spectral.js": Ye,
-  "../layouts/force-directed.js": je,
-  "../layouts/kamada-kawai.js": Ve,
-  "../layouts/bipartite.js": He,
-  "../layouts/multipartite.js": _e,
-  "../layouts/bfs.js": Ue
+  "../layouts/random.js": Ft,
+  "../layouts/circular.js": Jt,
+  "../layouts/spiral.js": Kt,
+  "../layouts/shell.js": jt,
+  "../layouts/spectral.js": St,
+  "../layouts/force-directed.js": Yt,
+  "../layouts/kamada-kawai.js": Vt,
+  "../layouts/bipartite.js": Ht,
+  "../layouts/multipartite.js": Ot,
+  "../layouts/bfs.js": _t
 };
 self.onmessage = async function(n) {
-  const { id: e, module: t, functionName: s, args: o = [] } = n.data;
+  const { id: t, module: e, functionName: s, args: o = [] } = n.data;
   try {
-    if (!t || !s)
+    if (!e || !s)
       throw new Error("Invalid task: module and functionName are required");
-    ie.debug("Processing task", {
-      id: e,
-      module: t,
+    it.debug("Processing task", {
+      id: t,
+      module: e,
       functionName: s,
       argsLength: o?.length || 0
     });
-    const i = (g) => {
+    const i = (h) => {
       self.postMessage({
-        id: e,
+        id: t,
         status: "progress",
-        progress: Math.min(Math.max(g, 0), 1)
+        progress: Math.min(Math.max(h, 0), 1)
         // Clamp to [0, 1]
       });
-    }, r = de[t];
+    }, r = dt[e];
     if (!r)
       throw new Error(
-        `Module '${t}' not found in registry. Available modules: ${Object.keys(de).join(", ")}`
+        `Module '${e}' not found in registry. Available modules: ${Object.keys(dt).join(", ")}`
       );
     const a = r[s];
     if (!a || typeof a != "function")
       throw new Error(
-        `Function '${s}' not found in module '${t}'. Available functions: ${Object.keys(r).join(", ")}`
+        `Function '${s}' not found in module '${e}'. Available functions: ${Object.keys(r).join(", ")}`
       );
-    const d = await a(...o, i);
+    const l = await a(...o, i);
     self.postMessage({
-      id: e,
+      id: t,
       status: "complete",
-      result: d
+      result: l
     });
   } catch (i) {
-    ie.error("Task failed", {
-      id: e,
+    it.error("Task failed", {
+      id: t,
       error: i.message,
       stack: i.stack
     }), self.postMessage({
-      id: e,
+      id: t,
       status: "error",
       error: i.message || "Unknown error",
       stack: i.stack
@@ -3499,7 +3524,7 @@ self.onmessage = async function(n) {
   }
 };
 self.onerror = function(n) {
-  ie.error("Worker error", {
+  it.error("Worker error", {
     error: n.message || "Worker error occurred",
     stack: n.stack
   }), self.postMessage({
@@ -3507,39 +3532,39 @@ self.onerror = function(n) {
     error: n.message || "Worker error occurred"
   });
 };
-ie.info("Initialized", { moduleCount: Object.keys(de).length });
-const he = {
+it.info("Initialized", { moduleCount: Object.keys(dt).length });
+const ht = {
   // Node-level statistics (all in one file)
-  "../statistics/algorithms/node-stats.js": Ee,
+  "../statistics/algorithms/node-stats.js": Et,
   // Graph-level statistics
-  "../statistics/algorithms/graph-stats.js": Re,
+  "../statistics/algorithms/graph-stats.js": Rt,
   // Community
-  "../community/algorithms/louvain.js": ze,
+  "../community/algorithms/louvain.js": zt,
   // Layouts
-  "../layouts/random.js": Je,
-  "../layouts/circular.js": Fe,
-  "../layouts/spiral.js": Ke,
-  "../layouts/shell.js": Se,
-  "../layouts/spectral.js": Ye,
-  "../layouts/force-directed.js": je,
-  "../layouts/kamada-kawai.js": Ve,
-  "../layouts/bipartite.js": He,
-  "../layouts/multipartite.js": _e,
-  "../layouts/bfs.js": Ue
+  "../layouts/random.js": Ft,
+  "../layouts/circular.js": Jt,
+  "../layouts/spiral.js": Kt,
+  "../layouts/shell.js": jt,
+  "../layouts/spectral.js": St,
+  "../layouts/force-directed.js": Yt,
+  "../layouts/kamada-kawai.js": Vt,
+  "../layouts/bipartite.js": Ht,
+  "../layouts/multipartite.js": Ot,
+  "../layouts/bfs.js": _t
 };
 async function as(n) {
-  const { module: e, functionName: t, args: s = [] } = n;
-  if (!e || !t)
+  const { module: t, functionName: e, args: s = [] } = n;
+  if (!t || !e)
     throw new Error("Invalid task: module and functionName are required");
-  const o = he[e];
+  const o = ht[t];
   if (!o)
     throw new Error(
-      `Module '${e}' not found in registry. Available modules: ${Object.keys(he).join(", ")}`
+      `Module '${t}' not found in registry. Available modules: ${Object.keys(ht).join(", ")}`
     );
-  const i = o[t];
+  const i = o[e];
   if (!i || typeof i != "function")
     throw new Error(
-      `Function '${t}' not found in module '${e}'. Available functions: ${Object.keys(o).join(", ")}`
+      `Function '${e}' not found in module '${t}'. Available functions: ${Object.keys(o).join(", ")}`
     );
   const r = () => {
   };
@@ -3547,7 +3572,7 @@ async function as(n) {
 }
 const cs = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  MODULE_REGISTRY: he,
+  MODULE_REGISTRY: ht,
   executeTask: as
 }, Symbol.toStringTag, { value: "Module" }));
 //# sourceMappingURL=network-worker.js.map
