@@ -105,8 +105,21 @@ export async function shellCompute(graphData, options, progressCallback) {
     center = { x: 0, y: 0 },
     nlist = null,
     rotate = null,
-    nodeProperties = null  // Map of node ID -> {degree, ...properties}
+    nodeProperties = null  // Map or Object of node ID -> {degree, ...properties}
   } = options || {};
+
+  // Handle nodeProperties as either Map or plain Object (for worker transfer compatibility)
+  const isMap = nodeProperties instanceof Map;
+  const isObject = nodeProperties && typeof nodeProperties === 'object' && !isMap;
+  const hasNodeProps = isMap ? nodeProperties.size > 0 :
+                       isObject ? Object.keys(nodeProperties).length > 0 : false;
+
+  // Helper to get node properties (works with both Map and Object)
+  const getNodeProps = (nodeId) => {
+    if (isMap) return nodeProperties.get(nodeId);
+    if (isObject) return nodeProperties[nodeId];
+    return null;
+  };
 
   // Handle edge cases
   if (n === 0) {
@@ -132,11 +145,11 @@ export async function shellCompute(graphData, options, progressCallback) {
 
     let nodeDegrees = new Map();
 
-    if (nodeProperties && nodeProperties.size > 0) {
+    if (hasNodeProps) {
       // Use pre-computed degree from nodeProperties (passed from caller who has already computed it)
       // This is the DRY approach - don't recompute what's already been calculated
       nodes.forEach(node => {
-        const props = nodeProperties.get(node);
+        const props = getNodeProps(node);
         const degree = props && typeof props === 'object' ? (props.degree || 0) : 0;
         nodeDegrees.set(node, degree);
       });

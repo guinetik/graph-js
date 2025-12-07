@@ -96,14 +96,26 @@ export async function spectralCompute(graphData, options, progressCallback) {
   const n = nodes.length;
 
   console.log('[spectralCompute] Starting with', n, 'nodes');
+  console.log('[spectralCompute] Raw options:', options);
+  console.log('[spectralCompute] Raw options keys:', options ? Object.keys(options) : 'null');
+  console.log('[spectralCompute] nodeProperties in options:', options?.nodeProperties);
 
   const {
     scale = 1,
     center = { x: 0, y: 0 },
-    nodeProperties = null  // Map of node ID -> {laplacian_x, laplacian_y}
+    nodeProperties = null  // Map or Object of node ID -> {laplacian_x, laplacian_y}
   } = options || {};
 
-  console.log('[spectralCompute] nodeProperties:', nodeProperties ? `Map with ${nodeProperties.size} entries` : 'null');
+  // Handle nodeProperties as either Map or plain Object (for worker transfer compatibility)
+  // Maps may lose their prototype during structured cloning in some environments
+  const isMap = nodeProperties instanceof Map;
+  const isObject = nodeProperties && typeof nodeProperties === 'object' && !isMap;
+  const hasNodeProps = isMap ? nodeProperties.size > 0 :
+                       isObject ? Object.keys(nodeProperties).length > 0 : false;
+
+  console.log('[spectralCompute] nodeProperties:',
+    isMap ? `Map with ${nodeProperties.size} entries` :
+    isObject ? `Object with ${Object.keys(nodeProperties).length} entries` : 'null');
 
   // Handle edge cases
   if (n === 0) {
@@ -121,41 +133,47 @@ export async function spectralCompute(graphData, options, progressCallback) {
   const positions = {};
   const coords = [];  // Array of [x, y] for rescaling
 
-  // Get laplacian coordinates from options.nodeProperties (pre-computed during analysis)
-  const nodeProps = nodeProperties || new Map();
+  // Helper to get node properties (works with both Map and Object)
+  const getNodeProps = (nodeId) => {
+    if (isMap) return nodeProperties.get(nodeId);
+    if (isObject) return nodeProperties[nodeId];
+    return null;
+  };
 
   console.log('[spectralCompute] Processing', n, 'nodes for eigenvector extraction');
+
+  // Track nodes without laplacian data for fallback positioning
+  const missingNodes = [];
 
   for (const node of nodes) {
     let x, y;
 
     // Try to get from nodeProperties first (DRY principle - pre-computed)
-    if (nodeProps && nodeProps.size > 0) {
-      const props = nodeProps.get(node);
+    if (hasNodeProps) {
+      const props = getNodeProps(node);
       if (props && props.laplacian_x !== undefined && props.laplacian_y !== undefined) {
         x = props.laplacian_x;
         y = props.laplacian_y;
       } else {
-        throw new Error(
-          `Spectral layout requires eigenvector-laplacian stat. ` +
-          `Node "${node}" missing laplacian_x/laplacian_y. ` +
-          `Include 'eigenvector-laplacian' in analyze() features.`
-        );
+        // Node missing laplacian data (likely disconnected or in separate component)
+        // Use fallback position - will be placed near center with random offset
+        missingNodes.push(node);
+        x = (Math.random() - 0.5) * 0.1;  // Small random offset
+        y = (Math.random() - 0.5) * 0.1;
+        console.log(`[spectralCompute] Node "${node}" missing laplacian data, using fallback position`);
       }
     } else {
-      // Fallback: try to get from node data directly (if passed in)
-      // This handles case where node object itself has the properties
-      if (graphData.nodes && typeof graphData.nodes[Symbol.iterator] === 'function') {
-        // nodes is iterable, but we need to get actual node objects
-        // This is a bit tricky - we'll throw error asking for proper data
-        throw new Error(
-          `Spectral layout requires eigenvector-laplacian stat. ` +
-          `Include 'eigenvector-laplacian' in analyze() features.`
-        );
-      }
+      throw new Error(
+        `Spectral layout requires eigenvector-laplacian stat. ` +
+        `Include 'eigenvector-laplacian' in analyze() features.`
+      );
     }
 
     coords.push([x, y]);
+  }
+
+  if (missingNodes.length > 0) {
+    console.log(`[spectralCompute] ${missingNodes.length} nodes missing laplacian data, used fallback positions`);
   }
 
   console.log('[spectralCompute] Extracted', coords.length, 'coordinates. Sample:', coords[0]);

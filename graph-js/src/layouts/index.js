@@ -17,6 +17,7 @@
  * - `BipartiteLayout`: Two-layer layout for bipartite graphs (O(V))
  * - `MultipartiteLayout`: Multi-layer layout for hierarchical graphs (O(V))
  * - `BFSLayout`: Layer layout based on breadth-first search (O(V + E))
+ * - `RadialLayout`: Concentric circles from center node (O(V + E)) - ideal for ego networks
  *
  * **Utilities**:
  * - `rescaleLayout`: Rescale positions to fit in specified range
@@ -36,6 +37,7 @@ export { KamadaKawaiLayout } from './kamada-kawai.js';
 export { BipartiteLayout } from './bipartite.js';
 export { MultipartiteLayout } from './multipartite.js';
 export { BFSLayout } from './bfs.js';
+export { RadialLayout } from './radial.js';
 export {
   rescaleLayout,
   randomLayout,
@@ -164,6 +166,15 @@ export const LAYOUT_REGISTRY = {
       category: 'hierarchical',
       complexity: 'O(n + m)',
       bestFor: ['Trees', 'Network exploration'],
+      requiresStats: false
+    },
+    {
+      id: 'radial',
+      name: 'Radial',
+      description: 'Concentric circles from a center node (BFS-based)',
+      category: 'hierarchical',
+      complexity: 'O(n + m)',
+      bestFor: ['Star networks', 'Ego networks', 'Kevin Bacon style'],
       requiresStats: false
     }
   ],

@@ -43,6 +43,7 @@ import * as kamadaKawaiCompute from '../layouts/kamada-kawai.js';
 import * as bipartiteCompute from '../layouts/bipartite.js';
 import * as multipartiteCompute from '../layouts/multipartite.js';
 import * as bfsCompute from '../layouts/bfs.js';
+import * as radialCompute from '../layouts/radial.js';
 
 // ============================================================================
 // MODULE REGISTRY - Maps module paths to their exports
@@ -68,7 +69,8 @@ const MODULE_REGISTRY = {
   '../layouts/kamada-kawai.js': kamadaKawaiCompute,
   '../layouts/bipartite.js': bipartiteCompute,
   '../layouts/multipartite.js': multipartiteCompute,
-  '../layouts/bfs.js': bfsCompute
+  '../layouts/bfs.js': bfsCompute,
+  '../layouts/radial.js': radialCompute
 };
 
 // ============================================================================
