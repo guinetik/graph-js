@@ -10,7 +10,7 @@ aliases: ["layouts", "layout-algorithms"]
 
 # Layout Algorithms Overview
 
-graph-js provides 13 layout algorithms for computing node positions for visualization.
+graph-js provides 14 layout algorithms for computing node positions for visualization.
 
 ## Available Layouts
 
@@ -29,6 +29,7 @@ graph-js provides 13 layout algorithms for computing node positions for visualiz
 | [[layout-bfs]] | Hierarchical | O(n + m) | Trees, exploration |
 | [[layout-dfs]] | Hierarchical | O(n + m) | Tree structures, call graphs |
 | [[layout-radial]] | Hierarchical | O(n + m) | Ego networks, star topology |
+| [[layout-force-directed-3d]] | Physics (3D) | O(iter·n²) | 3D visualization, VR/AR |
 
 > **Note:** "None" uses D3's built-in force simulation instead of a custom layout algorithm.
 
@@ -98,6 +99,7 @@ Some layouts require pre-computed statistics:
 - **Hierarchies**: [[layout-multipartite]]
 - **Ego networks**: [[layout-radial]]
 - **Call graphs**: [[layout-dfs]]
+- **3D visualization**: [[layout-force-directed-3d]]
 
 ## Related Notes
 
@@ -114,5 +116,6 @@ Some layouts require pre-computed statistics:
 - [[layout-bfs]] - BFSLayout details
 - [[layout-dfs]] - DFSLayout details
 - [[layout-radial]] - RadialLayout details
+- [[layout-force-directed-3d]] - ForceDirected3DLayout details (3D)
 
 

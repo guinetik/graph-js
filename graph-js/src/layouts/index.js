@@ -19,6 +19,7 @@
  * - `BFSLayout`: Layer layout based on breadth-first search (O(V + E))
  * - `DFSLayout`: Nested tree layout via depth-first search (O(V + E))
  * - `RadialLayout`: Concentric circles from center node (O(V + E)) - ideal for ego networks
+ * - `ForceDirected3DLayout`: 3D Fruchterman-Reingold layout (O(iterations × V²)) - for 3D visualization
  *
  * **Utilities**:
  * - `rescaleLayout`: Rescale positions to fit in specified range
@@ -40,11 +41,17 @@ export { MultipartiteLayout } from './multipartite.js';
 export { BFSLayout } from './bfs.js';
 export { DFSLayout } from './dfs.js';
 export { RadialLayout } from './radial.js';
+export { ForceDirected3DLayout } from './force-directed-3d.js';
 export {
   rescaleLayout,
   randomLayout,
   getBoundingBox,
-  distance
+  distance,
+  // 3D utilities
+  rescaleLayout3D,
+  randomLayout3D,
+  getBoundingBox3D,
+  distance3D
 } from './layout-utils.js';
 
 /**
@@ -187,6 +194,16 @@ export const LAYOUT_REGISTRY = {
       complexity: 'O(n + m)',
       bestFor: ['Star networks', 'Ego networks', 'Kevin Bacon style'],
       requiresStats: false
+    },
+    {
+      id: 'force-directed-3d',
+      name: 'Force Directed 3D',
+      description: '3D Fruchterman-Reingold force simulation',
+      category: 'physics',
+      complexity: 'O(iterations × n²)',
+      bestFor: ['3D visualization', 'VR/AR exploration', 'Large networks'],
+      requiresStats: false,
+      is3D: true
     }
   ],
 

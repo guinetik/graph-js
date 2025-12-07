@@ -24,6 +24,7 @@ import * as multipartiteCompute from '../layouts/multipartite.js';
 import * as bfsCompute from '../layouts/bfs.js';
 import * as dfsCompute from '../layouts/dfs.js';
 import * as radialCompute from '../layouts/radial.js';
+import * as forceDirected3DCompute from '../layouts/force-directed-3d.js';
 
 /**
  * Registry mapping module paths to their exports
@@ -50,7 +51,8 @@ export const MODULE_REGISTRY = {
   '../layouts/multipartite.js': multipartiteCompute,
   '../layouts/bfs.js': bfsCompute,
   '../layouts/dfs.js': dfsCompute,
-  '../layouts/radial.js': radialCompute
+  '../layouts/radial.js': radialCompute,
+  '../layouts/force-directed-3d.js': forceDirected3DCompute
 };
 
 /**
