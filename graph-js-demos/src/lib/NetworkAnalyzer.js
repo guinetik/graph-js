@@ -44,6 +44,7 @@ import {
   BipartiteLayout,
   MultipartiteLayout,
   BFSLayout,
+  DFSLayout,
   RadialLayout
 } from '@guinetik/graph-js';
 
@@ -399,6 +400,16 @@ export class NetworkAnalyzer {
         const startNode = nodes[0]?.id || Array.from(graph.nodes)[0];
         layout = new BFSLayout(graph, {
           startNode,
+          align: 'vertical',
+          ...layoutConfig
+        });
+        break;
+
+      case 'dfs':
+        // Use first node as start for DFS tree
+        const dfsStartNode = nodes[0]?.id || Array.from(graph.nodes)[0];
+        layout = new DFSLayout(graph, {
+          startNode: dfsStartNode,
           align: 'vertical',
           ...layoutConfig
         });

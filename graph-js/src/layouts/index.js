@@ -17,6 +17,7 @@
  * - `BipartiteLayout`: Two-layer layout for bipartite graphs (O(V))
  * - `MultipartiteLayout`: Multi-layer layout for hierarchical graphs (O(V))
  * - `BFSLayout`: Layer layout based on breadth-first search (O(V + E))
+ * - `DFSLayout`: Nested tree layout via depth-first search (O(V + E))
  * - `RadialLayout`: Concentric circles from center node (O(V + E)) - ideal for ego networks
  *
  * **Utilities**:
@@ -37,6 +38,7 @@ export { KamadaKawaiLayout } from './kamada-kawai.js';
 export { BipartiteLayout } from './bipartite.js';
 export { MultipartiteLayout } from './multipartite.js';
 export { BFSLayout } from './bfs.js';
+export { DFSLayout } from './dfs.js';
 export { RadialLayout } from './radial.js';
 export {
   rescaleLayout,
@@ -166,6 +168,15 @@ export const LAYOUT_REGISTRY = {
       category: 'hierarchical',
       complexity: 'O(n + m)',
       bestFor: ['Trees', 'Network exploration'],
+      requiresStats: false
+    },
+    {
+      id: 'dfs',
+      name: 'DFS Tree',
+      description: 'Nested tree layout via depth-first search',
+      category: 'hierarchical',
+      complexity: 'O(n + m)',
+      bestFor: ['Tree structures', 'Recursive patterns', 'Call graphs'],
       requiresStats: false
     },
     {

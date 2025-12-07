@@ -10,7 +10,7 @@ aliases: ["layouts", "layout-algorithms"]
 
 # Layout Algorithms Overview
 
-graph-js provides 11 layout algorithms for computing node positions for visualization.
+graph-js provides 13 layout algorithms for computing node positions for visualization.
 
 ## Available Layouts
 
@@ -27,6 +27,8 @@ graph-js provides 11 layout algorithms for computing node positions for visualiz
 | [[layout-bipartite]] | Hierarchical | O(n) | Two-layer graphs |
 | [[layout-multipartite]] | Hierarchical | O(n) | DAGs, hierarchies |
 | [[layout-bfs]] | Hierarchical | O(n + m) | Trees, exploration |
+| [[layout-dfs]] | Hierarchical | O(n + m) | Tree structures, call graphs |
+| [[layout-radial]] | Hierarchical | O(n + m) | Ego networks, star topology |
 
 > **Note:** "None" uses D3's built-in force simulation instead of a custom layout algorithm.
 
@@ -92,8 +94,10 @@ Some layouts require pre-computed statistics:
 - **Small graphs**: [[layout-kamada-kawai]]
 - **Symmetric graphs**: [[layout-circular]]
 - **Communities**: [[layout-spectral]]
-- **Trees**: [[layout-bfs]] or [[layout-kamada-kawai]]
+- **Trees**: [[layout-bfs]], [[layout-dfs]], or [[layout-kamada-kawai]]
 - **Hierarchies**: [[layout-multipartite]]
+- **Ego networks**: [[layout-radial]]
+- **Call graphs**: [[layout-dfs]]
 
 ## Related Notes
 
@@ -108,5 +112,7 @@ Some layouts require pre-computed statistics:
 - [[layout-bipartite]] - BipartiteLayout details
 - [[layout-multipartite]] - MultipartiteLayout details
 - [[layout-bfs]] - BFSLayout details
+- [[layout-dfs]] - DFSLayout details
+- [[layout-radial]] - RadialLayout details
 
 

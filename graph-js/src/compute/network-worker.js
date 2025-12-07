@@ -43,6 +43,7 @@ import * as kamadaKawaiCompute from '../layouts/kamada-kawai.js';
 import * as bipartiteCompute from '../layouts/bipartite.js';
 import * as multipartiteCompute from '../layouts/multipartite.js';
 import * as bfsCompute from '../layouts/bfs.js';
+import * as dfsCompute from '../layouts/dfs.js';
 import * as radialCompute from '../layouts/radial.js';
 
 // ============================================================================
@@ -70,6 +71,7 @@ const MODULE_REGISTRY = {
   '../layouts/bipartite.js': bipartiteCompute,
   '../layouts/multipartite.js': multipartiteCompute,
   '../layouts/bfs.js': bfsCompute,
+  '../layouts/dfs.js': dfsCompute,
   '../layouts/radial.js': radialCompute
 };
 
